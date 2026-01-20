@@ -1,5 +1,4 @@
 import { prisma } from "@/lib/prisma";
-import Image from "next/image";
 import { Package, Search } from "lucide-react";
 import BlurFade from "@/components/magicui/blur-fade";
 import { BorderBeam } from "@/components/magicui/border-beam";
@@ -19,7 +18,7 @@ async function getItems() {
       },
       orderBy: { createdAt: "desc" },
     });
-  } catch (e) {
+  } catch {
     return [];
   }
 }
@@ -51,6 +50,7 @@ export default async function Home() {
             <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/10">
               <div className="relative aspect-[4/3] w-full overflow-hidden">
                 {item.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={item.imageUrl}
                     alt={item.title}
@@ -82,7 +82,7 @@ export default async function Home() {
 
               <CardFooter className="p-4 pt-0">
                 <Button className="w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground">
-                  Voir l'offre
+                  Voir l&apos;offre
                 </Button>
               </CardFooter>
 
