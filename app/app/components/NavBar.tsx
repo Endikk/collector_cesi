@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { LogOut, PlusCircle, Sparkles } from "lucide-react";
+import { LogOut, PlusCircle, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,
@@ -22,9 +22,9 @@ export default function NavBar() {
         <BlurFade delay={0.1} className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <div className="container flex h-16 items-center justify-between">
                 <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tighter">
-                    <Sparkles className="h-6 w-6 text-yellow-500" />
+                    <PackageSearch className="h-6 w-6 text-yellow-500" />
                     <span className="bg-gradient-to-r from-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                        Collector.shop
+                        Collector
                     </span>
                 </Link>
 
