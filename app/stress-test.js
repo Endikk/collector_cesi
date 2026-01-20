@@ -7,9 +7,9 @@ const TARGET_URL = 'http://localhost:3000'; // Adjust if needed
 const CONCURRENT_USERS = 50;
 const TOTAL_REQUESTS = 500;
 
-console.log(`🚀 Starting stress test on ${TARGET_URL}`);
-console.log(`👉 Concurrent Users: ${CONCURRENT_USERS}`);
-console.log(`👉 Total Requests target: ${TOTAL_REQUESTS}`);
+console.log(`🚀 Lancement du test de charge sur ${TARGET_URL}`);
+console.log(`👉 Utilisateurs simultanés: ${CONCURRENT_USERS}`);
+console.log(`👉 Objectif de requêtes: ${TOTAL_REQUESTS}`);
 
 let completed = 0;
 let errors = 0;
@@ -24,7 +24,7 @@ async function simulateUser(id) {
         times.push(duration);
     } catch (e) {
         errors++;
-        // console.error(`❌ User ${id} failed:`, e.message);
+        console.error(`❌ User ${id} failed:`, e.message);
     } finally {
         completed++;
         process.stdout.write(`\rProgress: ${completed}/${TOTAL_REQUESTS} (Errors: ${errors})`);
@@ -51,14 +51,14 @@ async function run() {
     const avgTime = times.reduce((a, b) => a + b, 0) / times.length;
     const p95 = times.sort((a, b) => a - b)[Math.floor(times.length * 0.95)];
 
-    console.log('\n\n✨ Test Completed!');
+    console.log('\n\n✨ Test Terminé !');
     console.log(`-------------------------------------------`);
-    console.log(`⏱️  Total Duration: ${totalTime.toFixed(2)}s`);
-    console.log(`✅ Successful Requests: ${completed - errors}`);
-    console.log(`❌ Failed Requests: ${errors}`);
-    console.log(`Requests/sec: ${(completed / totalTime).toFixed(2)}`);
-    console.log(`Avg Latency: ${avgTime.toFixed(2)}ms`);
-    console.log(`P95 Latency: ${p95?.toFixed(2)}ms`);
+    console.log(`⏱️  Durée Totale: ${totalTime.toFixed(2)}s`);
+    console.log(`✅ Requêtes Réussies: ${completed - errors}`);
+    console.log(`❌ Requêtes Echouées: ${errors}`);
+    console.log(`Requêtes/sec: ${(completed / totalTime).toFixed(2)}`);
+    console.log(`Latence Moy.: ${avgTime.toFixed(2)}ms`);
+    console.log(`Latence P95: ${p95?.toFixed(2)}ms`);
     console.log(`-------------------------------------------`);
 }
 

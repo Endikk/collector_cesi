@@ -39,7 +39,7 @@ vi.mock("@/components/magicui/border-beam", () => ({
     BorderBeam: () => <div data-testid="border-beam" />,
 }));
 
-test("Home Page renders items correctly", async () => {
+test("La page d'accueil affiche les objets correctement", async () => {
     const jsx = await Home();
     render(jsx);
 

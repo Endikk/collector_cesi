@@ -25,7 +25,7 @@ vi.mock("@/components/magicui/blur-fade", () => ({
 }));
 
 
-test("Sell Page renders form correctly", () => {
+test("La page de vente affiche le formulaire", () => {
     render(<SellPage />);
 
     // Check for Title input
@@ -41,7 +41,7 @@ test("Sell Page renders form correctly", () => {
     expect(screen.getByRole("button", { name: /Publier/i })).toBeDefined();
 });
 
-test("Sell Page handles input changes", () => {
+test("Le formulaire gère la saisie utilisateur", () => {
     render(<SellPage />);
 
     const titleInput = screen.getByLabelText(/Titre/i) as HTMLInputElement;

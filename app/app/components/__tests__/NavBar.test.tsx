@@ -9,7 +9,7 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe('NavBar', () => {
-    it('renders login button when unauthenticated', () => {
+    it('affiche le bouton de connexion si non authentifié', () => {
         render(<NavBar />)
         expect(screen.getByText('Connexion')).toBeDefined()
     })
