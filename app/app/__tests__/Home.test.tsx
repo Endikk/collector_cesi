@@ -39,6 +39,13 @@ vi.mock("@/components/magicui/border-beam", () => ({
     BorderBeam: () => <div data-testid="border-beam" />,
 }));
 
+// Mock next-auth to avoid "headers called outside request scope" error
+vi.mock("next-auth", () => ({
+    __esModule: true,
+    default: vi.fn(),
+    getServerSession: vi.fn().mockResolvedValue({ user: { id: "user-1", name: "Test User" } }),
+}));
+
 test("La page d'accueil affiche les objets correctement", async () => {
     const jsx = await Home();
     render(jsx);
