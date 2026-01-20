@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { LogOut, PlusCircle, User as UserIcon, Sparkles } from "lucide-react";
+import { LogOut, PlusCircle, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
     DropdownMenu,

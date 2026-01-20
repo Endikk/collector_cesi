@@ -34,7 +34,7 @@ export default function RegisterPage() {
                 const data = await res.json();
                 setError(data.message || "Registration failed");
             }
-        } catch (err) {
+        } catch {
             setError("Something went wrong");
         }
     };
@@ -49,7 +49,7 @@ export default function RegisterPage() {
                     <CardHeader className="space-y-1">
                         <CardTitle className="text-2xl font-bold text-center">Créer un compte</CardTitle>
                         <CardDescription className="text-center">
-                            Rejoignez la communauté Collector dès aujourd'hui
+                            Rejoignez la communauté Collector dès aujourd&apos;hui
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -94,7 +94,7 @@ export default function RegisterPage() {
                                 />
                             </div>
                             <Button type="submit" className="w-full font-bold bg-emerald-600 hover:bg-emerald-700">
-                                S'inscrire
+                                S&apos;inscrire
                             </Button>
                         </form>
                     </CardContent>

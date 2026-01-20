@@ -71,7 +71,7 @@ export default function SellPage() {
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-6">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Titre de l'objet</Label>
+                                <Label htmlFor="title">Titre de l&apos;objet</Label>
                                 <Input
                                     id="title"
                                     value={title}
@@ -126,6 +126,7 @@ export default function SellPage() {
 
                             {imageUrl && (
                                 <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img src={imageUrl} alt="Preview" className="h-full w-full object-cover" />
                                 </div>
                             )}
