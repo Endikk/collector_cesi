@@ -5,6 +5,9 @@ import BlurFade from "@/components/magicui/blur-fade";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]/route";
+import ItemDeleteButton from "./components/ItemDeleteButton";
 
 export const revalidate = 10;
 
@@ -25,6 +28,10 @@ async function getItems() {
 
 export default async function Home() {
   const items = await getItems();
+  const session = await getServerSession(authOptions);
+
+
+
   const BLUR_FADE_DELAY = 0.04;
 
   return (
@@ -44,7 +51,7 @@ export default async function Home() {
         </div>
       </BlurFade>
 
-      <div id="catalogue" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div id="catalogue" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 scroll-mt-24">
         {items.map((item, idx) => (
           <BlurFade key={item.id} delay={BLUR_FADE_DELAY * 2 + idx * 0.05} inView>
             <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/10">
@@ -61,6 +68,14 @@ export default async function Home() {
                     <Package className="h-12 w-12 text-muted-foreground/50" />
                   </div>
                 )}
+
+                {/* Delete Button for Owner */}
+                {session?.user && (session.user.id === item.ownerId) && (
+                  <div className="absolute top-3 left-3 z-[20]">
+                    <ItemDeleteButton itemId={item.id} />
+                  </div>
+                )}
+
                 <div className="absolute top-3 right-3">
                   <Badge className="bg-background/80 backdrop-blur text-foreground border-0 font-bold shadow-sm">
                     {item.price.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
@@ -105,3 +120,4 @@ export default async function Home() {
     </div>
   );
 }
+
