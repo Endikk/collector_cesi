@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Package, Search } from "lucide-react";
 import BlurFade from "@/components/magicui/blur-fade";
-import { BorderBeam } from "@/components/magicui/border-beam";
+
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,7 +44,7 @@ export default async function Home() {
         </div>
       </BlurFade>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div id="catalogue" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item, idx) => (
           <BlurFade key={item.id} delay={BLUR_FADE_DELAY * 2 + idx * 0.05} inView>
             <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/10">
@@ -87,12 +87,7 @@ export default async function Home() {
               </CardFooter>
 
               {/* Shine effect on hover */}
-              <BorderBeam
-                size={250}
-                duration={12}
-                delay={9}
-                className="opacity-0 group-hover:opacity-100 transition-opacity"
-              />
+
             </Card>
           </BlurFade>
         ))}

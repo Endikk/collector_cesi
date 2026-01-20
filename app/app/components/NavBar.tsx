@@ -32,7 +32,7 @@ export default function NavBar() {
                     {session ? (
                         <>
                             <Button asChild variant="ghost" className="text-muted-foreground hover:text-foreground">
-                                <Link href="/">Catalogue</Link>
+                                <Link href="/#catalogue">Catalogue</Link>
                             </Button>
 
                             <Button asChild className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 border-0">
