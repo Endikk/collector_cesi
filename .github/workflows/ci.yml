@@ -106,10 +106,28 @@ jobs:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
       
-      - name: 🚚 Deploy to Staging
+      - name: 🚚 Deploy to Staging (Simulation)
         run: |
-          echo "Simulating deployment to RECETTE environment..."
-          # Insert actual deployment script here (e.g., Docker Hub push, SSH, Vercel)
+          echo "==== [FAKE GCP DEPLOYMENT] ===="
+          echo "1. Building Docker Image..."
+          docker build -t europe-west1-docker.pkg.dev/my-project/collector-repo/collector-app:latest .
+          
+          echo "2. Pushing to Artifact Registry..."
+          # docker push europe-west1-docker.pkg.dev/my-project/collector-repo/collector-app:latest
+          echo ">> Image pushed successfully"
+
+          echo "3. Terraform Provisioning..."
+          cd terraform
+          # Fake Init
+          echo ">> terraform init"
+          
+          # Fake Apply
+          echo ">> terraform apply -auto-approve -var='project_id=my-project' -var='db_password=secret'"
+          echo ">> Applying changes..."
+          echo ">> Resources created: Cloud Run Service, Cloud SQL Instance"
+          
+          echo "==== [DEPLOYMENT SUCCESS] ===="
+          echo "App available at: https://recette.collector.app"
 
   # ------------------------------------------------------------------
   # JOB 5: DELIVERY - PRODUCTION (Main Branch)
@@ -126,7 +144,25 @@ jobs:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
       
-      - name: 🚚 Deploy to Production
+      - name: 🚚 Deploy to Production (Simulation)
         run: |
-          echo "Simulating deployment to PRODUCTION environment..."
-          # Insert actual deployment script here
+          echo "==== [FAKE GCP DEPLOYMENT] ===="
+          echo "1. Building Docker Image..."
+          docker build -t europe-west1-docker.pkg.dev/my-project/collector-repo/collector-app:stable .
+          
+          echo "2. Pushing to Artifact Registry..."
+          # docker push europe-west1-docker.pkg.dev/my-project/collector-repo/collector-app:stable
+          echo ">> Image pushed successfully"
+
+          echo "3. Terraform Provisioning..."
+          cd terraform
+          # Fake Init
+          echo ">> terraform init"
+          
+          # Fake Apply
+          echo ">> terraform apply -auto-approve -var='project_id=my-project' -var='db_password=secret'"
+          echo ">> Applying changes..."
+          echo ">> Resources updated: Cloud Run Service, Cloud SQL Instance"
+          
+          echo "==== [DEPLOYMENT SUCCESS] ===="
+          echo "App available at: https://collector.app"

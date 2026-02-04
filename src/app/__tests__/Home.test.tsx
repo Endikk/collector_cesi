@@ -13,6 +13,7 @@ vi.mock("@/lib/prisma", () => ({
                     description: "Description 1",
                     price: 100,
                     imageUrl: "http://example.com/img1.jpg",
+                    images: [{ url: "http://example.com/img1.jpg" }],
                     owner: { name: "Seller 1" },
                     createdAt: new Date(),
                 },
@@ -22,6 +23,7 @@ vi.mock("@/lib/prisma", () => ({
                     description: "Description 2",
                     price: 200,
                     imageUrl: null, // Test fallback image
+                    images: [],
                     owner: { name: "Seller 2" },
                     createdAt: new Date(),
                 },
