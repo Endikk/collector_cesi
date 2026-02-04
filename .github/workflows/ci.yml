@@ -37,7 +37,13 @@ jobs:
       run: npm run build
 
     - name: Security Scan (Audit)
-      run: npm audit --audit-level=high || true # Pour ne pas bloquer le build si des vulns mineures existent, mais l'afficher. Remove "|| true" pour bloquer.
+      run: npm audit --audit-level=high || true
+
+    - name: Security Scan (Snyk)
+      run: npx snyk test
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      continue-on-error: true
 
   docker-build:
     needs: build-and-test

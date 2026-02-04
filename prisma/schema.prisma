@@ -1,0 +1,166 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  image         String?
+  bio           String?
+  role          String    @default("USER") // USER, ADMIN
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  items         Item[]
+  
+  // Buying / Selling relationships
+  purchases     Transaction[] @relation("Buyer")
+  sales         Transaction[] @relation("Seller")
+
+  // Social / Reviews
+  reviewsGiven    Review[] @relation("ReviewAuthor")
+  reviewsReceived Review[] @relation("ReviewTarget")
+
+  // Messaging
+  conversations Conversation[] @relation("UserConversations")
+  messages      Message[]
+
+  // System
+  notifications Notification[]
+  interests     UserInterest[]
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  price       Float
+  status      String   @default("AVAILABLE") // AVAILABLE, SOLD, RESERVED
+  viewCount   Int      @default(0)
+  published   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Images
+  images      Image[]
+
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id])
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+
+  // History / Transaction
+  priceHistory PriceHistory[]
+  transaction  Transaction?
+}
+
+model Image {
+  id        String   @id @default(cuid())
+  url       String
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId    String
+}
+
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  items Item[]
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  amount    Float
+  status    String   @default("PENDING") // PENDING, COMPLETED, CANCELLED
+  createdAt DateTime @default(now())
+
+  buyerId   String
+  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
+  
+  sellerId  String
+  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+
+  itemId    String   @unique
+  item      Item     @relation(fields: [itemId], references: [id])
+
+  review    Review?
+}
+
+model Review {
+  id            String      @id @default(cuid())
+  rating        Int
+  comment       String?
+  createdAt     DateTime    @default(now())
+
+  authorId      String
+  author        User        @relation("ReviewAuthor", fields: [authorId], references: [id])
+
+  targetId      String
+  target        User        @relation("ReviewTarget", fields: [targetId], references: [id])
+
+  transactionId String      @unique
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+}
+
+model Conversation {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  participants User[]    @relation("UserConversations")
+  messages     Message[]
+}
+
+model Message {
+  id             String       @id @default(cuid())
+  content        String
+  read           Boolean      @default(false)
+  createdAt      DateTime     @default(now())
+
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String   // PRICE_DROP, NEW_ITEM, MESSAGE, SYSTEM, TRANSACTION_UPDATE
+  read      Boolean  @default(false)
+  data      String?  // JSON data
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PriceHistory {
+  id        String   @id @default(cuid())
+  price     Float
+  recordedAt DateTime @default(now())
+
+  itemId    String
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model UserInterest {
+  id        String   @id @default(cuid())
+  keyword   String?
+  minPrice  Float?
+  maxPrice  Float?
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}

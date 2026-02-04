@@ -1,108 +1,128 @@
-# 📦 Projet Collector
+# 📦 Collector
 
 Bienvenue sur le dépôt officiel du projet **Collector**. 
-Ce projet a été réalisé dans le cadre de la validation du bloc de compétences **"Superviser et assurer le développement des applications logicielles"**.
 
-Il démontre la mise en œuvre d'une architecture moderne, sécurisée et industrialisée (DevSecOps).
-
----
-
-## 📑 Documents de Référence
-
-*   **[Rapport Complet (PROJECT_REPORT.md)](./PROJECT_REPORT.md)** : Documentation détaillée du processus qualité, sécurité et architecture. **Document principal pour l'évaluation.**
-*   **[Backlog (BACKLOG.md)](./BACKLOG.md)** : Suivi des User Stories et fonctionnalités.
-*   **[Présentation (PRESENTATION_SUPPORT.md)](./PRESENTATION_SUPPORT.md)** : Support pour la soutenance orale (Script & Schémas).
-*   **[Guide Contribution (app/CONTRIBUTING.md)](./app/CONTRIBUTING.md)** : Guide pour l'accueil des développeurs.
+**Collector** est une plateforme moderne permettant aux utilisateurs de gérer, vendre et échanger des objets de collection en toute simplicité. Conçue avec une architecture robuste et scalable, elle offre une expérience utilisateur fluide et sécurisée.
 
 ---
 
-## 🛠️ Architecture Technique (T3 Stack)
+## 🛠️ Stack Technique
 
-Le POC est construit sur une stack robuste et typée :
+Ce projet repose sur une architecture moderne et performante (T3 Stack / Next.js) :
 
-*   **Framework** : [Next.js 14](https://nextjs.org/) (App Router, Server Components)
-*   **Langage** : TypeScript
-*   **Base de Données** : Prisma ORM (SQLite en dev / Postgres compatible prod)
-*   **UI/UX** : Tailwind CSS + Shadcn UI + Magic UI (Animations)
-*   **Sécurité** : NextAuth.js + Validation Zod + Logs JSON
-*   **DevOps** : Docker + GitHub Actions (CI/CD)
+*   **Framework** : [Next.js 16](https://nextjs.org/) (App Router, Server Components, Server Actions)
+*   **Langage** : [TypeScript](https://www.typescriptlang.org/)
+*   **Base de Données** : [Prisma ORM](https://www.prisma.io/) (MySQL / PostgreSQL)
+*   **Styling** : [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
+*   **Authentification** : [NextAuth.js](https://next-auth.js.org/)
+*   **State Management** : [Zustand](https://zustand-demo.pmnd.rs/)
+*   **Validation** : [Zod](https://zod.dev/)
+*   **DevOps** : Docker & Docker Compose
+*   **Tests** : Vitest
 
 ---
 
-## 🚀 Guide de Démarrage
+## 🚀 Guide d'Installation et de Lancement
 
-### 1. Installation
+Suivez ces étapes pour lancer le projet localement.
+
+### Prérequis
+
+*   Node.js 20+ (recommandé)
+*   NPM ou PNPM
+*   Docker (optionnel, pour l'environnement complet de monitoring)
+
+### 1. Installation des dépendances
+
+Clonez le projet et installez les paquets nécessaires :
 
 ```bash
-# Aller dans le dossier du code source
-cd app
-
 # Installer les dépendances
 npm install
+```
 
-# Initialiser la base de données locale
+### 2. Configuration de l'environnement
+
+Assurez-vous d'avoir un fichier `.env` à la racine correctement configuré (notamment pour la base de données et NextAuth).
+
+Exemple structuré :
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/collector"
+NEXTAUTH_SECRET="votre_secret_super_securise"
+NEXTAUTH_URL="http://localhost:3000"
+```
+
+### 3. Base de Données
+
+Initialisez la base de données avec Prisma :
+
+```bash
+# Générer le client Prisma
 npx prisma generate
+
+# Pousser le schéma vers la base de données
 npx prisma db push
 ```
 
-### 2. Lancer l'application
+### 4. Lancer le projet
+
+Vous avez plusieurs options pour démarrer l'application.
+
+#### Mode Développement
+
+Pour lancer le serveur de développement avec rechargement à chaud (HMR) :
 
 ```bash
-# Mode développement
 npm run dev
 ```
-Accédez à l'application sur **[http://localhost:3000](http://localhost:3000)**.
+L'application sera accessible sur **[http://localhost:3000](http://localhost:3000)**.
+
+#### Tests
+
+Pour exécuter la suite de tests (unitaires et intégration) :
+
+```bash
+npm run test
+```
+
+#### Linting & Qualité
+
+Pour vérifier la qualité du code :
+
+```bash
+npm run lint
+```
 
 ---
 
-## ✅ Évaluation & Démonstration
+## 🐳 Lancement avec Docker (Stack complète)
 
-Voici les commandes pour vérifier les critères techniques de l'évaluation :
+Si vous souhaitez lancer l'application ainsi que toute la stack de monitoring (Prometheus, Grafana, cAdvisor) sans configuration node locale :
 
-### 1. Tests Automatisés (Qualité)
-Lancer la suite de tests unitaires et intégration (Vitest) :
 ```bash
-npm test
-```
-*Couvre : Composants UI, Sécurité des routes, Logique métier.*
-
-### 2. Audit de Sécurité (DevSecOps)
-Vérifier les vulnérabilités des dépendances :
-```bash
-npm audit
+# Construire et lancer les conteneurs en arrière-plan
+docker-compose up -d --build
 ```
 
-### 3. Test de Montée en Charge (Performance)
-Simuler 50 utilisateurs simultanés pour la démonstration de "Disponibilité" :
-```bash
-# Dans un nouveau terminal, pendant que le serveur tourne
-node stress-test.js
-```
-
-### 4. Supervision (Ops)
-Un endpoint de **Health Check** est disponible pour le monitoring :
-*   URL : [http://localhost:3000/api/health](http://localhost:3000/api/health)
-*   Retourne : Statut de l'application et connexion BDD.
+Services disponibles :
+*   **Application Collector** : [http://localhost:3000](http://localhost:3000)
+*   **Grafana** : [http://localhost:3001](http://localhost:3001)
+*   **Prometheus** : [http://localhost:9090](http://localhost:9090)
 
 ---
 
-## 📂 Structure du Répertoire
+## 📂 Structure du Projet
+
+Le projet suit une architecture scalable et modulaire :
 
 ```
-.
-├── PROJECT_REPORT.md       # Rapport Qualité/Sécurité/Archi
-├── PRESENTATION_SUPPORT.md # Script soutenance
-├── app/                    # Code Source (Next.js)
-│   ├── app/                # Pages & API Routes
-│   ├── components/         # Bibliothèque de composants
-│   ├── lib/                # Utilitaires (Logger, Prisma)
-│   ├── prisma/             # Schéma BDD
-│   ├── __tests__/          # Tests d'intégration
-│   ├── stress-test.js      # Script de charge
-│   ├── Dockerfile          # Configuration conteneur
-│   └── CONTRIBUTING.md     # Guide développeur
-└── ...
+src/
+├── app/                 # Routes Next.js (App Router)
+├── components/          # Composants React (UI, Layout, Pages, Common)
+├── lib/                 # Logique métier et adaptateurs (Prisma, Auth, Logger)
+├── lib/actions/         # Server Actions (API logic)
+├── hooks/               # Hooks React personnalisés
+├── stores/              # Gestion d'état global (Zustand)
+├── utils/               # Fonctions utilitaires
+└── middleware.ts        # Middleware (Authentification)
 ```
-
----
-*Projet réalisé le 20/01/2026.*
