@@ -49,7 +49,7 @@ jobs:
   test:
     name: 🧪 Tests
     runs-on: ubuntu-latest
-    needs: quality # Optional: Remove if you want parallel execution for faster feedback
+    needs: quality
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -72,7 +72,7 @@ jobs:
   build:
     name: 🏗️ Production Build
     runs-on: ubuntu-latest
-    needs: test # Ensure we only build if tests pass
+    needs: test
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -90,4 +90,43 @@ jobs:
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
-          # Add any build-time constraints here
+
+  # ------------------------------------------------------------------
+  # JOB 4: DELIVERY - RECETTE (Develop Branch)
+  # ------------------------------------------------------------------
+  deploy-recette:
+    name: 🚀 Deploy to Recette
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment:
+      name: recette
+      url: https://recette.collector.app
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🚚 Deploy to Staging
+        run: |
+          echo "Simulating deployment to RECETTE environment..."
+          # Insert actual deployment script here (e.g., Docker Hub push, SSH, Vercel)
+
+  # ------------------------------------------------------------------
+  # JOB 5: DELIVERY - PRODUCTION (Main Branch)
+  # ------------------------------------------------------------------
+  deploy-prod:
+    name: 🚀 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://collector.app
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🚚 Deploy to Production
+        run: |
+          echo "Simulating deployment to PRODUCTION environment..."
+          # Insert actual deployment script here
