@@ -5,7 +5,7 @@ import { register, collectDefaultMetrics } from 'prom-client';
 if (process.env.NODE_ENV !== 'test') {
     try {
         collectDefaultMetrics({ register });
-    } catch (e) {
+    } catch {
         // Prevent multiple registrations in dev mode
         console.warn('Metrics already registered');
     }
