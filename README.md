@@ -47,14 +47,23 @@ Assurez-vous d'avoir un fichier `.env` à la racine correctement configuré (not
 
 Exemple structuré :
 ```env
-DATABASE_URL="mysql://user:password@localhost:3306/collector"
+# URL de connexion à la base de données PostgreSQL (Docker)
+DATABASE_URL="postgresql://user:password@localhost:5432/collector?schema=public"
+
 NEXTAUTH_SECRET="votre_secret_super_securise"
 NEXTAUTH_URL="http://localhost:3000"
 ```
 
 ### 3. Base de Données
 
-Initialisez la base de données avec Prisma :
+Avant de lancer l'application, vous devez démarrer la base de données via Docker :
+
+```bash
+# Démarrer uniquement la base de données (PostgreSQL) en arrière-plan
+docker-compose up -d db
+```
+
+Une fois la base lancée, initialisez le schéma avec Prisma :
 
 ```bash
 # Générer le client Prisma

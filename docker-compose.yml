@@ -10,6 +10,26 @@ services:
     environment:
       - NODE_ENV=production
     restart: always
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15-alpine
+    container_name: collector-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: collector
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d collector" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   prometheus:
     image: prom/prometheus:latest
@@ -88,3 +108,4 @@ services:
 volumes:
   prometheus_data:
   grafana_data:
+  postgres_data:
