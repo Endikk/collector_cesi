@@ -1,9 +1,99 @@
 "use server";
 
+import { z } from "zod";
+import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+
+const createItemSchema = z.object({
+    title: z.string().min(5, "Le titre doit faire au moins 5 caractères").max(100),
+    description: z.string().min(20, "La description doit être détaillée (min 20 caractères)"),
+    price: z.preprocess((val) => Number(val), z.number().min(1, "Le prix minimum est de 1€")),
+    imageUrl: z.string().url("URL d'image invalide").optional().or(z.literal("")),
+    categoryId: z.string().min(1, "Veuillez sélectionner une catégorie"),
+});
+
+export type State = {
+    errors?: {
+        title?: string[];
+        description?: string[];
+        price?: string[];
+        imageUrl?: string[];
+        categoryId?: string[];
+    };
+    message?: string | null;
+    success?: boolean;
+};
+
+export async function createItem(prevState: State, formData: FormData) {
+    const session = await getServerSession(authOptions);
+
+    if (!session || !session.user) {
+        return {
+            message: "Vous devez être connecté pour publier une annonce.",
+            success: false,
+        };
+    }
+
+    const validatedFields = createItemSchema.safeParse({
+        title: formData.get("title"),
+        description: formData.get("description"),
+        price: formData.get("price"),
+        imageUrl: formData.get("imageUrl"),
+        categoryId: formData.get("categoryId"),
+    });
+
+    if (!validatedFields.success) {
+        return {
+            errors: validatedFields.error.flatten().fieldErrors,
+            message: "Veuillez corriger les erreurs dans le formulaire.",
+            success: false,
+        };
+    }
+
+    const { title, description, price, imageUrl, categoryId } = validatedFields.data;
+
+    try {
+        await prisma.item.create({
+            data: {
+                title,
+                description,
+                price,
+                ownerId: session.user.id,
+                published: true,
+                categoryId,
+                ...(imageUrl && {
+                    images: {
+                        create: { url: imageUrl },
+                    },
+                }),
+            },
+        });
+
+        revalidatePath("/");
+        revalidatePath("/profile/sales");
+
+        return { success: true, message: "Votre annonce a été publiée avec succès !" };
+    } catch (err) {
+        console.error("Database Error:", err);
+        return {
+            message: "Une erreur est survenue lors de la création de l'annonce.",
+            success: false,
+        };
+    }
+}
+
+export async function getCategories() {
+    try {
+        return await prisma.category.findMany({
+            orderBy: { name: "asc" },
+        });
+    } catch (error) {
+        console.error("Failed to fetch categories:", error);
+        return [];
+    }
+}
 
 export async function deleteItem(itemId: string) {
     const session = await getServerSession(authOptions);
@@ -18,7 +108,7 @@ export async function deleteItem(itemId: string) {
         });
 
         if (!item) {
-            return { success: false, message: "Objet non trouvé" };
+            return { success: false, message: "Objet introuvable" };
         }
 
         if (item.ownerId !== session.user.id) {
@@ -30,9 +120,11 @@ export async function deleteItem(itemId: string) {
         });
 
         revalidatePath("/");
-        return { success: true, message: "Objet supprimé avec succès" };
+        revalidatePath("/profile/sales");
+
+        return { success: true, message: "Annonce supprimée" };
     } catch (error) {
-        console.error("Erreur destruction objet:", error);
-        return { success: false, message: "Une erreur est survenue lors de la suppression" };
+        console.error("Delete Error:", error);
+        return { success: false, message: "Erreur lors de la suppression" };
     }
 }

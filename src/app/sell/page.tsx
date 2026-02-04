@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,18 +8,60 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2 } from "lucide-react";
+import { ImagePlus, Loader2, AlertCircle } from "lucide-react";
 import BlurFade from "@/components/ui/blur-fade";
+import { createItem, getCategories, State } from "@/lib/actions/items";
+import { useFormState, useFormStatus } from "react-dom";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+
+function SubmitButton() {
+    const { pending } = useFormStatus();
+    return (
+        <Button
+            type="submit"
+            disabled={pending}
+            className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6"
+        >
+            {pending ? (
+                <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Publication...
+                </>
+            ) : (
+                "Publier l'annonce"
+            )}
+        </Button>
+    );
+}
 
 export default function SellPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
-
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [price, setPrice] = useState("");
+    const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
     const [imageUrl, setImageUrl] = useState("");
-    const [loading, setLoading] = useState(false);
+
+    // Server Action State
+    const initialState: State = { message: null, errors: {} };
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore - useFormState generic type issue in some next versions
+    const [state, dispatch] = useFormState(createItem, initialState);
+
+    useEffect(() => {
+        getCategories().then(setCategories);
+    }, []);
+
+    useEffect(() => {
+        if (state.success) {
+            router.push("/");
+            router.refresh();
+        }
+    }, [state.success, router]);
 
     if (status === "loading") return (
         <div className="flex h-[50vh] items-center justify-center">
@@ -28,33 +70,9 @@ export default function SellPage() {
     );
 
     if (!session) {
-        router.push("/auth/login");
+        router.push("/api/auth/signin");
         return null;
     }
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-
-        try {
-            const res = await fetch("/api/items", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ title, description, price, imageUrl }),
-            });
-
-            if (res.ok) {
-                router.push("/");
-                router.refresh();
-            } else {
-                alert("Erreur lors de la création de l'annonce");
-            }
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     return (
         <div className="container mx-auto max-w-2xl py-10 px-4">
@@ -69,29 +87,66 @@ export default function SellPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form action={dispatch} className="space-y-6">
+                            {state.message && !state.success && (
+                                <div className="bg-red-50 text-red-600 p-4 rounded-md flex items-center gap-2">
+                                    <AlertCircle className="h-5 w-5" />
+                                    <p>{state.message}</p>
+                                </div>
+                            )}
+
                             <div className="space-y-2">
                                 <Label htmlFor="title">Titre de l&apos;objet</Label>
                                 <Input
                                     id="title"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    required
+                                    name="title"
                                     placeholder="Ex: Figurine Star Wars 1977"
+                                    required
                                     className="bg-background/50"
+                                    aria-describedby="title-error"
                                 />
+                                {state.errors?.title && (
+                                    <p id="title-error" className="text-sm text-red-500">
+                                        {state.errors.title.join(", ")}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="description">Description</Label>
+                                <Label htmlFor="category">Catégorie</Label>
+                                <Select name="categoryId" required>
+                                    <SelectTrigger className="bg-background/50">
+                                        <SelectValue placeholder="Sélectionner une catégorie" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {categories.map((cat) => (
+                                            <SelectItem key={cat.id} value={cat.id}>
+                                                {cat.name}
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                {state.errors?.categoryId && (
+                                    <p className="text-sm text-red-500">
+                                        {state.errors.categoryId.join(", ")}
+                                    </p>
+                                )}
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="description">Description (min. 20 caractères)</Label>
                                 <Textarea
                                     id="description"
-                                    value={description}
-                                    onChange={(e) => setDescription(e.target.value)}
-                                    required
+                                    name="description"
                                     placeholder="Détails sur l'état, l'année, provenance..."
+                                    required
                                     className="min-h-[120px] bg-background/50"
                                 />
+                                {state.errors?.description && (
+                                    <p className="text-sm text-red-500">
+                                        {state.errors.description.join(", ")}
+                                    </p>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-6">
@@ -99,20 +154,25 @@ export default function SellPage() {
                                     <Label htmlFor="price">Prix (€)</Label>
                                     <Input
                                         id="price"
+                                        name="price"
                                         type="number"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
-                                        required
-                                        min="0"
+                                        min="1"
                                         step="0.01"
+                                        required
                                         className="bg-background/50"
                                     />
+                                    {state.errors?.price && (
+                                        <p className="text-sm text-red-500">
+                                            {state.errors.price.join(", ")}
+                                        </p>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="image">Image URL (Optionnel)</Label>
+                                    <Label htmlFor="imageUrl">Image URL (Optionnel)</Label>
                                     <div className="relative">
                                         <Input
-                                            id="image"
+                                            id="imageUrl"
+                                            name="imageUrl"
                                             type="url"
                                             value={imageUrl}
                                             onChange={(e) => setImageUrl(e.target.value)}
@@ -121,6 +181,11 @@ export default function SellPage() {
                                         />
                                         <ImagePlus className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
                                     </div>
+                                    {state.errors?.imageUrl && (
+                                        <p className="text-sm text-red-500">
+                                            {state.errors.imageUrl.join(", ")}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
 
@@ -131,20 +196,7 @@ export default function SellPage() {
                                 </div>
                             )}
 
-                            <Button
-                                type="submit"
-                                disabled={loading}
-                                className="w-full bg-emerald-600 hover:bg-emerald-700 text-lg py-6"
-                            >
-                                {loading ? (
-                                    <>
-                                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                        Publication...
-                                    </>
-                                ) : (
-                                    "Publier l'annonce"
-                                )}
-                            </Button>
+                            <SubmitButton />
                         </form>
                     </CardContent>
                 </Card>

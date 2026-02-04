@@ -5,13 +5,41 @@ import { fetchBackend } from '@/lib/backend-api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useParams } from 'next/navigation';
 
+interface ShopItem {
+    id: string;
+    title: string;
+    price: number;
+    images: { url: string }[];
+}
+
+interface ShopReview {
+    id: string;
+    rating: number;
+    comment: string;
+    createdAt: string;
+    author: {
+        name: string | null;
+    };
+}
+
+interface Shop {
+    name: string;
+    bio: string | null;
+    _count: {
+        reviewsReceived: number;
+        sales: number;
+    };
+    items: ShopItem[];
+    reviewsReceived: ShopReview[];
+}
+
 export default function ShopPage() {
     const { id } = useParams();
-    const [shop, setShop] = useState<any>(null);
+    const [shop, setShop] = useState<Shop | null>(null);
 
     useEffect(() => {
         if (id) {
-            fetchBackend(`/shops/${id}`).then(setShop).catch(console.error);
+            fetchBackend<Shop>(`/shops/${id}`).then(setShop).catch(console.error);
         }
     }, [id]);
 
@@ -31,9 +59,10 @@ export default function ShopPage() {
             <h2 className="text-2xl font-bold mb-6">Articles en vente ({shop.items.length})</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {shop.items.map((item: any) => (
+                {shop.items.map((item) => (
                     <Card key={item.id} className="overflow-hidden hover:shadow-lg transition">
                         <div className="aspect-square bg-gray-200 relative">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             {item.images[0] && <img src={item.images[0].url} alt={item.title} className="w-full h-full object-cover" />}
                         </div>
                         <CardHeader className="p-4">
@@ -49,7 +78,7 @@ export default function ShopPage() {
                     <div className="mt-12">
                         <h2 className="text-2xl font-bold mb-6">Avis clients</h2>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {shop.reviewsReceived.map((review: any) => (
+                            {shop.reviewsReceived.map((review) => (
                                 <Card key={review.id}>
                                     <CardHeader className="p-4 flex flex-row justify-between items-start">
                                         <div>
@@ -59,7 +88,7 @@ export default function ShopPage() {
                                         <span className="text-xs text-gray-400">{new Date(review.createdAt).toLocaleDateString()}</span>
                                     </CardHeader>
                                     <CardContent className="p-4 pt-0">
-                                        <p className="text-gray-600 italic">"{review.comment}"</p>
+                                        <p className="text-gray-600 italic">&quot;{review.comment}&quot;</p>
                                     </CardContent>
                                 </Card>
                             ))}

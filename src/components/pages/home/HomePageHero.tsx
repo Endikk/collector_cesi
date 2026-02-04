@@ -9,10 +9,10 @@ export function HomePageHero() {
     return (
         <BlurFade delay={BLUR_FADE_DELAY}>
             <div className="flex flex-col items-center text-center mb-16 space-y-4">
-                <Badge variant="outline" className="px-4 py-1 border-yellow-500/50 text-yellow-500 bg-yellow-500/10">
+                <Badge variant="outline" className="px-4 py-1 border-primary/50 text-primary bg-primary/5">
                     Nouveautés 2026
                 </Badge>
-                <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-gradient-to-br from-white via-white to-neutral-500 bg-clip-text text-transparent">
+                <h1 className="text-5xl md:text-7xl font-bold tracking-tighter bg-gradient-to-br from-gray-900 via-gray-700 to-gray-500 bg-clip-text text-transparent">
                     Objets rares &<br /> uniques
                 </h1>
                 <p className="text-muted-foreground max-w-[600px] text-lg">

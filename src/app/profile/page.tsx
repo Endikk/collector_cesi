@@ -5,28 +5,45 @@ import { useSession } from 'next-auth/react';
 import { fetchBackend } from '@/lib/backend-api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Link from 'next/link';
+
+interface Transaction {
+    id: string;
+    amount: number;
+    createdAt: string;
+    item: {
+        title: string;
+    };
+}
+
+interface UserProfile {
+    id: string;
+    name: string;
+    email: string;
+    image?: string;
+    role: string;
+    _count: {
+        items: number;
+        sales: number;
+    };
+    purchases: Transaction[];
+    sales: Transaction[];
+}
 
 export default function ProfilePage() {
     const { data: session } = useSession();
-    const [profile, setProfile] = useState<any>(null);
+    const [profile, setProfile] = useState<UserProfile | null>(null);
 
     useEffect(() => {
-        if (session?.user?.email) {
-            // In a real app we'd use ID, here finding by email or ID if available
-            // The backend expects ID. Assuming session has ID or we implement /me
-            // For POC, let's fetch endpoint and hope mock/ID works. 
-            // If we don't have ID in session easily without callback hacking, 
-            // providing a fallback in UI.
-            if ((session.user as any).id) {
-                fetchBackend(`/users/${(session.user as any).id}/profile`)
-                    .then(setProfile)
-                    .catch(console.error);
-            }
+        if (session?.user?.id) {
+            fetchBackend<UserProfile>(`/users/${session.user.id}/profile`)
+                .then(setProfile)
+                .catch(console.error);
         }
     }, [session]);
 
-    if (!session) return <div className="p-8 text-center"><a href="/api/auth/signin" className="underline">Connectez-vous</a> pour voir votre profil.</div>;
-    if (!profile) return <div className="p-8 text-center">Chargement du profil depuis le Backend NestJS...</div>;
+    if (!session) return <div className="p-8 text-center"><Link href="/api/auth/signin" className="underline">Connectez-vous</Link> pour voir votre profil.</div>;
+    if (!profile) return <div className="p-8 text-center">Chargement du profil...</div>;
 
     return (
         <div className="container mx-auto py-10 max-w-2xl">
@@ -54,10 +71,19 @@ export default function ProfilePage() {
                 </CardContent>
             </Card>
 
+            <div className="flex gap-4 justify-center mt-6">
+                <Link href="/profile/sales" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    Gérer mes ventes
+                </Link>
+                <Link href="/profile/purchases" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                    Voir mes achats
+                </Link>
+            </div>
+
             <div className="mt-8 text-center">
-                <a href={`/shop/${profile.id}`} className="text-blue-500 hover:underline">
+                <Link href={`/shop/${profile.id}`} className="text-blue-500 hover:underline">
                     Voir ma boutique publique
-                </a>
+                </Link>
             </div>
 
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -66,7 +92,7 @@ export default function ProfilePage() {
                     <CardContent>
                         {profile.purchases?.length > 0 ? (
                             <ul className="space-y-4">
-                                {profile.purchases.map((p: any) => (
+                                {profile.purchases.map((p) => (
                                     <li key={p.id} className="border-b pb-2">
                                         <span className="font-semibold">{p.item.title}</span>
                                         <div className="text-sm text-gray-500">{p.amount} € - {new Date(p.createdAt).toLocaleDateString()}</div>
@@ -81,7 +107,7 @@ export default function ProfilePage() {
                     <CardContent>
                         {profile.sales?.length > 0 ? (
                             <ul className="space-y-4">
-                                {profile.sales.map((s: any) => (
+                                {profile.sales.map((s) => (
                                     <li key={s.id} className="border-b pb-2">
                                         <span className="font-semibold">{s.item.title}</span>
                                         <div className="text-sm text-gray-500">{s.amount} € - {new Date(s.createdAt).toLocaleDateString()}</div>

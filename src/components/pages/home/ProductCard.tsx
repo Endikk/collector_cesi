@@ -25,7 +25,7 @@ interface ProductCardProps {
 export function ProductCard({ item, delay, currentUserId }: ProductCardProps) {
     return (
         <BlurFade delay={delay} inView>
-            <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-primary/10">
+            <Card className="group relative overflow-hidden border-0 bg-white shadow-md transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/5">
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
                     {item.images.length > 0 ? (
                         // eslint-disable-next-line @next/next/no-img-element
@@ -48,7 +48,7 @@ export function ProductCard({ item, delay, currentUserId }: ProductCardProps) {
                     )}
 
                     <div className="absolute top-3 right-3">
-                        <Badge className="bg-background/80 backdrop-blur text-foreground border-0 font-bold shadow-sm">
+                        <Badge className="bg-white/90 backdrop-blur text-foreground font-bold shadow-sm">
                             {item.price.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
                         </Badge>
                     </div>

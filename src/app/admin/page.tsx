@@ -6,13 +6,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 
+interface AdminStats {
+    users: number;
+    items: number;
+    transactions: number;
+}
+
+interface AdminUser {
+    id: string;
+    name: string | null;
+    email: string;
+    createdAt: string;
+}
+
 export default function AdminDashboard() {
-    const [stats, setStats] = useState<any>(null);
-    const [users, setUsers] = useState<any[]>([]);
+    const [stats, setStats] = useState<AdminStats | null>(null);
+    const [users, setUsers] = useState<AdminUser[]>([]);
 
     useEffect(() => {
-        fetchBackend('/admin/stats').then(setStats).catch(console.error);
-        fetchBackend<any[]>('/admin/users').then(setUsers).catch(console.error);
+        fetchBackend<AdminStats>('/admin/stats').then(setStats).catch(console.error);
+        fetchBackend<AdminUser[]>('/admin/users').then(setUsers).catch(console.error);
     }, []);
 
     if (!stats) return <div className="p-8">Chargement du Dashboard Admin...</div>;
