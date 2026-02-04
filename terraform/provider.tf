@@ -1,21 +1,15 @@
 terraform {
   required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.0.0"
     }
   }
-  required_version = ">= 1.2.0"
+  required_version = ">= 1.0.0"
 }
 
-provider "aws" {
-  region = var.aws_region
-  
-  default_tags {
-    tags = {
-      Project     = "Collector"
-      Environment = var.environment
-      ManagedBy   = "Terraform"
-    }
-  }
+provider "google" {
+  project = var.project_id
+  region  = var.region
+  zone    = "${var.region}-a"
 }
