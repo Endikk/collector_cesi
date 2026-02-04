@@ -61,6 +61,24 @@ export default function NavBar() {
                                         </div>
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
+                                    <DropdownMenuItem asChild>
+                                        <Link href="/profile" className="cursor-pointer">
+                                            <span>Mon Profil</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem asChild>
+                                        <Link href={`/shop/${(session.user as any).id}`} className="cursor-pointer">
+                                            <span>Ma Boutique</span>
+                                        </Link>
+                                    </DropdownMenuItem>
+                                    {(session.user as any).role === 'ADMIN' && (
+                                        <DropdownMenuItem asChild>
+                                            <Link href="/admin" className="cursor-pointer text-purple-600 font-semibold text-xs">
+                                                <span>Administration</span>
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    )}
+                                    <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={() => signOut()} className="text-red-500 focus:text-red-500">
                                         <LogOut className="mr-2 h-4 w-4" />
                                         <span>Déconnexion</span>

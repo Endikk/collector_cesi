@@ -17,6 +17,13 @@
 /.next/
 /out/
 
+# nestjs
+/backend/node_modules
+/backend/.next
+/backend/dist
+/backend/prisma/dev.db
+/backend/prisma/migrations
+
 # production
 /build
 

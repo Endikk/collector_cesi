@@ -8,7 +8,9 @@
     "test": "vitest run",
     "lint": "eslint .",
     "snyk": "snyk test",
-    "security-check": "npm audit && npm run snyk"
+    "security-check": "npm audit && npm run snyk",
+    "postinstall": "prisma generate --schema=./backend/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=./backend/prisma/schema.prisma"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",

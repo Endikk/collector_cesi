@@ -8,96 +8,102 @@ Bienvenue sur le dépôt officiel du projet **Collector**.
 
 ## 🛠️ Stack Technique
 
-Ce projet repose sur une architecture moderne et performante (T3 Stack / Next.js) :
+Ce projet repose sur une architecture moderne séparant le Frontend du Backend :
 
-*   **Framework** : [Next.js 16](https://nextjs.org/) (App Router, Server Components, Server Actions)
-*   **Langage** : [TypeScript](https://www.typescriptlang.org/)
-*   **Base de Données** : [Prisma ORM](https://www.prisma.io/) (MySQL / PostgreSQL)
+*   **Frontend** : [Next.js 16](https://nextjs.org/) (App Router, Server Components)
+*   **Backend** : [NestJS](https://nestjs.com/) (API REST, Business Logic)
+*   **Langage** : [TypeScript](https://www.typescriptlang.org/) (Fullstack)
+*   **Base de Données** : [Prisma ORM](https://www.prisma.io/) (PostgreSQL) - Schéma unique centralisé dans le Backend
 *   **Styling** : [Tailwind CSS](https://tailwindcss.com/) + [Shadcn UI](https://ui.shadcn.com/)
 *   **Authentification** : [NextAuth.js](https://next-auth.js.org/)
-*   **State Management** : [Zustand](https://zustand-demo.pmnd.rs/)
-*   **Validation** : [Zod](https://zod.dev/)
 *   **DevOps** : Docker & Docker Compose
-*   **Tests** : Vitest
 
 ---
 
 ## 🚀 Guide d'Installation et de Lancement
 
-Suivez ces étapes pour lancer le projet localement.
+Le projet est divisé en deux parties : la racine (Frontend) et le dossier `backend/` (API).
 
 ### Prérequis
 
-*   Node.js 20+ (recommandé)
-*   NPM ou PNPM
-*   Docker (optionnel, pour l'environnement complet de monitoring)
+*   Node.js 20+
+*   Docker & Docker Compose (Recommandé pour la base de données et le backend)
 
 ### 1. Installation des dépendances
 
-Clonez le projet et installez les paquets nécessaires :
+Il faut installer les paquets pour le Frontend **ET** le Backend.
 
+**A la racine du projet (Frontend) :**
 ```bash
-# Installer les dépendances
 npm install
 ```
 
-### 2. Configuration de l'environnement
-
-Assurez-vous d'avoir un fichier `.env` à la racine correctement configuré (notamment pour la base de données et NextAuth).
-
-Exemple structuré :
-```env
-# URL de connexion à la base de données PostgreSQL (Docker)
-DATABASE_URL="postgresql://user:password@localhost:5432/collector?schema=public"
-
-NEXTAUTH_SECRET="votre_secret_super_securise"
-NEXTAUTH_URL="http://localhost:3000"
+**Dans le dossier backend (API) :**
+```bash
+cd backend
+npm install
+cd ..
 ```
+
+### 2. Configuration (Environment)
+
+Créez un fichier `.env` à la racine (pour Next.js) et configurez les variables (voir `.env.example`).
+Le Backend (NestJS) utilise également ce `.env` ou ses propres variables si besoin, mais pour Docker, tout est géré dans `docker-compose.yml`.
 
 ### 3. Base de Données
 
-Avant de lancer l'application, vous devez démarrer la base de données via Docker :
+Le schéma Prisma est désormais centralisé dans **`backend/prisma/schema.prisma`**.
 
+Pour lancer la base de données :
 ```bash
-# Démarrer uniquement la base de données (PostgreSQL) en arrière-plan
 docker-compose up -d db
 ```
 
-Une fois la base lancée, initialisez le schéma avec Prisma :
-
+Pour synchroniser la base avec le schéma :
 ```bash
-# Générer le client Prisma
-npx prisma generate
-
-# Pousser le schéma vers la base de données
-npx prisma db push
+# Depuis la racine (commande proxy vers le schéma du backend)
+npm run db:push
 ```
 
 ### 4. Lancer le projet
 
-Vous avez plusieurs options pour démarrer l'application.
-
-#### Mode Développement
-
-Pour lancer le serveur de développement avec rechargement à chaud (HMR) :
+#### Option A : Tout avec Docker (Recommandé) ✨
+Lance le Frontend (Next.js), le Backend (NestJS) et la Base de données en une seule commande.
 
 ```bash
+docker-compose up -d --build
+```
+*   **Frontend** : http://localhost:3000
+*   **Backend API** : http://localhost:4000
+*   **Monitoring** : http://localhost:3001 (Grafana)
+
+#### Option B : Manuel (Développement)
+Si vous voulez lancer les services séparément pour développer :
+
+**Terminal 1 - Backend (NestJS)** :
+```bash
+cd backend
+npm run start:dev
+```
+*Le backend tournera sur http://localhost:3000 (mappé sur 4000 par défaut dans Docker, attention aux ports en local).*
+
+**Terminal 2 - Frontend (Next.js)** :
+```bash
+# À la racine
 npm run dev
 ```
-L'application sera accessible sur **[http://localhost:3000](http://localhost:3000)**.
+*Le frontend tournera sur http://localhost:3000.*
 
-#### Tests
+---
 
-Pour exécuter la suite de tests (unitaires et intégration) :
+## 🧪 Tests & Qualité
 
+#### Tester tout le projet
 ```bash
 npm run test
 ```
 
-#### Linting & Qualité
-
-Pour vérifier la qualité du code :
-
+#### Vérifier le code (Lint)
 ```bash
 npm run lint
 ```
@@ -125,13 +131,19 @@ Services disponibles :
 Le projet suit une architecture scalable et modulaire :
 
 ```
-src/
-├── app/                 # Routes Next.js (App Router)
-├── components/          # Composants React (UI, Layout, Pages, Common)
-├── lib/                 # Logique métier et adaptateurs (Prisma, Auth, Logger)
-├── lib/actions/         # Server Actions (API logic)
-├── hooks/               # Hooks React personnalisés
-├── stores/              # Gestion d'état global (Zustand)
-├── utils/               # Fonctions utilitaires
-└── middleware.ts        # Middleware (Authentification)
+.
+├── backend/             # Application NestJS (API, Logique Métier)
+│   ├── src/
+│   │   ├── admin/       # Module Administration
+│   │   ├── shops/       # Module Boutiques
+│   │   ├── users/       # Module Utilisateurs
+│   │   └── prisma/      # Service BDD & Schema Unique
+│   └── Dockerfile
+├── src/                 # Application Next.js (Frontend)
+│   ├── app/             # Pages & Routes (App Router)
+│   ├── components/      # UI (Shadcn, Layouts)
+│   ├── lib/             # API Client & NextAuth
+│   └── ...
+├── docker-compose.yml   # Orchestration complète
+└── README.md
 ```

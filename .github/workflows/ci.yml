@@ -91,6 +91,13 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
 
+      - name: 🛠️ Build NestJS Backend
+        run: |
+          cd backend
+          npm ci
+          npx prisma generate
+          npm run build
+
   # ------------------------------------------------------------------
   # JOB 4: DELIVERY - RECETTE (Develop Branch)
   # ------------------------------------------------------------------

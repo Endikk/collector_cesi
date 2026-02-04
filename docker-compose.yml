@@ -3,7 +3,7 @@ version: '3.8'
 services:
   app:
     build:
-      context: ./app
+      context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
@@ -12,6 +12,19 @@ services:
     restart: always
     depends_on:
       - db
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "4000:3000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/collector?schema=public
+      - PORT=3000
+    depends_on:
+      - db
+    restart: always
 
   db:
     image: postgres:15-alpine
