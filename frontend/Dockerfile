@@ -5,17 +5,33 @@ RUN apk add --no-cache openssl
 
 FROM base AS deps
 WORKDIR /app
-COPY package.json package-lock.json* ./
-COPY backend/prisma ./backend/prisma
-COPY scripts ./scripts
-RUN npm ci
+
+# Copy package files from frontend directory
+COPY frontend/package.json frontend/package-lock.json* ./
+
+# Copy schema to local ./prisma so it can find node_modules
+COPY backend/prisma ./prisma
+
+# Install deps but skip postinstall (which uses ../backend path)
+RUN npm ci --ignore-scripts
+
+# Generate client using local schema path
+RUN npx prisma generate --schema=./prisma/schema.prisma
 
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+
+# Copy frontend source code
+COPY frontend/ .
+
+# Copy schema again for builder stage
+COPY backend/prisma ./prisma
+
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npx prisma generate --schema=./backend/prisma/schema.prisma
+
+# Generate client again (needed if node_modules were pruned or just to be safe)
+RUN npx prisma generate --schema=./prisma/schema.prisma
 RUN npm run build
 
 FROM base AS runner

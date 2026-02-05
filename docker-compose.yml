@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: frontend/Dockerfile
       target: deps
     ports:
       - "3000:3000"
@@ -13,7 +13,7 @@ services:
       - DATABASE_URL=postgresql://user:password@db:5432/collector?schema=public
       - WATCHPACK_POLLING=true
     volumes:
-      - .:/app
+      - ./frontend:/app
       - /app/node_modules
       - /app/.next
     command: npm run dev
@@ -118,13 +118,6 @@ services:
     command:
       - '--config.file=/etc/alertmanager/config.yml'
       - '--storage.path=/alertmanager'
-
-  alertmanager-discord:
-    image: benjojo/alertmanager-discord
-    ports:
-      - "9094:9094"
-    environment:
-      - DISCORD_WEBHOOK=${DISCORD_WEBHOOK_URL}
 
 volumes:
   prometheus_data:
