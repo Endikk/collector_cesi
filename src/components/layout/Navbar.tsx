@@ -49,7 +49,7 @@ function SearchBar() {
                     Rechercher
                 </Button>
             </form>
-            <Link href="#" className="text-[11px] text-muted-foreground hover:underline hidden lg:block whitespace-nowrap">
+            <Link href="/" className="text-[11px] text-muted-foreground hover:underline hidden lg:block whitespace-nowrap">
                 Recherche approfondie
             </Link>
         </div>
@@ -64,10 +64,7 @@ export default function NavBar() {
             <div className="border-b">
                 <div className="container flex h-[72px] items-center gap-6">
                     <Link href="/" className="flex items-center gap-1 font-bold text-3xl tracking-tighter flex-shrink-0 -mt-1">
-                        <span className="text-[#e53238]">e</span>
-                        <span className="text-[#0064d2]">b</span>
-                        <span className="text-[#f5af02]">a</span>
-                        <span className="text-[#86b817]">y</span>
+                        <span className="text-yellow-500">Collector</span>
                     </Link>
 
                     <div className="flex-1 hidden md:flex items-center">

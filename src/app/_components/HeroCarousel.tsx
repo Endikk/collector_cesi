@@ -9,38 +9,11 @@ interface HeroCarouselProps {
 }
 
 export function HeroCarousel({ items = [] }: HeroCarouselProps) {
-    // Fallback static slides if no items
-    const defaultSlides = [
-        {
-            id: "static-1",
-            title: "Lot de Cartes Pokémon – Boosters 2.5 / Coffrets / unité RETRO",
-            user: "geekncard",
-            image: "https://images.unsplash.com/photo-1613771404784-3a5686aa2be3?q=80&w=2669&auto=format&fit=crop",
-            time: "Il y a 2h",
-            avatarSeed: "geekncard",
-            live: false
-        },
-        {
-            id: "static-2",
-            title: "Coffret MEGA SHOW BOXBREAK ME2.5 (Scellé)",
-            user: "blazingtail",
-            image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=2574&auto=format&fit=crop",
-            time: "Il y a 4h",
-            avatarSeed: "blazingtail",
-            live: false
-        },
-        {
-            id: "static-3",
-            title: "Vente de Pieces et de Billets - Antic World Collections 🔥",
-            user: "anticworld",
-            image: "https://images.unsplash.com/photo-1517260731337-1cd47e331f4a?q=80&w=2583&auto=format&fit=crop",
-            time: "Il y a 1j",
-            avatarSeed: "antic",
-            live: false
-        },
-    ];
+    if (!items || items.length === 0) {
+        return null;
+    }
 
-    const displayItems = items && items.length > 0 ? items.slice(0, 8).map(item => ({
+    const displayItems = items.slice(0, 8).map(item => ({
         id: item.id,
         title: item.title,
         user: item.owner?.name || "Vendeur",
@@ -48,7 +21,7 @@ export function HeroCarousel({ items = [] }: HeroCarouselProps) {
         time: "À l'instant",
         avatarSeed: item.owner?.name || "user",
         live: false
-    })) : defaultSlides;
+    }));
 
     return (
         <section className="mb-12">

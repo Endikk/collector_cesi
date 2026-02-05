@@ -40,12 +40,7 @@ export function ProductCard({ item, delay, currentUserId }: ProductCardProps) {
                         </div>
                     )}
 
-                    {/* Delete Button for Owner */}
-                    {currentUserId && (currentUserId === item.ownerId) && (
-                        <div className="absolute top-3 left-3 z-[20]">
-                            <ItemDeleteButton itemId={item.id} />
-                        </div>
-                    )}
+
 
                     <div className="absolute top-3 right-3">
                         <Badge className="bg-white/90 backdrop-blur text-foreground font-bold shadow-sm">
