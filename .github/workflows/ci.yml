@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   # ------------------------------------------------------------------
-  # JOB 1: FRONTEND CHECK (Lint, Build)
+  # JOB 1: FRONTEND CHECK (Audit, Lint, Test, Build)
   # ------------------------------------------------------------------
   frontend-check:
     name: 🎨 Frontend Check
@@ -33,15 +33,23 @@ jobs:
         working-directory: ./frontend
         run: npm ci --legacy-peer-deps
 
+      - name: 🔒 NPM Audit (Security)
+        working-directory: ./frontend
+        run: npm audit --audit-level=high
+        continue-on-error: true # Non-blocking for now
+
       - name: 🧬 Prisma Generate (Frontend)
         working-directory: ./frontend
-        # Use local schema copy logic or point to backend if possible.
-        # Since we are in CI, we can access ../backend
+        # Use backend schema for generation
         run: npx prisma generate --schema=../backend/prisma/schema.prisma
 
-      - name: 🎨 Linting
+      - name: 🎨 Linting (ESLint)
         working-directory: ./frontend
         run: npm run lint
+
+      - name: 🧪 Unit Tests (Jest)
+        working-directory: ./frontend
+        run: npm run test
 
       - name: 🏗️ Build Next.js
         working-directory: ./frontend
@@ -50,7 +58,7 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
 
   # ------------------------------------------------------------------
-  # JOB 2: BACKEND CHECK (Lint, Test, Build)
+  # JOB 2: BACKEND CHECK (Audit, Lint, Test, Build)
   # ------------------------------------------------------------------
   backend-check:
     name: 🛡️ Backend Check
@@ -70,13 +78,18 @@ jobs:
         working-directory: ./backend
         run: npm ci
 
-      - name: 🎨 Linting
+      - name: 🔒 NPM Audit (Security)
+        working-directory: ./backend
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+      - name: 🎨 Linting (ESLint)
         working-directory: ./backend
         run: npm run lint
 
-      # - name: 🧪 Unit Tests
-      #   working-directory: ./backend
-      #   run: npm run test
+      - name: 🧪 Unit Tests (Jest)
+        working-directory: ./backend
+        run: npm run test
 
       - name: 🏗️ Build NestJS
         working-directory: ./backend
@@ -85,10 +98,10 @@ jobs:
           npm run build
 
   # ------------------------------------------------------------------
-  # JOB 3: DOCKER BUILD (Parallel)
+  # JOB 3: SECURITY SCAN (Trivy) & DOCKER BUILD
   # ------------------------------------------------------------------
-  docker-build:
-    name: 🐳 Docker Build
+  security-and-build:
+    name: 🔒 Security & Docker Build
     runs-on: ubuntu-latest
     needs: [frontend-check, backend-check]
     steps:
@@ -98,8 +111,28 @@ jobs:
       - name: 🐳 Build Frontend Image
         run: docker build -f frontend/Dockerfile -t collector-app:latest .
 
+      - name: 🔍 Trivy Scan (Frontend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'collector-app:latest'
+          format: 'table'
+          exit-code: '0' # Don't block build on vulnerability yet
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
       - name: 🐳 Build Backend Image
         run: docker build -f backend/Dockerfile -t collector-backend:latest ./backend
+
+      - name: 🔍 Trivy Scan (Backend)
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'collector-backend:latest'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
 
   # ------------------------------------------------------------------
   # JOB 4: DELIVERY (Simulation)
@@ -107,7 +140,7 @@ jobs:
   deploy-simulation:
     name: 🚀 Deploy Simulation
     runs-on: ubuntu-latest
-    needs: docker-build
+    needs: security-and-build
     if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'recette' }}
