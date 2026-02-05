@@ -12,38 +12,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ------------------------------------------------------------------
-  # JOB 1: GLOBAL AUDIT (Security)
-  # ------------------------------------------------------------------
-  global-audit:
-    name: 🔒 Global Audit
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
-      - name: 🔍 Audit Frontend
-        working-directory: ./frontend
-        run: |
-          npm ci --legacy-peer-deps --ignore-scripts
-          npm audit --audit-level=high || true
-
-      - name: 🔍 Audit Backend
-        working-directory: ./backend
-        run: |
-          npm ci --ignore-scripts
-          npm audit --audit-level=high || true
-
-  # ------------------------------------------------------------------
-  # JOB 2: BACKEND QUALITY (Lint & Build)
-  # ------------------------------------------------------------------
+  # ==================================================================
+  # BLOCK 1: BACKEND (Quality & Tests)
+  # ==================================================================
   backend-quality:
     name: 🛡️ Backend Quality
     runs-on: ubuntu-latest
@@ -72,9 +43,6 @@ jobs:
           npx prisma generate
           npm run build
 
-  # ------------------------------------------------------------------
-  # JOB 3: BACKEND TESTS (Jest)
-  # ------------------------------------------------------------------
   backend-tests:
     name: 🧪 Backend Tests
     runs-on: ubuntu-latest
@@ -99,12 +67,14 @@ jobs:
           npx prisma generate
           npm run test
 
-  # ------------------------------------------------------------------
-  # JOB 4: FRONTEND QUALITY (Lint & Build)
-  # ------------------------------------------------------------------
+  # ==================================================================
+  # BLOCK 2: FRONTEND (Quality & Tests)
+  # Depends on: Backend
+  # ==================================================================
   frontend-quality:
     name: 🎨 Frontend Quality
     runs-on: ubuntu-latest
+    needs: [backend-quality, backend-tests]
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -134,12 +104,10 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: 1
 
-  # ------------------------------------------------------------------
-  # JOB 5: FRONTEND TESTS (Jest)
-  # ------------------------------------------------------------------
   frontend-tests:
     name: 🧪 Frontend Tests
     runs-on: ubuntu-latest
+    needs: [backend-quality, backend-tests]
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -163,13 +131,45 @@ jobs:
         working-directory: ./frontend
         run: npm run test
 
-  # ------------------------------------------------------------------
-  # JOB 6: SECURITY SCAN & DOCKER BUILD
-  # ------------------------------------------------------------------
+  # ==================================================================
+  # BLOCK 3: AUDIT
+  # Depends on: Frontend
+  # ==================================================================
+  global-audit:
+    name: 🔒 Global Audit
+    runs-on: ubuntu-latest
+    needs: [frontend-quality, frontend-tests]
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: 🔍 Audit Backend
+        working-directory: ./backend
+        run: |
+          npm ci --ignore-scripts
+          npm audit --audit-level=high || true
+
+      - name: 🔍 Audit Frontend
+        working-directory: ./frontend
+        run: |
+          npm ci --legacy-peer-deps --ignore-scripts
+          npm audit --audit-level=high || true
+
+  # ==================================================================
+  # BLOCK 4: SECURITY SCAN & DOCKER
+  # Depends on: Audit
+  # ==================================================================
   security-and-build:
     name: 🔒 Security & Docker Build
     runs-on: ubuntu-latest
-    needs: [global-audit, backend-quality, backend-tests, frontend-quality, frontend-tests]
+    needs: [global-audit]
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -200,9 +200,10 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
-  # ------------------------------------------------------------------
-  # JOB 7: DELIVERY (Simulation)
-  # ------------------------------------------------------------------
+  # ==================================================================
+  # BLOCK 5: DELIVERY
+  # Depends on: Security & Docker
+  # ==================================================================
   deploy-simulation:
     name: 🚀 Deploy Simulation
     runs-on: ubuntu-latest
