@@ -71,7 +71,7 @@ export function RachatBanner({ shouldShow = true }: { shouldShow?: boolean }) {
             subtitle: "Authenticité Garantie",
             description: "Des milliers d'objets vérifiés par la communauté. Achetez vos pépites sans stress.",
             buttonText: "Explorer le catalogue",
-            link: "/",
+            link: "/#catalogue",
             images: [
                 "/images/banner/slide2-1.jpg",
                 "/images/banner/slide2-2.jpg",
