@@ -77,7 +77,6 @@ Lance le Frontend (Next.js), le Backend (NestJS) et la Base de données en une s
 
 * **Frontend** : http://localhost:3000
 * **Backend API** : http://localhost:4000
-* **Monitoring** : http://localhost:3001 (Grafana)
 
 #### Option B : Manuel (Développement)
 
@@ -119,22 +118,6 @@ npm run lint
 
 ---
 
-## 🐳 Lancement avec Docker (Stack complète)
-
-Si vous souhaitez lancer l'application ainsi que toute la stack de monitoring (Prometheus, Grafana, cAdvisor) sans configuration node locale :
-
-```bash
-# Construire et lancer les conteneurs en arrière-plan
-docker-compose up -d --build
-```
-
-Services disponibles :
-
-* **Application Collector** : [http://localhost:3000](http://localhost:3000)
-* **Grafana** : [http://localhost:3001](http://localhost:3001)
-* **Prometheus** : [http://localhost:9090](http://localhost:9090)
-
----
 
 ## 📂 Structure du Projet
 
