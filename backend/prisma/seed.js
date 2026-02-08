@@ -59,16 +59,14 @@ async function main() {
     await prisma.user.deleteMany();
     console.log('📁 Creating categories...');
     const categories = await Promise.all([
-        prisma.category.create({ data: { name: 'Consoles de jeux' } }),
-        prisma.category.create({ data: { name: 'Jeux vidéo' } }),
-        prisma.category.create({ data: { name: 'Figurines' } }),
-        prisma.category.create({ data: { name: 'Cartes à collectionner' } }),
-        prisma.category.create({ data: { name: 'BD & Comics' } }),
-        prisma.category.create({ data: { name: 'Manga' } }),
-        prisma.category.create({ data: { name: 'Vinyles' } }),
-        prisma.category.create({ data: { name: 'Montres' } }),
-        prisma.category.create({ data: { name: 'Sneakers' } }),
-        prisma.category.create({ data: { name: 'Art & Posters' } }),
+        prisma.category.create({ data: { name: 'Art & Collections' } }),
+        prisma.category.create({ data: { name: 'Auto & Moto' } }),
+        prisma.category.create({ data: { name: 'High-Tech' } }),
+        prisma.category.create({ data: { name: 'Maison & Jardin' } }),
+        prisma.category.create({ data: { name: 'Jouets & Jeux' } }),
+        prisma.category.create({ data: { name: 'Culture & Loisirs' } }),
+        prisma.category.create({ data: { name: 'Mode' } }),
+        prisma.category.create({ data: { name: 'Seconde main' } }),
     ]);
     console.log('👥 Creating users...');
     const password = await bcrypt.hash('password123', 10);
@@ -183,7 +181,7 @@ async function main() {
             published: true,
             ownerId: users[1].id,
             shopId: shops[0].id,
-            categoryId: categories[0].id,
+            categoryId: categories[2].id, // High-Tech
             images: {
                 create: [
                     {
@@ -208,7 +206,7 @@ async function main() {
             published: true,
             ownerId: users[1].id,
             shopId: shops[0].id,
-            categoryId: categories[1].id,
+            categoryId: categories[2].id, // High-Tech
             images: {
                 create: [
                     {
@@ -230,7 +228,7 @@ async function main() {
             published: true,
             ownerId: users[1].id,
             shopId: shops[0].id,
-            categoryId: categories[0].id,
+            categoryId: categories[2].id, // High-Tech
             images: {
                 create: [
                     {
@@ -252,7 +250,7 @@ async function main() {
             published: true,
             ownerId: users[2].id,
             shopId: shops[1].id,
-            categoryId: categories[5].id,
+            categoryId: categories[5].id, // Culture & Loisirs
             images: {
                 create: [
                     {
@@ -274,7 +272,7 @@ async function main() {
             published: true,
             ownerId: users[2].id,
             shopId: shops[1].id,
-            categoryId: categories[2].id,
+            categoryId: categories[4].id, // Jouets & Jeux
             images: {
                 create: [
                     {
@@ -296,7 +294,7 @@ async function main() {
             published: true,
             ownerId: users[3].id,
             shopId: shops[2].id,
-            categoryId: categories[6].id,
+            categoryId: categories[5].id, // Culture & Loisirs
             images: {
                 create: [
                     {
@@ -318,7 +316,7 @@ async function main() {
             published: true,
             ownerId: users[3].id,
             shopId: shops[2].id,
-            categoryId: categories[6].id,
+            categoryId: categories[2].id, // High-Tech
             images: {
                 create: [
                     {
@@ -340,7 +338,7 @@ async function main() {
             published: true,
             ownerId: users[5].id,
             shopId: shops[3].id,
-            categoryId: categories[3].id,
+            categoryId: categories[4].id, // Jouets & Jeux
             images: {
                 create: [
                     {
@@ -362,7 +360,7 @@ async function main() {
             published: true,
             ownerId: users[5].id,
             shopId: shops[3].id,
-            categoryId: categories[3].id,
+            categoryId: categories[4].id, // Jouets & Jeux
             images: {
                 create: [
                     {
@@ -383,7 +381,7 @@ async function main() {
             validationStatus: 'APPROVED',
             published: true,
             ownerId: users[4].id,
-            categoryId: categories[8].id,
+            categoryId: categories[6].id, // Mode
             images: {
                 create: [
                     {
@@ -490,7 +488,7 @@ async function main() {
         prisma.userInterest.create({
             data: {
                 userId: users[4].id,
-                categoryId: categories[0].id,
+                categoryId: categories[2].id, // High-Tech
                 keyword: 'nintendo',
                 minPrice: 50,
                 maxPrice: 200,
@@ -499,7 +497,7 @@ async function main() {
         prisma.userInterest.create({
             data: {
                 userId: users[4].id,
-                categoryId: categories[8].id,
+                categoryId: categories[6].id, // Mode
                 keyword: 'jordan',
                 minPrice: 500,
                 maxPrice: 2000,

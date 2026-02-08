@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { getRecommendations, RecommendedItem } from '@/app/actions/recommendations';
 import { ProductCard } from './ProductCard';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
-import { Sparkles } from 'lucide-react';
+import { Club } from 'lucide-react';
 import Link from 'next/link';
 
 export function RecommendationsSection() {
@@ -51,7 +51,7 @@ export function RecommendationsSection() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Sparkles className="h-6 w-6 text-purple-600" />
+              <Club className="h-6 w-6 text-purple-600" />
               <CardTitle className="text-xl">Recommandations personnalisées</CardTitle>
             </div>
           </div>
@@ -72,7 +72,7 @@ export function RecommendationsSection() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Sparkles className="h-6 w-6 text-purple-600" />
+            <Club className="h-6 w-6 text-purple-600" />
             <CardTitle className="text-xl">Pour vous</CardTitle>
           </div>
           <Link

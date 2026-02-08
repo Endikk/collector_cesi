@@ -11,7 +11,7 @@ const categories = [
     { name: "Jouets & Jeux", href: "/?categories=Jouets%20%26%20Jeux" },
     { name: "Culture & Loisirs", href: "/?categories=Culture%20%26%20Loisirs" },
     { name: "Mode", href: "/?categories=Mode" },
-    { name: "Seconde main", href: "/" },
+    { name: "Seconde main", href: "/?categories=Seconde%20main" },
 ];
 
 export function SecondaryNav() {
