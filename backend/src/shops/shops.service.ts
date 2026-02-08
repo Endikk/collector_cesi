@@ -78,20 +78,20 @@ export class ShopsService {
             createdAt: true,
             bio: true,
             reviewsReceived: {
-              include: { 
+              include: {
                 author: {
                   select: {
                     name: true,
-                  }
-                } 
+                  },
+                },
               },
               take: 10,
               orderBy: { createdAt: 'desc' },
             },
             _count: {
-              select: { 
-                sales: true, 
-                reviewsReceived: true 
+              select: {
+                sales: true,
+                reviewsReceived: true,
               },
             },
           },
