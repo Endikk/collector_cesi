@@ -140,15 +140,34 @@ export function RachatBanner({ shouldShow = true }: { shouldShow?: boolean }) {
                                     <div className="hidden lg:flex relative w-[500px] h-full items-center justify-center perspective-1000">
                                         {/* Image 1 - Left Back */}
                                         <div className="absolute left-0 top-1/2 -translate-y-1/2 w-48 h-64 -rotate-12 hover:-rotate-6 transition-transform duration-500 z-10 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10">
-                                            <Image src={slide.images[0]} alt="Item" fill className="object-cover" />
+                                            <Image 
+                                                src={slide.images[0]} 
+                                                alt="Item" 
+                                                fill 
+                                                className="object-cover" 
+                                                sizes="(max-width: 768px) 0px, 192px"
+                                                priority={slide.id === 1}
+                                            />
                                         </div>
                                         {/* Image 2 - Center Front */}
                                         <div className="absolute left-24 top-1/2 -translate-y-1/2 w-56 h-72 rotate-0 hover:scale-105 transition-transform duration-500 z-20 rounded-xl overflow-hidden shadow-2xl border-4 border-white/20">
-                                            <Image src={slide.images[1]} alt="Item" fill className="object-cover" />
+                                            <Image 
+                                                src={slide.images[1]} 
+                                                alt="Item" 
+                                                fill 
+                                                className="object-cover" 
+                                                sizes="(max-width: 768px) 0px, 224px"
+                                            />
                                         </div>
                                         {/* Image 3 - Right Back */}
                                         <div className="absolute right-12 top-1/2 -translate-y-1/2 w-48 h-64 rotate-12 hover:rotate-6 transition-transform duration-500 z-10 rounded-xl overflow-hidden shadow-2xl border-4 border-white/10">
-                                            <Image src={slide.images[2]} alt="Item" fill className="object-cover" />
+                                            <Image 
+                                                src={slide.images[2]} 
+                                                alt="Item" 
+                                                fill 
+                                                className="object-cover" 
+                                                sizes="(max-width: 768px) 0px, 192px"
+                                            />
                                         </div>
                                     </div>
                                 </div>
