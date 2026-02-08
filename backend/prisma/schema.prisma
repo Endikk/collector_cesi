@@ -9,43 +9,66 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(cuid())
-  email           String         @unique
-  password        String
-  name            String?
-  image           String?
-  bio             String?
-  role            String         @default("USER")
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  items           Item[]
-  messages        Message[]
-  notifications   Notification[]
-  reviewsGiven    Review[]       @relation("ReviewAuthor")
-  reviewsReceived Review[]       @relation("ReviewTarget")
-  purchases       Transaction[]  @relation("Buyer")
-  sales           Transaction[]  @relation("Seller")
-  interests       UserInterest[]
-  conversations   Conversation[] @relation("UserConversations")
+  id                       String                    @id @default(cuid())
+  email                    String                    @unique
+  password                 String
+  name                     String?
+  image                    String?
+  bio                      String?
+  role                     String                    @default("USER")
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  items                    Item[]
+  shops                    Shop[]
+  messages                 Message[]
+  notifications            Notification[]
+  reviewsGiven             Review[]                  @relation("ReviewAuthor")
+  reviewsReceived          Review[]                  @relation("ReviewTarget")
+  purchases                Transaction[]             @relation("Buyer")
+  sales                    Transaction[]             @relation("Seller")
+  interests                UserInterest[]
+  conversations            Conversation[]            @relation("UserConversations")
+  notificationPreferences  NotificationPreferences?
+  isSeller                 Boolean                   @default(false)
+  sellerType               String?                   // "PARTICULIER" ou "PROFESSIONNEL"
+}
+
+model Shop {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  logo        String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  ownerId     String
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  items       Item[]
 }
 
 model Item {
-  id           String         @id @default(cuid())
-  title        String
-  description  String
-  price        Float
-  status       String         @default("AVAILABLE")
-  viewCount    Int            @default(0)
-  published    Boolean        @default(false)
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  ownerId      String
-  categoryId   String?
-  images       Image[]
-  category     Category?      @relation(fields: [categoryId], references: [id])
-  owner        User           @relation(fields: [ownerId], references: [id])
-  priceHistory PriceHistory[]
-  transaction  Transaction?
+  id               String         @id @default(cuid())
+  title            String
+  description      String
+  price            Float
+  shippingCost     Float          @default(0)
+  status           String         @default("AVAILABLE")
+  validationStatus String         @default("PENDING_REVIEW") // PENDING_REVIEW, APPROVED, REJECTED
+  validationNote   String?        // Notes du contrôle automatique
+  rejectionReason  String?        // Raison du rejet si REJECTED
+  validatedAt      DateTime?      // Date de validation
+  viewCount        Int            @default(0)
+  published        Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  ownerId          String
+  shopId           String?
+  categoryId       String?
+  images           Image[]
+  shop             Shop?          @relation(fields: [shopId], references: [id])
+  category         Category?      @relation(fields: [categoryId], references: [id])
+  owner            User           @relation(fields: [ownerId], references: [id])
+  priceHistory     PriceHistory[]
+  transaction      Transaction?
 }
 
 model Image {
@@ -56,23 +79,28 @@ model Image {
 }
 
 model Category {
-  id    String @id @default(cuid())
-  name  String @unique
-  items Item[]
+  id        String         @id @default(cuid())
+  name      String         @unique
+  items     Item[]
+  interests UserInterest[]
 }
 
 model Transaction {
-  id        String   @id @default(cuid())
-  amount    Float
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now())
-  buyerId   String
-  sellerId  String
-  itemId    String   @unique
-  review    Review?
-  buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
-  item      Item     @relation(fields: [itemId], references: [id])
-  seller    User     @relation("Seller", fields: [sellerId], references: [id])
+  id                    String   @id @default(cuid())
+  amount                Float
+  status                String   @default("PENDING")
+  createdAt             DateTime @default(now())
+  buyerId               String
+  sellerId              String
+  itemId                String   @unique
+  review                Review?
+  buyer                 User     @relation("Buyer", fields: [buyerId], references: [id])
+  item                  Item     @relation(fields: [itemId], references: [id])
+  seller                User     @relation("Seller", fields: [sellerId], references: [id])
+  commission            Float    @default(0)
+  stripePaymentIntentId String?  @unique
+  stripePaymentStatus   String?
+  paymentMethod         String   @default("card")
 }
 
 model Review {
@@ -105,6 +133,8 @@ model Message {
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender         User         @relation(fields: [senderId], references: [id])
+  flagged        Boolean      @default(false)
+  moderationNote String?
 }
 
 model Notification {
@@ -126,10 +156,119 @@ model PriceHistory {
 }
 
 model UserInterest {
-  id       String  @id @default(cuid())
-  keyword  String?
-  minPrice Float?
-  maxPrice Float?
-  userId   String
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  keyword    String?
+  minPrice   Float?
+  maxPrice   Float?
+  userId     String
+  categoryId String?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category? @relation(fields: [categoryId], references: [id])
+}
+
+model NotificationPreferences {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  emailNewItem              Boolean  @default(true)
+  emailMatchingInterest     Boolean  @default(true)
+  emailMessages             Boolean  @default(true)
+  emailTransactions         Boolean  @default(true)
+  inAppNewItem              Boolean  @default(true)
+  inAppMatchingInterest     Boolean  @default(true)
+  inAppMessages             Boolean  @default(true)
+  inAppTransactions         Boolean  @default(true)
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Translation {
+  id        String   @id @default(cuid())
+  key       String
+  locale    String   // fr, en, es, de, etc.
+  value     String   @db.Text
+  context   String?  // category, item, ui, etc.
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([key, locale])
+  @@index([locale])
+  @@index([context])
+}
+
+model AdvertisingPartner {
+  id               String             @id @default(cuid())
+  name             String
+  domain           String             @unique
+  apiKey           String             @unique
+  webhookUrl       String?
+  active           Boolean            @default(true)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  trackingPixelUrl String?
+  campaigns        AdCampaign[]
+  impressions      AdImpression[]
+  preferences      PartnerPreferences?
+}
+
+model PartnerPreferences {
+  id                String             @id @default(cuid())
+  partnerId         String             @unique
+  partner           AdvertisingPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  targetCategories  String[]           // Array of category IDs
+  minPrice          Float?
+  maxPrice          Float?
+  itemConditions    String[]           // NEUF, OCCASION, etc.
+  autoSync          Boolean            @default(true)
+  syncFrequency     Int                @default(3600) // seconds
+  format            String             @default("JSON") // JSON, XML, RSS
+}
+
+model AdCampaign {
+  id          String             @id @default(cuid())
+  partnerId   String
+  partner     AdvertisingPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  name        String
+  startDate   DateTime
+  endDate     DateTime?
+  active      Boolean            @default(true)
+  budget      Float?
+  spent       Float              @default(0)
+  clicks      Int                @default(0)
+  impressions Int                @default(0)
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+}
+
+model AdImpression {
+  id         String             @id @default(cuid())
+  partnerId  String
+  partner    AdvertisingPartner @relation(fields: [partnerId], references: [id], onDelete: Cascade)
+  itemId     String
+  clicked    Boolean            @default(false)
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime           @default(now())
+  campaignId String?
+
+  @@index([partnerId, createdAt])
+  @@index([itemId])
+}
+
+// 🔒 Security: Audit logs pour traçabilité (RGPD, PCI-DSS, SOC2)
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String?
+  action      String   // LOGIN, PAYMENT, ADMIN_ACTION, etc.
+  resource    String?  // USER, ITEM, TRANSACTION, etc.
+  resourceId  String?
+  severity    String   @default("INFO") // INFO, LOW, MEDIUM, HIGH, CRITICAL
+  ip          String?
+  userAgent   String?
+  metadata    Json?    // Données additionnelles contextuelles
+  success     Boolean  @default(true)
+  timestamp   DateTime @default(now())
+
+  @@index([userId, timestamp])
+  @@index([action, timestamp])
+  @@index([severity, timestamp])
+  @@index([timestamp])
 }

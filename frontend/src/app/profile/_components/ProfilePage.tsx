@@ -30,7 +30,7 @@ interface UserProfile {
     sales: Transaction[];
 }
 
-export function ProfilePage() {
+export function ProfilePageContent() {
     const { data: session } = useSession();
     const [profile, setProfile] = useState<UserProfile | null>(null);
 
@@ -77,6 +77,12 @@ export function ProfilePage() {
                 </Link>
                 <Link href="/profile/purchases" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
                     Voir mes achats
+                </Link>
+                <Link href="/profile/interests" className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
+                    Mes centres d&apos;intérêt
+                </Link>
+                <Link href="/profile/notifications" className="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition">
+                    Préférences notifications
                 </Link>
             </div>
 

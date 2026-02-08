@@ -22,7 +22,10 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/prisma ./prisma
+COPY start.sh ./
 
-EXPOSE 3000
+RUN chmod +x start.sh
 
-CMD [ "npm", "run", "start:prod" ]
+EXPOSE 3000 5555
+
+CMD [ "./start.sh" ]

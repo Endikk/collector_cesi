@@ -5,6 +5,76 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+// Fonction de modération du contenu
+async function moderateContent(content: string): Promise<{
+    allowed: boolean;
+    flagged?: boolean;
+    reasons?: string[];
+    message?: string;
+}> {
+    const emailPattern = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi;
+    const phonePatterns = [
+        /\b0[1-9](?:[\s.-]*\d{2}){4}\b/g,
+        /\b(?:\+33|0033)[1-9](?:[\s.-]*\d{2}){4}\b/g,
+        /\b\d{10,}\b/g,
+    ];
+    const urlPattern = /(https?:\/\/[^\s]+)/gi;
+    const suspiciousKeywords = [
+        'whatsapp', 'telegram', 'signal', 'appel', 'appeler',
+        'contacte', 'contactez', 'hors site', 'paypal', 'virement',
+        'espèces', 'liquide', 'cash', 'western union', 'mandat',
+    ];
+
+    const reasons: string[] = [];
+    let flagged = false;
+
+    // Vérifier emails
+    if (emailPattern.test(content)) {
+        flagged = true;
+        reasons.push('Adresse email détectée');
+    }
+
+    // Vérifier téléphones
+    for (const pattern of phonePatterns) {
+        if (pattern.test(content)) {
+            flagged = true;
+            reasons.push('Numéro de téléphone détecté');
+            break;
+        }
+    }
+
+    // Vérifier URLs externes
+    const urls = content.match(urlPattern);
+    if (urls) {
+        const externalUrls = urls.filter(url => !url.includes('collector.shop'));
+        if (externalUrls.length > 0) {
+            flagged = true;
+            reasons.push('Lien externe détecté');
+        }
+    }
+
+    // Vérifier mots-clés suspects
+    const lowerContent = content.toLowerCase();
+    const foundKeywords = suspiciousKeywords.filter(keyword =>
+        lowerContent.includes(keyword)
+    );
+    if (foundKeywords.length > 0) {
+        flagged = true;
+        reasons.push(`Mots suspects: ${foundKeywords.join(', ')}`);
+    }
+
+    if (flagged) {
+        return {
+            allowed: false,
+            flagged: true,
+            reasons,
+            message: `❌ Message bloqué : ${reasons.join(', ')}.\n\n⚠️ Les échanges d'informations personnelles sont interdits.\n💳 Tous les paiements doivent passer par Collector.shop pour votre sécurité.`,
+        };
+    }
+
+    return { allowed: true, flagged: false };
+}
+
 export async function getConversations() {
     const session = await getServerSession(authOptions);
 
@@ -104,6 +174,16 @@ export async function sendMessage(conversationId: string, content: string) {
 
     if (!session || !session.user) {
         return { success: false, message: "Non autorisé" };
+    }
+
+    // Modération du contenu
+    const moderationResult = await moderateContent(content);
+    
+    if (!moderationResult.allowed) {
+        return { 
+            success: false, 
+            message: moderationResult.message || "Message bloqué par la modération"
+        };
     }
 
     try {

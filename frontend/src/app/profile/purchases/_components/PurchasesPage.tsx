@@ -9,7 +9,7 @@ import { ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
-export async function PurchasesPage() {
+export async function PurchasesPageContent() {
     const session = await getServerSession(authOptions) as Session | null;
 
     if (!session || !session.user) {
@@ -25,7 +25,10 @@ export async function PurchasesPage() {
                 include: { images: true },
             },
             seller: {
-                select: { name: true, email: true },
+                select: { id: true, name: true, email: true },
+            },
+            review: {
+                select: { id: true, rating: true },
             },
         },
         orderBy: { createdAt: "desc" },

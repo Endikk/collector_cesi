@@ -40,6 +40,7 @@ export async function buyItem(itemId: string) {
                     itemId: item.id,
                     buyerId: userId,
                     sellerId: item.ownerId,
+                    commission: item.price * 0.05,
                 },
             }),
             prisma.item.update({

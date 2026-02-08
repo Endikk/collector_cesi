@@ -1,7 +1,7 @@
-import { SalesPage as SalesPageComponent } from "@/app/profile/sales/_components/SalesPage";
+import { SalesPageContent } from "@/app/profile/sales/_components/SalesPage";
 
 export const dynamic = 'force-dynamic';
 
 export default function SalesPage() {
-    return <SalesPageComponent />;
+    return <SalesPageContent />;
 }

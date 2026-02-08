@@ -1,0 +1,233 @@
+{
+  "common": {
+    "loading": "Wird geladen...",
+    "error": "Ein Fehler ist aufgetreten",
+    "success": "Vorgang erfolgreich",
+    "cancel": "Abbrechen",
+    "confirm": "Bestätigen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "sortBy": "Sortieren nach",
+    "price": "Preis",
+    "category": "Kategorie",
+    "readMore": "Mehr lesen",
+    "close": "Schließen",
+    "back": "Zurück",
+    "next": "Weiter",
+    "previous": "Zurück",
+    "seeAll": "Alles ansehen"
+  },
+  "nav": {
+    "home": "Startseite",
+    "explore": "Entdecken",
+    "sell": "Verkaufen",
+    "messages": "Nachrichten",
+    "profile": "Profil",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "register": "Registrieren",
+    "admin": "Verwaltung",
+    "settings": "Einstellungen",
+    "notifications": "Benachrichtigungen",
+    "shops": "Geschäfte",
+    "favorites": "Favoriten"
+  },
+  "home": {
+    "title": "Willkommen bei Collector",
+    "subtitle": "Der Referenz-Marktplatz für Sammler",
+    "hero": {
+      "title": "Finden Sie Ihre Traum-Sammlerstücke",
+      "description": "Tausende einzigartige Artikel warten auf Sie",
+      "cta": "Entdecken beginnen",
+      "sellCta": "Meine Artikel verkaufen"
+    },
+    "categories": {
+      "title": "Beliebte Kategorien",
+      "viewAll": "Alle Kategorien anzeigen"
+    },
+    "featured": {
+      "title": "Empfohlene Artikel",
+      "newArrivals": "Neuheiten",
+      "trending": "Trends"
+    }
+  },
+  "item": {
+    "title": "Artikel",
+    "description": "Beschreibung",
+    "price": "Preis",
+    "condition": "Zustand",
+    "seller": "Verkäufer",
+    "category": "Kategorie",
+    "addToCart": "In den Warenkorb",
+    "buyNow": "Jetzt kaufen",
+    "contactSeller": "Verkäufer kontaktieren",
+    "reportItem": "Melden",
+    "shareItem": "Teilen",
+    "priceHistory": "Preisverlauf",
+    "shipping": "Versandkosten",
+    "status": {
+      "available": "Verfügbar",
+      "sold": "Verkauft",
+      "reserved": "Reserviert",
+      "pending": "Ausstehend"
+    },
+    "condition": {
+      "new": "Neu",
+      "likeNew": "Wie neu",
+      "excellent": "Ausgezeichnet",
+      "good": "Gut",
+      "fair": "Akzeptabel",
+      "poor": "Gebraucht"
+    }
+  },
+  "sell": {
+    "title": "Artikel verkaufen",
+    "createListing": "Anzeige erstellen",
+    "itemDetails": "Artikeldetails",
+    "pricing": "Preisgestaltung",
+    "photos": "Fotos",
+    "publish": "Veröffentlichen",
+    "draft": "Als Entwurf speichern",
+    "form": {
+      "title": "Titel",
+      "titlePlaceholder": "Z.B.: Nintendo 64 Konsole in ausgezeichnetem Zustand",
+      "description": "Beschreibung",
+      "descriptionPlaceholder": "Beschreiben Sie Ihren Artikel im Detail...",
+      "price": "Verkaufspreis",
+      "shippingCost": "Versandkosten",
+      "category": "Kategorie",
+      "selectCategory": "Kategorie auswählen",
+      "condition": "Zustand",
+      "photos": "Fotos (max 5)",
+      "uploadPhotos": "Fotos hochladen"
+    },
+    "validation": {
+      "titleRequired": "Titel ist erforderlich",
+      "descriptionRequired": "Beschreibung ist erforderlich",
+      "priceRequired": "Preis ist erforderlich",
+      "priceMin": "Preis muss größer als 0 sein",
+      "categoryRequired": "Kategorie ist erforderlich",
+      "photosRequired": "Mindestens ein Foto ist erforderlich"
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "myItems": "Meine Artikel",
+    "myPurchases": "Meine Käufe",
+    "mySales": "Meine Verkäufe",
+    "myShops": "Meine Geschäfte",
+    "settings": "Einstellungen",
+    "reviews": "Bewertungen",
+    "rating": "Bewertung",
+    "memberSince": "Mitglied seit",
+    "edit": "Profil bearbeiten",
+    "bio": "Über"
+  },
+  "messages": {
+    "title": "Nachrichten",
+    "conversations": "Unterhaltungen",
+    "newMessage": "Neue Nachricht",
+    "sendMessage": "Senden",
+    "typePlaceholder": "Nachricht schreiben...",
+    "noConversations": "Keine Unterhaltungen",
+    "markAsRead": "Als gelesen markieren",
+    "delete": "Unterhaltung löschen"
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "noNotifications": "Keine Benachrichtigungen",
+    "types": {
+      "newMessage": "Neue Nachricht",
+      "itemSold": "Artikel verkauft",
+      "priceChange": "Preisänderung",
+      "newReview": "Neue Bewertung",
+      "itemValidated": "Artikel validiert",
+      "itemRejected": "Artikel abgelehnt"
+    }
+  },
+  "shop": {
+    "title": "Geschäft",
+    "createShop": "Geschäft erstellen",
+    "editShop": "Geschäft bearbeiten",
+    "shopName": "Geschäftsname",
+    "shopDescription": "Beschreibung",
+    "items": "Artikel",
+    "totalSales": "Gesamtumsatz",
+    "rating": "Bewertung",
+    "owner": "Eigentümer"
+  },
+  "checkout": {
+    "title": "Kasse",
+    "summary": "Zusammenfassung",
+    "itemPrice": "Artikelpreis",
+    "shipping": "Versand",
+    "commission": "Provision (5%)",
+    "total": "Gesamt",
+    "paymentMethod": "Zahlungsmethode",
+    "confirmPurchase": "Kauf bestätigen",
+    "processing": "Wird verarbeitet...",
+    "success": "Kauf erfolgreich!",
+    "error": "Zahlungsfehler"
+  },
+  "admin": {
+    "title": "Verwaltung",
+    "dashboard": "Dashboard",
+    "items": "Artikel",
+    "users": "Benutzer",
+    "shops": "Geschäfte",
+    "reports": "Berichte",
+    "moderation": "Moderation",
+    "analytics": "Analysen",
+    "settings": "Einstellungen",
+    "fraudDetection": "Betrugserkennung",
+    "advertising": "Werbung"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "confirmPassword": "Passwort bestätigen",
+    "forgotPassword": "Passwort vergessen?",
+    "rememberMe": "Angemeldet bleiben",
+    "loginButton": "Anmelden",
+    "registerButton": "Registrieren",
+    "or": "oder",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "alreadyHaveAccount": "Sie haben bereits ein Konto?",
+    "dontHaveAccount": "Sie haben noch kein Konto?"
+  },
+  "errors": {
+    "notFound": "Seite nicht gefunden",
+    "unauthorized": "Unbefugter Zugriff",
+    "serverError": "Serverfehler",
+    "networkError": "Netzwerkfehler",
+    "goHome": "Zur Startseite",
+    "tryAgain": "Erneut versuchen"
+  },
+  "footer": {
+    "about": "Über uns",
+    "contact": "Kontakt",
+    "terms": "Nutzungsbedingungen",
+    "privacy": "Datenschutz",
+    "help": "Hilfe",
+    "followUs": "Folgen Sie uns",
+    "copyright": "© 2026 Collector. Alle Rechte vorbehalten."
+  },
+  "accessibility": {
+    "skipToContent": "Zum Hauptinhalt springen",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "openUserMenu": "Benutzermenü öffnen",
+    "languageSelector": "Sprachauswahl",
+    "searchButton": "Suchschaltfläche",
+    "logoLink": "Link zur Startseite",
+    "notificationCount": "{count} ungelesene Benachrichtigung(en)",
+    "loading": "Wird geladen",
+    "imageAlt": "Bild von {title}"
+  }
+}

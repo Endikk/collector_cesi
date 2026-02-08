@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import BlurFade from "@/components/ui/blur-fade";
-import ItemDeleteButton from "@/components/common/ItemDeleteButton";
 import { Package } from "lucide-react";
 
 interface ProductCardProps {
@@ -19,10 +18,9 @@ interface ProductCardProps {
         owner: { name: string | null };
     };
     delay: number;
-    currentUserId?: string;
 }
 
-export function ProductCard({ item, delay, currentUserId }: ProductCardProps) {
+export function ProductCard({ item, delay }: ProductCardProps) {
     return (
         <BlurFade delay={delay} inView>
             <Card className="group relative overflow-hidden border-0 bg-white shadow-md transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/5">

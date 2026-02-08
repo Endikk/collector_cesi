@@ -12,7 +12,7 @@ import ItemDeleteButton from "@/components/common/ItemDeleteButton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export async function SalesPage() {
+export async function SalesPageContent() {
     const session = await getServerSession(authOptions) as Session | null;
 
     if (!session || !session.user) {
@@ -39,7 +39,10 @@ export async function SalesPage() {
                 include: { images: true },
             },
             buyer: {
-                select: { name: true, email: true },
+                select: { id: true, name: true, email: true },
+            },
+            review: {
+                select: { id: true, rating: true },
             },
         },
         orderBy: { createdAt: "desc" },

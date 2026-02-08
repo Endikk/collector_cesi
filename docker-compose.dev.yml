@@ -1,0 +1,35 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+      target: development
+    ports:
+      - "4000:3000"
+      - "5555:5555"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/collector?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - PORT=3000
+      - STRIPE_SECRET_KEY=sk_test_placeholder
+      - STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
+      - STRIPE_WEBHOOK_SECRET=whsec_placeholder
+      - JWT_SECRET=dev-jwt-secret-key
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_SECURE=false
+      - SMTP_USER=dev@example.com
+      - SMTP_PASSWORD=dev-password
+      - SMTP_FROM=noreply@thecollector.com
+      - FRAUD_DETECTION_WEBHOOK_URL=
+      - FRAUD_DETECTION_API_KEY=
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - /app/dist
+    command: sh -c "chmod +x /app/start-dev.sh && /app/start-dev.sh"
+    depends_on:
+      - db
+      - redis
+    restart: always

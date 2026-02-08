@@ -7,6 +7,7 @@ import { ProductCard } from "./ProductCard";
 import { FiltersSection } from "./FiltersSection";
 import { RachatBanner } from "./RachatBanner";
 import { HeroCarousel } from "./HeroCarousel";
+import { RecommendationsSection } from "./RecommendationsSection";
 import { Search } from "lucide-react";
 import { Prisma } from "@prisma/client";
 
@@ -105,7 +106,10 @@ export async function HomePage({ searchParams }: HomePageProps) {
             {/* 2. Live Events / Hero Carousel */}
             <HeroCarousel items={items} />
 
-            {/* 3. Main Content Grid */}
+            {/* 3. Personalized Recommendations - Only for authenticated users */}
+            {!hasActiveFilters && <RecommendationsSection />}
+
+            {/* 4. Main Content Grid */}
             <div className="flex flex-col lg:flex-row gap-8 mt-8">
                 <aside className="hidden lg:block w-64 flex-shrink-0">
                     <FiltersSection />
@@ -119,7 +123,6 @@ export async function HomePage({ searchParams }: HomePageProps) {
                                 key={item.id}
                                 item={item}
                                 delay={BLUR_FADE_DELAY * 2 + idx * 0.05}
-                                currentUserId={session?.user?.id}
                             />
                         ))}
 

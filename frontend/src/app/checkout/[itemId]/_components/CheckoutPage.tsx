@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { CreditCard, Lock, CheckCircle2, Loader2 } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Lock, CheckCircle2, Loader2, CreditCard } from "lucide-react";
 import { buyItem } from "@/app/actions/transaction";
 
 interface CheckoutPageProps {
@@ -208,6 +208,12 @@ export function CheckoutPage({ item }: CheckoutPageProps) {
                                         {item.price.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
                                     </span>
                                 </div>
+                            </div>
+
+                            <div className="bg-muted p-3 rounded-md text-xs text-muted-foreground mt-4">
+                                <p>
+                                    Collector prend une commission de 5% sur la transaction (à la charge du vendeur).
+                                </p>
                             </div>
                         </CardContent>
                     </Card>

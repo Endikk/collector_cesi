@@ -2,11 +2,10 @@
 
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
-import { Bell, ShoppingCart, ChevronDown } from "lucide-react";
+import { ShoppingCart, ChevronDown } from "lucide-react";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -15,6 +14,7 @@ import {
     AvatarFallback,
     AvatarImage,
 } from "@/components/ui/avatar";
+import { NotificationsDropdown } from "@/components/common/NotificationsDropdown";
 
 export function UtilityBar() {
     const { data: session } = useSession();
@@ -53,6 +53,12 @@ export function UtilityBar() {
                                         Paramètres du compte
                                     </Link>
 
+                                    {session.user?.role === 'ADMIN' && (
+                                        <Link href="/admin" className="block py-1.5 hover:underline hover:text-[#3665f3] transition-colors font-semibold text-purple-600">
+                                            🔐 Back Office Admin
+                                        </Link>
+                                    )}
+
                                     <DropdownMenuSeparator className="my-2" />
 
                                     <button
@@ -89,9 +95,7 @@ export function UtilityBar() {
                         <ChevronDown className="h-3 w-3" />
                     </Link>
                     <div className="flex items-center gap-4 text-foreground">
-                        <button className="hover:text-muted-foreground transition-colors relative">
-                            <Bell className="h-5 w-5" />
-                        </button>
+                        {session && <NotificationsDropdown />}
                         <button className="hover:text-muted-foreground transition-colors relative">
                             <ShoppingCart className="h-5 w-5" />
                         </button>

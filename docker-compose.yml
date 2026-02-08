@@ -25,12 +25,43 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4000:3000"
+      - "5555:5555"
     environment:
       - DATABASE_URL=postgresql://user:password@db:5432/collector?schema=public
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
       - PORT=3000
+      - STRIPE_SECRET_KEY=sk_test_placeholder
+      - STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
+      - STRIPE_WEBHOOK_SECRET=whsec_placeholder
+      - JWT_SECRET=dev-jwt-secret-key
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_PORT=587
+      - SMTP_SECURE=false
+      - SMTP_USER=dev@example.com
+      - SMTP_PASSWORD=dev-password
+      - SMTP_FROM=noreply@thecollector.com
+      - FRAUD_DETECTION_WEBHOOK_URL=
+      - FRAUD_DETECTION_API_KEY=
     depends_on:
       - db
+      - redis
     restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: collector-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
   db:
     image: postgres:15-alpine
@@ -52,3 +83,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:

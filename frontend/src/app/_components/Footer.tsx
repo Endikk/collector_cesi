@@ -129,7 +129,7 @@ export function Footer() {
                             <Link href="#" className="underline text-[#767676] hover:text-[#0654ba]">Avis sur les données personnelles</Link>,
                             <Link href="#" className="underline text-[#767676] hover:text-[#0654ba]">Conditions d&apos;utilisation des services de paiement</Link>,
                             <Link href="#" className="underline text-[#767676] hover:text-[#0654ba]">Cookies</Link> et
-                            <Link href="#" className="underline text-[#767676] hover:text-[#0654ba] flex items-center gap-0.5">AdChoice <div className="w-2.5 h-2.5 rounded-full border border-gray-400 flex items-center justify-center">i</div></Link>
+                            <Link href="#" className="underline text-[#767676] hover:text-[#0654ba] inline-flex items-center gap-0.5">AdChoice <span className="w-2.5 h-2.5 rounded-full border border-gray-400 inline-flex items-center justify-center text-[8px]">i</span></Link>
                         </p>
                     </div>
                 </div>

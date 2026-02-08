@@ -69,9 +69,13 @@ export function SellPage() {
         </div>
     );
 
+    // This is a fallback, but the page should already redirect on the server side
     if (!session) {
-        router.push("/api/auth/signin");
-        return null;
+        return (
+            <div className="flex h-[50vh] items-center justify-center">
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            </div>
+        );
     }
 
     return (

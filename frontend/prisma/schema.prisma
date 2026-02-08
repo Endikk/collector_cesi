@@ -9,24 +9,25 @@ datasource db {
 }
 
 model User {
-  id              String         @id @default(cuid())
-  email           String         @unique
-  password        String
-  name            String?
-  image           String?
-  bio             String?
-  role            String         @default("USER")
-  createdAt       DateTime       @default(now())
-  updatedAt       DateTime       @updatedAt
-  items           Item[]
-  messages        Message[]
-  notifications   Notification[]
-  reviewsGiven    Review[]       @relation("ReviewAuthor")
-  reviewsReceived Review[]       @relation("ReviewTarget")
-  purchases       Transaction[]  @relation("Buyer")
-  sales           Transaction[]  @relation("Seller")
-  interests       UserInterest[]
-  conversations   Conversation[] @relation("UserConversations")
+  id                       String                    @id @default(cuid())
+  email                    String                    @unique
+  password                 String
+  name                     String?
+  image                    String?
+  bio                      String?
+  role                     String                    @default("USER")
+  createdAt                DateTime                  @default(now())
+  updatedAt                DateTime                  @updatedAt
+  items                    Item[]
+  messages                 Message[]
+  notifications            Notification[]
+  reviewsGiven             Review[]                  @relation("ReviewAuthor")
+  reviewsReceived          Review[]                  @relation("ReviewTarget")
+  purchases                Transaction[]             @relation("Buyer")
+  sales                    Transaction[]             @relation("Seller")
+  interests                UserInterest[]
+  conversations            Conversation[]            @relation("UserConversations")
+  notificationPreferences  NotificationPreferences?
 }
 
 model Item {
@@ -56,9 +57,10 @@ model Image {
 }
 
 model Category {
-  id    String @id @default(cuid())
-  name  String @unique
-  items Item[]
+  id        String         @id @default(cuid())
+  name      String         @unique
+  items     Item[]
+  interests UserInterest[]
 }
 
 model Transaction {
@@ -73,6 +75,7 @@ model Transaction {
   buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
   item      Item     @relation(fields: [itemId], references: [id])
   seller    User     @relation("Seller", fields: [sellerId], references: [id])
+  commission Float   @default(0)
 }
 
 model Review {
@@ -126,10 +129,26 @@ model PriceHistory {
 }
 
 model UserInterest {
-  id       String  @id @default(cuid())
-  keyword  String?
-  minPrice Float?
-  maxPrice Float?
-  userId   String
-  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String    @id @default(cuid())
+  keyword    String?
+  minPrice   Float?
+  maxPrice   Float?
+  userId     String
+  categoryId String?
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category? @relation(fields: [categoryId], references: [id])
+}
+
+model NotificationPreferences {
+  id                        String   @id @default(cuid())
+  userId                    String   @unique
+  emailNewItem              Boolean  @default(true)
+  emailMatchingInterest     Boolean  @default(true)
+  emailMessages             Boolean  @default(true)
+  emailTransactions         Boolean  @default(true)
+  inAppNewItem              Boolean  @default(true)
+  inAppMatchingInterest     Boolean  @default(true)
+  inAppMessages             Boolean  @default(true)
+  inAppTransactions         Boolean  @default(true)
+  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

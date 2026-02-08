@@ -55,7 +55,7 @@ export async function createItem(prevState: State, formData: FormData) {
     const { title, description, price, imageUrl, categoryId } = validatedFields.data;
 
     try {
-        await prisma.item.create({
+        const item = await prisma.item.create({
             data: {
                 title,
                 description,
@@ -70,6 +70,22 @@ export async function createItem(prevState: State, formData: FormData) {
                 }),
             },
         });
+
+        // Trigger notifications in background (don't wait for it)
+        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'}/notifications/trigger-new-item`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                itemId: item.id,
+                title: item.title,
+                description: item.description,
+                price: item.price,
+                categoryId: item.categoryId,
+                ownerId: item.ownerId,
+            }),
+        }).catch(err => console.error('Failed to trigger notifications:', err));
 
         revalidatePath("/");
         revalidatePath("/profile/sales");
