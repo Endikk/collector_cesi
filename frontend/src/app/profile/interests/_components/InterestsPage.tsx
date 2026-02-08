@@ -69,7 +69,7 @@ export function InterestsPage() {
     try {
       const [interestsData, categoriesData] = await Promise.all([
         getUserInterests(),
-        fetchBackend<Category[]>('/admin/categories'),
+        fetchBackend<Category[]>('/items/categories'),
       ]);
       setInterests(interestsData);
       setCategories(categoriesData);

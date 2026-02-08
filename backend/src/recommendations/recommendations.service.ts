@@ -12,8 +12,8 @@ export class RecommendationsService {
     });
 
     if (interests.length === 0) {
-      // No interests configured, return popular items
-      return this.getPopularItems(limit);
+      // No interests configured, return empty array to encourage user to configure interests
+      return [];
     }
 
     // Build query conditions based on interests

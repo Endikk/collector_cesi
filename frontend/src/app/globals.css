@@ -3,53 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
-    /* Premium Light Foundation (Pure White / Alabaster) */
-    --background: 0 0% 100%;
-    /* Pure White */
-    --foreground: 224 71% 4%;
-    /* Deep Midnight Navy/Charcoal for text */
-
-    --card: 0 0% 100%;
-    /* White cards */
-    --card-foreground: 224 71% 4%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71% 4%;
-
-    /* Luxury Gold / Metallic Bronze */
-    --primary: 46 83% 45%;
-    /* darker gold for better contrast on white */
-    --primary-foreground: 0 0% 100%;
-
-    /* Soft Platinum / Silver for secondary actions */
-    --secondary: 210 20% 96%;
-    /* Very light grey/silver */
-    --secondary-foreground: 224 71% 4%;
-
-    /* Stone / Warm Grey for Muted elements */
-    --muted: 60 4.8% 95.9%;
-    --muted-foreground: 25 5.3% 44.7%;
-    /* Warm grey text */
-
-    --accent: 46 83% 45%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-
-    /* Subtle Borders */
-    --border: 220 13% 91%;
-    /* Very light grey border */
-    --input: 220 13% 91%;
-    --ring: 46 83% 45%;
-    /* Gold ring */
-
-    --radius: 0.5rem;
-  }
-}
-
-@layer base {
   * {
     @apply border-border;
   }
@@ -59,6 +12,26 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: 'cv01', 'cv02', 'cv03', 'cv04', 'ss01';
+  }
+
+  /* Premium smooth scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-neutral-100;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 hover:bg-neutral-400 rounded-full;
+  }
+
+  /* Smooth focus rings */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary/20 ring-offset-2;
   }
 }

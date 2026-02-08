@@ -25,6 +25,19 @@ export class ItemsService {
   ) {}
 
   /**
+   * Obtenir toutes les catégories (endpoint public)
+   */
+  async getCategories() {
+    return this.prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: { name: 'asc' },
+    });
+  }
+
+  /**
    * Obtenir un article par ID
    */
   async getItemById(itemId: string) {

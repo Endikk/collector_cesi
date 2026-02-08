@@ -16,6 +16,10 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Collector",
   description: "La marketplace de référence pour les collectionneurs.",
+  icons: {
+    icon: '/collector.svg',
+    apple: '/collector.svg',
+  },
 };
 
 export default async function RootLayout({

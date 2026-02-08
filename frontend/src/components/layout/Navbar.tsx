@@ -63,8 +63,9 @@ export default function NavBar() {
 
             <div className="border-b">
                 <div className="container flex h-[72px] items-center gap-6">
-                    <Link href="/" className="flex items-center gap-1 font-bold text-3xl tracking-tighter flex-shrink-0 -mt-1">
-                        <span className="text-yellow-500">Collector</span>
+                    <Link href="/" className="flex items-center gap-3 font-bold text-3xl tracking-tighter flex-shrink-0 -mt-1">
+                        <img src="/collector.svg" alt="Collector Logo" className="h-10 w-10" />
+                        <span className="text-collector-gold">Collector</span>
                     </Link>
 
                     <div className="flex-1 hidden md:flex items-center">

@@ -6,6 +6,14 @@ export class ItemsController {
   constructor(private readonly itemsService: ItemsService) {}
 
   /**
+   * Obtenir toutes les catégories (endpoint public)
+   */
+  @Get('categories')
+  async getCategories() {
+    return this.itemsService.getCategories();
+  }
+
+  /**
    * Obtenir un article par ID
    */
   @Get(':id')
