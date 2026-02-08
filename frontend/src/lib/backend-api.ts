@@ -1,4 +1,16 @@
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+// Determine backend URL based on environment
+// - Server-side (in Docker): use internal Docker network URL
+// - Client-side: use public URL (localhost or env variable)
+const getBackendUrl = () => {
+    // If running on server (SSR) and BACKEND_URL is set, use it (for Docker internal communication)
+    if (typeof window === 'undefined' && process.env.BACKEND_URL) {
+        return process.env.BACKEND_URL;
+    }
+    // Otherwise use public URL for client-side or development
+    return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+};
+
+const BACKEND_URL = getBackendUrl();
 
 export async function fetchBackend<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const res = await fetch(`${BACKEND_URL}${endpoint}`, {

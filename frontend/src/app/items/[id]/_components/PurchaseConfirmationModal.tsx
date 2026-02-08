@@ -36,28 +36,30 @@ export function PurchaseConfirmationModal({
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Confirmer l&apos;achat</AlertDialogTitle>
-                    <AlertDialogDescription className="space-y-4">
-                        <p>Vous êtes sur le point d&apos;acheter : <span className="font-semibold text-foreground">{itemName}</span></p>
+                    <AlertDialogDescription asChild>
+                        <div className="space-y-4">
+                            <div>Vous êtes sur le point d&apos;acheter : <span className="font-semibold text-foreground">{itemName}</span></div>
 
-                        <div className="bg-muted/50 p-4 rounded-md space-y-2 text-sm">
-                            <div className="flex justify-between">
-                                <span>Prix de l&apos;objet</span>
-                                <span>{itemPrice.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</span>
+                            <div className="bg-muted/50 p-4 rounded-md space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span>Prix de l&apos;objet</span>
+                                    <span>{itemPrice.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</span>
+                                </div>
+                                <div className="flex justify-between text-muted-foreground">
+                                    <span>Frais de livraison</span>
+                                    <span>Offerts</span>
+                                </div>
+                                <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg text-foreground">
+                                    <span>Total à payer</span>
+                                    <span>{total.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</span>
+                                </div>
                             </div>
-                            <div className="flex justify-between text-muted-foreground">
-                                <span>Frais de livraison</span>
-                                <span>Offerts</span>
-                            </div>
-                            <div className="border-t pt-2 mt-2 flex justify-between font-bold text-lg text-foreground">
-                                <span>Total à payer</span>
-                                <span>{total.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}</span>
+
+                            <div className="text-xs text-muted-foreground">
+                                En confirmant, vous acceptez les conditions générales de vente.
+                                Collector prend une commission de 5% sur la transaction (à la charge du vendeur).
                             </div>
                         </div>
-
-                        <p className="text-xs text-muted-foreground">
-                            En confirmant, vous acceptez les conditions générales de vente.
-                            Collector prend une commission de 5% sur la transaction (à la charge du vendeur).
-                        </p>
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
