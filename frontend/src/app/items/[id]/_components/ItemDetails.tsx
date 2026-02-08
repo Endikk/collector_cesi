@@ -81,7 +81,7 @@ export function ItemDetails({ item, isOwner, currentUserId }: ItemDetailsProps) 
                             <span className="text-muted-foreground">·</span>
                             <Link href={`/shop/${item.ownerId}`} className="hover:underline cursor-pointer">Autres objets du vendeur</Link>
                             <span className="text-muted-foreground">·</span>
-                            <span className="hover:underline cursor-pointer">Contacter le vendeur</span>
+                            <Link href={`/chat?userId=${item.ownerId}`} className="hover:underline cursor-pointer text-[#3665f3]">Contacter le vendeur</Link>
                         </div>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto" />
@@ -157,7 +157,7 @@ export function ItemDetails({ item, isOwner, currentUserId }: ItemDetailsProps) 
                     <div className="flex gap-4">
                         <span className="text-muted-foreground w-24 shrink-0">Livraison :</span>
                         <div>
-                            <p>Livraison possible vers : États-Unis. Consultez la description de l&apos;objet ou <span className="underline cursor-pointer">contactez le vendeur</span> pour en savoir plus sur les options de livraison.</p>
+                            <p>Livraison possible vers : États-Unis. Consultez la description de l&apos;objet ou <Link href={`/chat?userId=${item.ownerId}`} className="underline cursor-pointer text-[#3665f3]">contactez le vendeur</Link> pour en savoir plus sur les options de livraison.</p>
                             <span className="underline cursor-pointer text-[#3665f3] block mt-1">Afficher les détails</span>
                             <p className="text-muted-foreground text-xs mt-1">Lieu où se trouve l&apos;objet : Paris, France</p>
                         </div>

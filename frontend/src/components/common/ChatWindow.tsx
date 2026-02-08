@@ -98,12 +98,14 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, oth
     };
 
     return (
-        <div className="flex flex-col h-full w-full">
-            <div className="p-4 border-b bg-card">
+        <div className="flex flex-col h-full w-full max-h-full">
+            {/* Header - fixed height */}
+            <div className="p-4 border-b bg-card flex-shrink-0">
                 <h2 className="font-semibold">{otherUserName}</h2>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4" ref={scrollRef}>
+            {/* Messages area - scrollable */}
+            <div className="flex-1 overflow-y-auto p-4 min-h-0" ref={scrollRef}>
                 {messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
                         <p>Aucun message. Dites bonjour !</p>
@@ -122,7 +124,8 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, oth
                 )}
             </div>
 
-            <div className="p-4 border-t bg-muted/20">
+            {/* Input area - fixed at bottom */}
+            <div className="p-4 border-t bg-muted/20 flex-shrink-0">
                 <form onSubmit={handleSendMessage} className="flex gap-2">
                     <Input
                         value={newMessage}

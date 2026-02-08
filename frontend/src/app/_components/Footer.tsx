@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import { ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
 
 export function Footer() {
@@ -137,12 +137,20 @@ export function Footer() {
 
             {/* Floating Buttons */}
             <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-                <button className="bg-white p-3 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] border border-gray-100 hover:bg-gray-50 transition-shadow">
+                <button 
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
+                    className="bg-white p-3 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] border border-gray-100 hover:bg-gray-50 transition-shadow"
+                    aria-label="Retour en haut"
+                >
                     <ChevronUp className="w-5 h-5 text-gray-700" />
                 </button>
-                <button className="bg-white p-3 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] border border-gray-100 hover:bg-gray-50 transition-shadow">
-                    <HelpCircle className="w-5 h-5 text-gray-700" />
-                </button>
+                <Link 
+                    href="/chat/" 
+                    className="bg-[#3665f3] hover:bg-[#2b54d6] p-3 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] border border-[#3665f3] transition-all"
+                    aria-label="Ouvrir le chat"
+                >
+                    <MessageCircle className="w-5 h-5 text-white" />
+                </Link>
             </div>
         </footer>
     );

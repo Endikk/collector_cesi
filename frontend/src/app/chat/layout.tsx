@@ -14,12 +14,12 @@ export default async function ChatLayout({ children }: { children: React.ReactNo
     const { conversations } = await getConversations();
 
     return (
-        <div className="flex h-[calc(100vh-4rem)] w-full">
+        <div className="flex h-[calc(100vh-144px)] w-full">
             <ChatSidebar
                 conversations={conversations || []}
                 currentUserId={session.user.id}
             />
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 overflow-hidden h-full">
                 {children}
             </div>
         </div>

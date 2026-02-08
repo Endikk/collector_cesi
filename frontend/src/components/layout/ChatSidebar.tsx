@@ -24,6 +24,15 @@ interface ChatSidebarProps {
     currentUserId: string;
 }
 
+// Format date consistently on server and client
+function formatDate(date: Date): string {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+}
+
 export function ChatSidebar({ conversations, currentUserId }: ChatSidebarProps) {
     const pathname = usePathname();
 
@@ -68,7 +77,7 @@ export function ChatSidebar({ conversations, currentUserId }: ChatSidebarProps) 
                                         </span>
                                         {lastMessage && (
                                             <span className="text-[10px] text-muted-foreground">
-                                                {new Date(lastMessage.createdAt).toLocaleDateString()}
+                                                {formatDate(lastMessage.createdAt)}
                                             </span>
                                         )}
                                     </div>

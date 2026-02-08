@@ -22,7 +22,8 @@ export async function fetchBackend<T>(endpoint: string, options: RequestInit = {
     });
 
     if (!res.ok) {
-        throw new Error(`API Error: ${res.statusText}`);
+        const errorText = await res.text().catch(() => res.statusText);
+        throw new Error(`API Error (${res.status}): ${errorText}`);
     }
 
     return res.json();

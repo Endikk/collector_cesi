@@ -76,6 +76,24 @@ export class ShopsService {
             isSeller: true,
             sellerType: true,
             createdAt: true,
+            bio: true,
+            reviewsReceived: {
+              include: { 
+                author: {
+                  select: {
+                    name: true,
+                  }
+                } 
+              },
+              take: 10,
+              orderBy: { createdAt: 'desc' },
+            },
+            _count: {
+              select: { 
+                sales: true, 
+                reviewsReceived: true 
+              },
+            },
           },
         },
         items: {
@@ -98,7 +116,18 @@ export class ShopsService {
       throw new NotFoundException('Boutique non trouvée');
     }
 
-    return shop;
+    // Restructure to match frontend expectations (flatten owner data to shop level)
+    return {
+      ...shop,
+      name: shop.owner.name,
+      bio: shop.owner.bio,
+      reviewsReceived: shop.owner.reviewsReceived,
+      _count: {
+        ...shop._count,
+        reviewsReceived: shop.owner._count.reviewsReceived,
+        sales: shop.owner._count.sales,
+      },
+    };
   }
 
   /**

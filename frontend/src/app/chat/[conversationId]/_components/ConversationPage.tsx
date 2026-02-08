@@ -39,11 +39,13 @@ export async function ConversationPage({ params }: { params: Promise<{ conversat
     ) || currentConversation.participants[0];
 
     return (
-        <ChatWindow
-            conversationId={conversationId}
-            initialMessages={messages || []}
-            currentUserId={session.user.id}
-            otherUserName={otherParticipant?.name || "Utilisateur"}
-        />
+        <div className="h-full w-full">
+            <ChatWindow
+                conversationId={conversationId}
+                initialMessages={messages || []}
+                currentUserId={session.user.id}
+                otherUserName={otherParticipant?.name || "Utilisateur"}
+            />
+        </div>
     );
 }

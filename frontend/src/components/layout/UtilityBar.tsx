@@ -80,7 +80,7 @@ export function UtilityBar() {
                     </div>
                     <Link href="/sell" className="hover:underline hidden sm:block">Mise en vente</Link>
                     <Link href="#" className="hover:underline hidden sm:block">Bons Plans</Link>
-                    <Link href="#" className="hover:underline hidden sm:block">Aide</Link>
+                    <Link href="/chat/" className="hover:underline hidden sm:block">Chat</Link>
                 </div>
 
                 {/* Right Side */}
