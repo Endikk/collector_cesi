@@ -3,10 +3,11 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Heart, Zap, CreditCard, ChevronRight } from "lucide-react";
+import { Heart, Zap, CreditCard, ChevronRight, Trash2 } from "lucide-react";
 import { PurchaseConfirmationModal } from "./PurchaseConfirmationModal";
 import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
+import { deleteItemAsAdmin } from "@/app/actions/items";
 
 interface ItemDetailsProps {
     item: {
@@ -22,12 +23,14 @@ interface ItemDetailsProps {
         };
     };
     isOwner: boolean;
+    isAdmin?: boolean;
     currentUserId?: string;
 }
 
-export function ItemDetails({ item, isOwner, currentUserId }: ItemDetailsProps) {
+export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetailsProps) {
     const router = useRouter();
     const [showConfirm, setShowConfirm] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleAction = (action: () => void) => {
         if (!currentUserId) {
@@ -47,6 +50,29 @@ export function ItemDetails({ item, isOwner, currentUserId }: ItemDetailsProps) 
         setShowConfirm(false);
     };
 
+    const handleDeleteItem = async () => {
+        if (!confirm(`Êtes-vous sûr de vouloir supprimer l'annonce "${item.title}" ?`)) {
+            return;
+        }
+
+        setIsDeleting(true);
+        try {
+            const result = await deleteItemAsAdmin(item.id);
+            if (result.success) {
+                alert("Annonce supprimée avec succès");
+                router.push("/");
+                router.refresh();
+            } else {
+                alert(result.message || "Erreur lors de la suppression");
+            }
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            alert("Erreur lors de la suppression");
+        } finally {
+            setIsDeleting(false);
+        }
+    };
+
     return (
         <div className="space-y-6">
             <PurchaseConfirmationModal
@@ -59,7 +85,21 @@ export function ItemDetails({ item, isOwner, currentUserId }: ItemDetailsProps) 
             />
 
             <div>
-                <h1 className="text-2xl font-bold mb-2 text-foreground">{item.title}</h1>
+                <div className="flex items-center justify-between mb-2">
+                    <h1 className="text-2xl font-bold text-foreground">{item.title}</h1>
+                    {isAdmin && (
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={handleDeleteItem}
+                            disabled={isDeleting}
+                            className="ml-2"
+                        >
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            {isDeleting ? "Suppression..." : "Supprimer"}
+                        </Button>
+                    )}
+                </div>
 
                 {/* Seller Info */}
                 <div className="flex items-center gap-2 text-sm text-foreground mb-4">

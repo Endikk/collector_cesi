@@ -26,6 +26,7 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
 
     const session = await getServerSession(authOptions) as Session | null;
     const isOwner = session?.user?.id === item.ownerId;
+    const isAdmin = session?.user?.role === 'ADMIN';
 
     return (
         <div className="container mx-auto py-12 px-4">
@@ -34,6 +35,7 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
                 <ItemDetails
                     item={item}
                     isOwner={isOwner}
+                    isAdmin={isAdmin}
                     currentUserId={session?.user?.id}
                 />
             </div>
