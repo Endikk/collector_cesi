@@ -2,28 +2,33 @@
 
 import { MessageSquare } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { startConversation } from "@/lib/actions/chat";
 
 export function ChatPage() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const [isRedirecting, setIsRedirecting] = useState(false);
+    const initiationRef = useRef(false);
     const userId = searchParams.get("userId");
 
     useEffect(() => {
-        if (userId && !isRedirecting) {
-            setIsRedirecting(true);
+        if (userId && !initiationRef.current) {
+            initiationRef.current = true;
+            // Use setTimeout to avoid synchronous setState warning
+            setTimeout(() => setIsRedirecting(true), 0);
+
             startConversation(userId).then((result) => {
                 if (result.success && result.conversationId) {
                     router.push(`/chat/${result.conversationId}`);
                 } else {
                     setIsRedirecting(false);
+                    initiationRef.current = false;
                     console.error("Failed to start conversation:", result.message);
                 }
             });
         }
-    }, [userId, router, isRedirecting]);
+    }, [userId, router]);
 
     if (isRedirecting) {
         return (

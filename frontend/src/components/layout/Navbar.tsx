@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, Suspense } from "react";
 import { Search, ChevronDown } from "lucide-react";
@@ -64,7 +65,7 @@ export default function NavBar() {
             <div className="border-b">
                 <div className="container flex h-[72px] items-center gap-6">
                     <Link href="/" className="flex items-center gap-3 font-bold text-3xl tracking-tighter flex-shrink-0 -mt-1">
-                        <img src="/collector.svg" alt="Collector Logo" className="h-10 w-10" />
+                        <Image src="/collector.svg" alt="Collector Logo" width={40} height={40} className="h-10 w-10" />
                         <span className="text-collector-gold">Collector</span>
                     </Link>
 

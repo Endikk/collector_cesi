@@ -1,8 +1,6 @@
 
 import { prisma } from "@/lib/prisma";
-import { getServerSession } from "next-auth/next";
-import { Session } from "next-auth";
-import { authOptions } from "@/lib/auth";
+
 import { ProductCard } from "./ProductCard";
 import { FiltersSection } from "./FiltersSection";
 import { RachatBanner } from "./RachatBanner";
@@ -91,7 +89,7 @@ export async function HomePage({ searchParams }: HomePageProps) {
 
     const items = await getItems({ query: q, categoryIds, minPrice, maxPrice });
 
-    const session = await getServerSession(authOptions) as Session | null;
+
 
     // Check if any filters are active
     const hasActiveFilters = !!(q || categoriesParam || minPrice || maxPrice);
