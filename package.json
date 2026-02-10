@@ -7,18 +7,22 @@
         "frontend"
     ],
     "scripts": {
-        "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run start:dev --workspace=backend\"",
-        "db:seed:admin": "ts-node scripts/db/create-admin.ts",
-        "db:seed:categories": "ts-node scripts/db/seed-categories.ts",
-        "db:sync": "node scripts/utils/sync-prisma.js",
+        "dev": "dotenv -e .env -- concurrently \"npm run dev --workspace=frontend\" \"npm run start:dev --workspace=backend\"",
+        "db:seed:admin": "dotenv -e .env -- ts-node scripts/db/create-admin.ts",
+        "db:seed:categories": "dotenv -e .env -- ts-node scripts/db/seed-categories.ts",
+        "db:sync": "dotenv -e .env -- node scripts/utils/sync-prisma.js",
         "infra:minikube": "bash scripts/infra/setup-minikube.sh",
         "infra:demo": "bash scripts/infra/demo-scalability.sh",
+        "test": "dotenv -e .env -- concurrently \"npm run test --workspace=frontend\" \"npm run test --workspace=backend\"",
         "test:load": "bash scripts/test/load-test.sh",
         "test:stress": "node scripts/test/stress-test.js",
-        "setup:notifications": "bash scripts/setup/setup-notifications.sh"
+        "lint": "dotenv -e .env -- concurrently \"npm run lint --workspace=frontend\" \"npm run lint --workspace=backend\"",
+        "build": "dotenv -e .env -- concurrently \"npm run build --workspace=frontend\" \"npm run build --workspace=backend\"",
+        "setup:notifications": "dotenv -e .env -- bash scripts/setup/setup-notifications.sh"
     },
     "devDependencies": {
         "concurrently": "^8.2.2",
+        "dotenv-cli": "^11.0.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
     }

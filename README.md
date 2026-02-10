@@ -56,6 +56,10 @@ Assurez-vous d'avoir installé :
 *   **Node.js** (v20+) & **npm** (pour le dev local)
 *   **Minikube** (optionnel, pour déploiement K8s)
 
+### 🔑 Variables d'Environnement
+Le projet utilise un fichier `.env` centralisé à la racine.
+Copiez le `.env.example` (si disponible) ou utilisez le `.env` généré automatiquement pour commencer.
+
 ---
 
 ## Démarrage Rapide (Docker)

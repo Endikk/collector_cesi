@@ -8,10 +8,12 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://user:password@db:5432/collector?schema=public
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
       - WATCHPACK_POLLING=true
       - BACKEND_URL=http://backend:3000
-      - NEXT_PUBLIC_BACKEND_URL=http://localhost:4000
+      - NEXT_PUBLIC_BACKEND_URL=${NEXT_PUBLIC_BACKEND_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -25,27 +27,33 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+      target: development
     ports:
       - "4000:3000"
       - "5555:5555"
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/collector?schema=public
+      - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}?schema=public
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - PORT=3000
-      - STRIPE_SECRET_KEY=sk_test_placeholder
-      - STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
-      - STRIPE_WEBHOOK_SECRET=whsec_placeholder
-      - JWT_SECRET=dev-jwt-secret-key
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_PORT=587
-      - SMTP_SECURE=false
-      - SMTP_USER=dev@example.com
-      - SMTP_PASSWORD=dev-password
-      - SMTP_FROM=noreply@thecollector.com
-      - FRAUD_DETECTION_WEBHOOK_URL=
-      - FRAUD_DETECTION_API_KEY=
+      - STRIPE_SECRET_KEY=${STRIPE_SECRET_KEY}
+      - STRIPE_PUBLISHABLE_KEY=${STRIPE_PUBLISHABLE_KEY}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET}
+      - JWT_SECRET=${JWT_SECRET}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_SECURE=${SMTP_SECURE}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM=${SMTP_FROM}
+      - FRAUD_DETECTION_WEBHOOK_URL=${FRAUD_DETECTION_WEBHOOK_URL}
+      - FRAUD_DETECTION_API_KEY=${FRAUD_DETECTION_API_KEY}
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - /app/dist
+    command: sh -c "chmod +x /app/start-dev.sh && /app/start-dev.sh"
     depends_on:
       - db
       - redis
@@ -61,7 +69,7 @@ services:
     command: redis-server --appendonly yes
     restart: always
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 5
@@ -70,16 +78,16 @@ services:
     image: postgres:15-alpine
     container_name: collector-db
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: collector
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U user -d collector" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 5s
       timeout: 5s
       retries: 5

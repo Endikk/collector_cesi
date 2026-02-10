@@ -29,6 +29,7 @@ import { PrometheusConfigModule } from './common/prometheus.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['../.env', '.env'],
     }),
     PrometheusConfigModule,
     EventBusModule, // Global event bus for modular architecture
