@@ -1,3 +1,4 @@
+
 name: 🚀 Quality & Delivery
 
 on:
@@ -13,10 +14,10 @@ concurrency:
 
 jobs:
   # ==================================================================
-  # BLOCK 1: BACKEND (Quality & Tests)
+  # GLOBAL QUALITY GATE
   # ==================================================================
-  backend-quality:
-    name: 🛡️ Backend Quality
+  quality-gate:
+    name: 🛡️ Quality Gate (Lint, Build, Test)
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout
@@ -27,167 +28,48 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
 
-      - name: 📦 Install Dependencies
-        working-directory: ./backend
-        run: npm ci
-
-      - name: 🎨 Linting (ESLint)
-        working-directory: ./backend
-        run: npm run lint
-
-      - name: 🏗️ Build NestJS
-        working-directory: ./backend
+      - name: 📦 Install Dependencies (Root)
         run: |
-          npx prisma generate
-          npm run build
+          # Install dependencies for root + workspaces (including dev dependencies)
+          # We use --legacy-peer-deps to avoid potential conflicts in sub-projects
+          npm ci --legacy-peer-deps
 
-  backend-tests:
-    name: 🧪 Backend Tests
-    runs-on: ubuntu-latest
-    steps:
-      - name: ⬇️ Checkout
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
-
-      - name: 📦 Install Dependencies
-        working-directory: ./backend
-        run: npm ci
-
-      - name: 🧪 Unit Tests (Jest)
-        working-directory: ./backend
+      - name: 🔧 Create Mock Environment
         run: |
-          npx prisma generate
-          npm run test
-
-  # ==================================================================
-  # BLOCK 2: FRONTEND (Quality & Tests)
-  # Depends on: Backend
-  # ==================================================================
-  frontend-quality:
-    name: 🎨 Frontend Quality
-    runs-on: ubuntu-latest
-    needs: [backend-quality, backend-tests]
-    steps:
-      - name: ⬇️ Checkout
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: 📦 Install Dependencies
-        working-directory: ./frontend
-        run: npm ci --legacy-peer-deps --ignore-scripts
-        env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-          NEXT_PUBLIC_BACKEND_URL: http://localhost:4000
-          NEXTAUTH_SECRET: supersecret
-          NEXTAUTH_URL: http://localhost:3000
+          # Create a dummy .env file for the build/test process
+          echo "DATABASE_URL=postgresql://ci:ci@localhost:5432/ci" >> .env
+          echo "NEXT_PUBLIC_BACKEND_URL=http://localhost:4000" >> .env
+          echo "NEXTAUTH_SECRET=supersecret" >> .env
+          echo "NEXTAUTH_URL=http://localhost:3000" >> .env
+          # Add other required variables if needed
+          echo "JWT_SECRET=supersecret" >> .env
+          echo "JWT_EXPIRES_IN=7d" >> .env
 
       - name: 🧬 Prisma Generate
-        working-directory: ./frontend
-        run: npx prisma generate --schema=../backend/prisma/schema.prisma
-        env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+        # We need to generate the client manually first because root scripts might rely on it
+        run: |
+            npx prisma generate --schema=backend/prisma/schema.prisma
 
-      - name: 🎨 Linting (ESLint)
-        working-directory: ./frontend
+      - name: 🎨 Global Lint
         run: npm run lint
 
-      - name: 🏗️ Build Next.js
-        working-directory: ./frontend
+      - name: 🏗️ Global Build
         run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-          NEXT_PUBLIC_BACKEND_URL: http://localhost:4000
-          NEXTAUTH_SECRET: supersecret
-          NEXTAUTH_URL: http://localhost:3000
 
-  frontend-tests:
-    name: 🧪 Frontend Tests
-    runs-on: ubuntu-latest
-    needs: [backend-quality, backend-tests]
-    steps:
-      - name: ⬇️ Checkout
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
-
-      - name: 📦 Install Dependencies
-        working-directory: ./frontend
-        run: npm ci --legacy-peer-deps --ignore-scripts
-
-      - name: 🧬 Prisma Generate
-        working-directory: ./frontend
-        run: npx prisma generate --schema=../backend/prisma/schema.prisma
-        env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-
-      - name: 🧪 Unit Tests (Jest)
-        working-directory: ./frontend
+      - name: 🧪 Global Tests
         run: npm run test
-        env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
-          NEXT_PUBLIC_BACKEND_URL: http://localhost:4000
-          NEXTAUTH_SECRET: supersecret
-          NEXTAUTH_URL: http://localhost:3000
 
   # ==================================================================
-  # BLOCK 3: AUDIT
-  # Depends on: Frontend
-  # ==================================================================
-  global-audit:
-    name: 🔒 Global Audit
-    runs-on: ubuntu-latest
-    needs: [frontend-quality, frontend-tests]
-    steps:
-      - name: ⬇️ Checkout
-        uses: actions/checkout@v4
-
-      - name: 🟢 Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-          cache-dependency-path: '**/package-lock.json'
-
-      - name: 🔍 Audit Backend
-        working-directory: ./backend
-        run: |
-          npm ci --ignore-scripts
-          npm audit --audit-level=high || true
-
-      - name: 🔍 Audit Frontend
-        working-directory: ./frontend
-        run: |
-          npm ci --legacy-peer-deps --ignore-scripts
-          npm audit --audit-level=high || true
-
-  # ==================================================================
-  # BLOCK 4: SECURITY SCAN & DOCKER
-  # Depends on: Audit
+  # SECURITY SCAN & DOCKER
+  # Depends on: Quality Gate
   # ==================================================================
   security-and-build:
     name: 🔒 Security & Docker Build
     runs-on: ubuntu-latest
-    needs: [global-audit]
+    needs: [quality-gate]
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -200,7 +82,7 @@ jobs:
         with:
           image-ref: 'collector-app:latest'
           format: 'table'
-          exit-code: '0'
+          exit-code: '0' # Don't fail the build for now, just report
           ignore-unfixed: true
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
@@ -219,7 +101,7 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
   # ==================================================================
-  # BLOCK 5: DELIVERY
+  # DELIVERY
   # Depends on: Security & Docker
   # ==================================================================
   deploy-simulation:
