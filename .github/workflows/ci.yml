@@ -16,8 +16,11 @@ jobs:
   # ==================================================================
   # GLOBAL QUALITY GATE
   # ==================================================================
-  quality-gate:
-    name: 🛡️ Quality Gate (Lint, Build, Test)
+  # ==================================================================
+  # BACKEND QUALITY GATE
+  # ==================================================================
+  backend-quality:
+    name: 🛡️ Backend (Lint, Build, Test)
     runs-on: ubuntu-latest
     steps:
       - name: ⬇️ Checkout
@@ -29,38 +32,66 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - name: 📦 Install Dependencies (Root)
-        run: |
-          # Install dependencies for root + workspaces (including dev dependencies)
-          # We use --legacy-peer-deps to avoid potential conflicts in sub-projects
-          npm ci --legacy-peer-deps
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
 
       - name: 🔧 Create Mock Environment
         run: |
-          # Create a dummy .env file for the build/test process
           echo "DATABASE_URL=postgresql://ci:ci@localhost:5432/ci" >> .env
-          echo "NEXT_PUBLIC_BACKEND_URL=http://localhost:4000" >> .env
-          echo "NEXTAUTH_SECRET=supersecret" >> .env
-          echo "NEXTAUTH_URL=http://localhost:3000" >> .env
-          # Add other required variables if needed
           echo "JWT_SECRET=supersecret" >> .env
           echo "JWT_EXPIRES_IN=7d" >> .env
 
       - name: 🧬 Prisma Generate
-        # We need to generate the client manually first because root scripts might rely on it
+        run: npx prisma generate --schema=backend/prisma/schema.prisma
+
+      - name: 🎨 Backend Lint
+        run: npm run lint --workspace=backend
+
+      - name: 🧪 Backend Tests
+        run: npm run test --workspace=backend
+
+      - name: 🏗️ Backend Build
+        run: npm run build --workspace=backend
+
+  # ==================================================================
+  # FRONTEND QUALITY GATE
+  # ==================================================================
+  frontend-quality:
+    name: 🎨 Frontend (Lint, Build, Test)
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+
+      - name: 🔧 Create Mock Environment
         run: |
-            npx prisma generate --schema=backend/prisma/schema.prisma
+          echo "DATABASE_URL=postgresql://ci:ci@localhost:5432/ci" >> .env
+          echo "NEXT_PUBLIC_BACKEND_URL=http://localhost:4000" >> .env
+          echo "NEXTAUTH_SECRET=supersecret" >> .env
+          echo "NEXTAUTH_URL=http://localhost:3000" >> .env
 
-      - name: 🎨 Global Lint
-        run: npm run lint
+      - name: 🧬 Prisma Generate
+        run: npx prisma generate --schema=backend/prisma/schema.prisma
 
-      - name: 🏗️ Global Build
-        run: npm run build
+      - name: 🎨 Frontend Lint
+        run: npm run lint --workspace=frontend
+
+      - name: 🧪 Frontend Tests
+        run: npm run test --workspace=frontend
+
+      - name: 🏗️ Frontend Build
+        run: npm run build --workspace=frontend
         env:
           NEXT_TELEMETRY_DISABLED: 1
-
-      - name: 🧪 Global Tests
-        run: npm run test
 
   # ==================================================================
   # SECURITY SCAN & DOCKER
@@ -69,7 +100,7 @@ jobs:
   security-and-build:
     name: 🔒 Security & Docker Build
     runs-on: ubuntu-latest
-    needs: [quality-gate]
+    needs: [backend-quality, frontend-quality]
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
