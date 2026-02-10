@@ -44,14 +44,17 @@ jobs:
       - name: 🧬 Prisma Generate
         run: npx -y prisma generate --schema=backend/prisma/schema.prisma
 
-      - name: 🎨 Backend Lint
-        run: npm run lint --workspace=backend
+      - name: 🎨 Backend Lint (Check)
+        working-directory: ./backend
+        run: npm run lint
 
       - name: 🧪 Backend Tests
-        run: npm run test --workspace=backend
+        working-directory: ./backend
+        run: npm run test
 
       - name: 🏗️ Backend Build
-        run: npm run build --workspace=backend
+        working-directory: ./backend
+        run: npm run build
 
   # ==================================================================
   # FRONTEND QUALITY GATE
@@ -83,13 +86,16 @@ jobs:
         run: npx -y prisma generate --schema=backend/prisma/schema.prisma
 
       - name: 🎨 Frontend Lint
-        run: npm run lint --workspace=frontend
+        working-directory: ./frontend
+        run: npm run lint
 
       - name: 🧪 Frontend Tests
-        run: npm run test --workspace=frontend
+        working-directory: ./frontend
+        run: npm run test
 
       - name: 🏗️ Frontend Build
-        run: npm run build --workspace=frontend
+        working-directory: ./frontend
+        run: npm run build
         env:
           NEXT_TELEMETRY_DISABLED: 1
 
