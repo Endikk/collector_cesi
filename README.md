@@ -89,6 +89,22 @@ La méthode la plus simple pour lancer le projet.
 
 ---
 
+## Infrastructure as Code (Terraform)
+
+Le projet adopte une approche **GitOps** :
+1.  **Terraform** : Provisionne l'infrastructure "physique" (Cluster K8s, VPC, Namespaces, Storage).
+2.  **Kubernetes Manifests** : Gère le déploiement des applications (Deployment, Service, Ingress).
+
+**Provisionner l'infrastructure (Simulation Locale) :**
+```bash
+cd infrastructure/terraform
+terraform init
+terraform apply
+```
+*Cela créera le namespace `collector` dans votre cluster actuel.*
+
+---
+
 ## Déploiement Kubernetes (Minikube)
 
 Déployer l'application dans un cluster Kubernetes local.
