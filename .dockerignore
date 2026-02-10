@@ -1,0 +1,14 @@
+node_modules
+.next
+.git
+.DS_Store
+.env*
+!frontend/.env.production
+coverage
+build
+dist
+.vercel
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*

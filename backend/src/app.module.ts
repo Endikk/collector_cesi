@@ -23,10 +23,14 @@ import { TranslationModule } from './translation/translation.module';
 import { AdvertisingModule } from './advertising/advertising.module';
 import { EventBusModule } from './common/event-bus.module';
 import { ConfigModule } from '@nestjs/config';
+import { PrometheusConfigModule } from './common/prometheus.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    PrometheusConfigModule,
     EventBusModule, // Global event bus for modular architecture
     BullModule.forRoot({
       redis: {
@@ -68,4 +72,4 @@ import { ConfigModule } from '@nestjs/config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

@@ -1,0 +1,61 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: collector
+  labels:
+    app: backend
+spec:
+  ports:
+    - port: 3000
+      name: http
+      targetPort: 3000
+    - port: 5555
+      name: debug
+      targetPort: 5555
+  selector:
+    app: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: collector-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+            - containerPort: 5555
+              name: debug
+          env:
+            - name: DATABASE_URL
+              value: postgresql://user:password@db:5432/collector?schema=public
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PORT
+              value: "3000"
+            # Secrets should be mounted via Secret/ConfigMap in prod
+            - name: JWT_SECRET
+              value: "dev-jwt-secret-key"
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

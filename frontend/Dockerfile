@@ -1,7 +1,7 @@
 FROM node:20-alpine AS base
 
-# Install OpenSSL for Prisma
-RUN apk add --no-cache openssl
+# Install OpenSSL for Prisma and libc6-compat for next/image
+RUN apk add --no-cache openssl libc6-compat
 
 FROM base AS deps
 WORKDIR /app
@@ -9,8 +9,8 @@ WORKDIR /app
 # Copy package files from frontend directory
 COPY frontend/package.json frontend/package-lock.json* ./
 
-# Copy schema to local ./prisma so it can find node_modules
-COPY backend/prisma ./prisma
+# Copy only schema to local ./prisma to avoid copying seed.ts (which causes build errors)
+COPY backend/prisma/schema.prisma ./prisma/schema.prisma
 
 # Install deps but skip postinstall (which uses ../backend path)
 RUN npm ci --ignore-scripts
@@ -26,7 +26,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY frontend/ .
 
 # Copy schema again for builder stage
-COPY backend/prisma ./prisma
+COPY backend/prisma/schema.prisma ./prisma/schema.prisma
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
