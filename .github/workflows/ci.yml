@@ -42,7 +42,7 @@ jobs:
           echo "JWT_EXPIRES_IN=7d" >> .env
 
       - name: 🧬 Prisma Generate
-        run: npx prisma generate --schema=backend/prisma/schema.prisma
+        run: npx -y prisma generate --schema=backend/prisma/schema.prisma
 
       - name: 🎨 Backend Lint
         run: npm run lint --workspace=backend
@@ -80,7 +80,7 @@ jobs:
           echo "NEXTAUTH_URL=http://localhost:3000" >> .env
 
       - name: 🧬 Prisma Generate
-        run: npx prisma generate --schema=backend/prisma/schema.prisma
+        run: npx -y prisma generate --schema=backend/prisma/schema.prisma
 
       - name: 🎨 Frontend Lint
         run: npm run lint --workspace=frontend
