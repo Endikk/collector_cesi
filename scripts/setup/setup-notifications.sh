@@ -4,7 +4,8 @@ echo "🔔 Installation du système de notifications avancé"
 echo ""
 
 # 1. Vérifier que nous sommes dans le bon répertoire
-if [ ! -d "backend" ] || [ ! -d "frontend" ]; then
+# 1. Vérifier que nous sommes dans le bon répertoire
+if [ ! -f "package.json" ] || [ ! -d "backend" ]; then
     echo "❌ Erreur: Ce script doit être exécuté depuis la racine du projet collector"
     exit 1
 fi

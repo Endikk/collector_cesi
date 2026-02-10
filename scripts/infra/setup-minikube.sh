@@ -22,6 +22,12 @@ echo "🔨 Building Docker images (this may take a while)..."
 docker-compose build
 
 # 4. Apply Infrastructure via Terraform
+# Check if we are in root (simple check for package.json)
+if [ ! -f "package.json" ]; then
+    echo "❌ Please run this script from the project root!"
+    exit 1
+fi
+
 echo "🏗️ Provisioning infrastructure with Terraform..."
 cd infrastructure/terraform
 terraform init

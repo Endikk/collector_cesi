@@ -106,8 +106,8 @@ docker build -t collector-backend:latest -f backend/Dockerfile ./backend
 # Déployer tous les manifestes
 kubectl apply -k infrastructure/k8s/base
 
-# Ou utiliser le script d'installation
-./scripts/setup-minikube.sh
+# Ou utiliser le script d'installation via npm
+npm run infra:minikube
 ```
 
 ### 4. Accéder
@@ -122,19 +122,21 @@ minikube tunnel
 
 Pour les développeurs souhaitant lancer les services individuellement.
 
-### Backend
+### Global
 ```bash
-cd backend
-npm install
-npm run db:push    # Synchro Base de Données
-npm run start:dev  # Démarrer Serveur
+npm install        # Installer toutes les dépendances (root, backend, frontend)
+npm run dev        # Démarrer Backend + Frontend en parallèle
+npm run db:sync    # Synchroniser le client Prisma entre backend et root
 ```
 
-### Frontend
+### Backend (via Workspace)
 ```bash
-cd frontend
-npm install
-npm run dev
+npm run start:dev --workspace=backend
+```
+
+### Frontend (via Workspace)
+```bash
+npm run dev --workspace=frontend
 ```
 
 *Note : Nécessite une instance PostgreSQL/Redis active (utilisez `docker-compose up -d db redis`).*

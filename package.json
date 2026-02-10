@@ -1,0 +1,25 @@
+{
+    "name": "collector-root",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "backend",
+        "frontend"
+    ],
+    "scripts": {
+        "dev": "concurrently \"npm run dev --workspace=frontend\" \"npm run start:dev --workspace=backend\"",
+        "db:seed:admin": "ts-node scripts/db/create-admin.ts",
+        "db:seed:categories": "ts-node scripts/db/seed-categories.ts",
+        "db:sync": "node scripts/utils/sync-prisma.js",
+        "infra:minikube": "bash scripts/infra/setup-minikube.sh",
+        "infra:demo": "bash scripts/infra/demo-scalability.sh",
+        "test:load": "bash scripts/test/load-test.sh",
+        "test:stress": "node scripts/test/stress-test.js",
+        "setup:notifications": "bash scripts/setup/setup-notifications.sh"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.3.3"
+    }
+}

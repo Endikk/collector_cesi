@@ -2,10 +2,10 @@
 const fs = require('fs');
 const path = require('path');
 
-const backendClientPath = path.join(__dirname, '../backend/node_modules/.prisma');
-const rootClientPath = path.join(__dirname, '../node_modules/.prisma');
-const backendPrismaLibPath = path.join(__dirname, '../backend/node_modules/@prisma/client');
-const rootPrismaLibPath = path.join(__dirname, '../node_modules/@prisma/client');
+const backendClientPath = path.join(__dirname, '../../backend/node_modules/.prisma');
+const rootClientPath = path.join(__dirname, '../../node_modules/.prisma');
+const backendPrismaLibPath = path.join(__dirname, '../../backend/node_modules/@prisma/client');
+const rootPrismaLibPath = path.join(__dirname, '../../node_modules/@prisma/client');
 
 function copyDir(src, dest) {
     if (!fs.existsSync(src)) {
