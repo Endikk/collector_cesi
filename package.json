@@ -18,10 +18,12 @@
         "test:stress": "node scripts/test/stress-test.js",
         "lint": "dotenv -e .env -- concurrently \"npm run lint --workspace=frontend\" \"npm run lint --workspace=backend\"",
         "build": "dotenv -e .env -- concurrently \"npm run build --workspace=frontend\" \"npm run build --workspace=backend\"",
-        "setup:notifications": "dotenv -e .env -- bash scripts/setup/setup-notifications.sh"
+        "setup:notifications": "dotenv -e .env -- bash scripts/setup/setup-notifications.sh",
+        "stress-test:artillery": "artillery run scripts/test/stress-test.yml"
     },
     "devDependencies": {
         "@types/jest": "^30.0.0",
+        "artillery": "^2.0.30",
         "concurrently": "^8.2.2",
         "dotenv-cli": "^11.0.0",
         "jest": "^30.2.0",
@@ -30,5 +32,8 @@
         "ts-jest": "^29.4.6",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.22.0"
     }
 }

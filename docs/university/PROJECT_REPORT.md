@@ -140,8 +140,8 @@ Une analyse initiale du POC (Version 1) a mis en évidence les points suivants :
 
 | Composant | Vulnérabilité Potentielle | Sévérité | Statut POC |
 | :--- | :--- | :--- | :--- |
-| **Authentification** | Absence de 2FA (Double facteur) | Moyen | 🔴 Non implémenté |
-| **API** | Rate Limiting (Protection DDoS/Brute-force) | Critique | 🔴 Non implémenté |
+| **Authentification** | Absence de 2FA (Double facteur) | Moyen | 🟢 Implémenté (TOTP Admin) |
+| **API** | Rate Limiting (Protection DDoS/Brute-force) | Critique | 🟢 Implémenté (Backend Throttler) |
 | **Données** | Chiffrement en base de données (At rest) | Faible | 🟡 Partiel (Mots de passe hashés, mais données métier en clair) |
 | **Validation API** | Injection de données / XSS | Critique | 🟢 Géré par Validation Zod stricte sur les routes API |
 | **Dépendances** | Failles dans les libs tierces | Critique | 🟢 Géré par `npm audit` dans la CI |

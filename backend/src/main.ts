@@ -3,9 +3,21 @@ import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { SanitizeInterceptor } from './common/sanitize.interceptor';
 import { ValidationPipe } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
+
+import { JsonLoggerService } from './common/json-logger.service';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = process.env.HTTPS_ENABLED === 'true' ? {
+    key: fs.readFileSync(path.join(__dirname, '..', 'secrets', 'key.pem')),
+    cert: fs.readFileSync(path.join(__dirname, '..', 'secrets', 'cert.pem')),
+  } : undefined;
+
+  const app = await NestFactory.create(AppModule, {
+    httpsOptions,
+    logger: new JsonLoggerService(),
+  });
 
   // 🔒 Security: Helmet - Secure HTTP headers
   app.use(

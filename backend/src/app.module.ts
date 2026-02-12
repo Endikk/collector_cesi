@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bull';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-ioredis-yet';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
@@ -24,6 +26,7 @@ import { AdvertisingModule } from './advertising/advertising.module';
 import { EventBusModule } from './common/event-bus.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrometheusConfigModule } from './common/prometheus.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -33,6 +36,10 @@ import { PrometheusConfigModule } from './common/prometheus.module';
     }),
     PrometheusConfigModule,
     EventBusModule, // Global event bus for modular architecture
+    ThrottlerModule.forRoot([{
+      ttl: 60000,
+      limit: 10,
+    }]),
     BullModule.forRoot({
       redis: {
         host: process.env.REDIS_HOST || 'localhost',
@@ -70,7 +77,13 @@ import { PrometheusConfigModule } from './common/prometheus.module';
     TranslationModule,
     AdvertisingModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, HealthController],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
 })
 export class AppModule { }

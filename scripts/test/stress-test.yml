@@ -1,0 +1,15 @@
+config:
+  target: "https://localhost:4000"
+  phases:
+    - duration: 10
+      arrivalRate: 50
+      name: "Spike test"
+  tls:
+    rejectUnauthorized: false
+  http:
+    timeout: 5
+
+scenarios:
+  - flow:
+      - get:
+          url: "/"

@@ -31,6 +31,8 @@ model User {
   notificationPreferences  NotificationPreferences?
   isSeller                 Boolean                   @default(false)
   sellerType               String?                   // "PARTICULIER" ou "PROFESSIONNEL"
+  twoFactorSecret          String?
+  twoFactorEnabled         Boolean                   @default(false)
 }
 
 model Shop {
