@@ -63,5 +63,7 @@ backend/prisma/*.db
 backend/test-report.xml
 
 # Docs CESI 
-docs/
-docs/university/docs/
+!docs/
+docs/*
+!docs/presentation/
+!docs/university/docs/
