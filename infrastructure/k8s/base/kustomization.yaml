@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
   - namespace.yaml
-  - database/postgres.yaml
-  - database/redis.yaml
-  - backend/backend.yaml
-  - frontend/frontend.yaml
+  - postgres.yaml
+  - redis.yaml
+  - backend.yaml
+  - frontend.yaml
+  - prometheus.yaml
