@@ -1,9 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
+import { TwoFactorService } from './two-factor.service';
 
 const mockUsersService = {
     getProfile: jest.fn(),
+};
+
+const mockTwoFactorService = {
+    generateTwoFactorSecret: jest.fn(),
+    generateQrCodeDataURL: jest.fn(),
+    verifyTwoFactorToken: jest.fn(),
+    enableTwoFactor: jest.fn(),
 };
 
 describe('UsersController', () => {
@@ -15,6 +23,7 @@ describe('UsersController', () => {
             controllers: [UsersController],
             providers: [
                 { provide: UsersService, useValue: mockUsersService },
+                { provide: TwoFactorService, useValue: mockTwoFactorService },
             ],
         }).compile();
 

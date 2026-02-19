@@ -40,14 +40,30 @@ spec:
               value: "http://backend:4000"
             # Backend URL for client-side calls (public URL via minikube tunnel)
             - name: NEXT_PUBLIC_BACKEND_URL
-              value: "http://localhost:4000"
+              value: "https://localhost:4000"
             # NextAuth — obligatoire en mode production
             - name: NEXTAUTH_SECRET
               value: "dev-nextauth-secret-key"
             - name: NEXTAUTH_URL
-              value: "http://localhost:3000"
+              value: "https://localhost:3000"
             - name: DATABASE_URL
               value: "postgresql://user:password@db:5432/collector?schema=public"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
           resources:
             requests:
               cpu: 100m
@@ -74,4 +90,4 @@ spec:
               service:
                 name: frontend
                 port:
-                  number: 80
+                  number: 3000

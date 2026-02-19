@@ -13,9 +13,23 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
         where: { id },
         include: {
             owner: {
-                select: { id: true, name: true, image: true },
+                select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                    _count: {
+                        select: {
+                            sales: true,
+                            items: true,
+                            reviewsReceived: true,
+                        },
+                    },
+                },
             },
             images: true,
+            category: {
+                select: { name: true },
+            },
         },
     });
 
@@ -23,6 +37,12 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
         notFound();
     }
 
+    // Get average rating for seller
+    const sellerReviews = await prisma.review.aggregate({
+        where: { targetId: item.ownerId },
+        _avg: { rating: true },
+        _count: { rating: true },
+    });
 
     const session = await getServerSession(authOptions) as Session | null;
     const isOwner = session?.user?.id === item.ownerId;
@@ -37,6 +57,13 @@ export async function ItemPage({ params }: { params: Promise<{ id: string }> }) 
                     isOwner={isOwner}
                     isAdmin={isAdmin}
                     currentUserId={session?.user?.id}
+                    sellerStats={{
+                        salesCount: item.owner._count.sales,
+                        itemsCount: item.owner._count.items,
+                        reviewCount: sellerReviews._count.rating,
+                        avgRating: sellerReviews._avg.rating,
+                    }}
+                    categoryName={item.category?.name}
                 />
             </div>
         </div>

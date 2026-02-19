@@ -49,8 +49,8 @@ export function UtilityBar() {
                                         </div>
                                     </div>
 
-                                    <Link href="/profile/settings" className="block py-1.5 hover:underline hover:text-[#3665f3] transition-colors">
-                                        Paramètres du compte
+                                    <Link href="/profile" className="block py-1.5 hover:underline hover:text-[#3665f3] transition-colors">
+                                        Mon profil
                                     </Link>
 
                                     {session.user?.role === 'ADMIN' && (

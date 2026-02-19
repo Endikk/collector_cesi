@@ -616,7 +616,7 @@ kubectl run load-generator \
   --image=williamyeh/hey \
   --restart=Never --rm -it \
   -- -z 2m -c 50 \
-  http://backend.collector.svc:4000/api/items
+  https://backend.collector.svc:4000/api/items
 
 # Observer l'auto-scaling
 kubectl get hpa -n collector -w

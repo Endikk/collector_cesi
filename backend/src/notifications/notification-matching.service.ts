@@ -19,7 +19,7 @@ export class NotificationMatchingService {
     private prisma: PrismaService,
     @InjectQueue('email') private emailQueue: Queue,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) {}
+  ) { }
 
   /**
    * Find all users who should be notified about a new item
@@ -120,7 +120,7 @@ export class NotificationMatchingService {
     categoryId: string | null;
     ownerId: string;
   }): Promise<void> {
-    const itemUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/items/${item.id}`;
+    const itemUrl = `${process.env.FRONTEND_URL || 'https://localhost:3000'}/items/${item.id}`;
 
     // 1. Find users with matching interests
     const matchingUsers = await this.findMatchingUsers(item);

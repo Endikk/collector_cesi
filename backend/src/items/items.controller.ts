@@ -1,5 +1,8 @@
-import { Controller, Get, Put, Param, Body, Request } from '@nestjs/common';
+import { Controller, Get, Put, Param, Body, Request, UseGuards } from '@nestjs/common';
 import { ItemsService } from './items.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { UpdatePriceDto } from './dto/update-price.dto';
+import { UpdateItemDto } from './dto/update-item.dto';
 
 @Controller('items')
 export class ItemsController {
@@ -30,36 +33,28 @@ export class ItemsController {
   }
 
   /**
-   * Mettre à jour le prix d'un article
+   * Mettre à jour le prix d'un article (authentifié uniquement)
    */
+  @UseGuards(JwtAuthGuard)
   @Put(':id/price')
   async updatePrice(
     @Param('id') id: string,
-    @Request() req: { user?: { id: string } },
-    @Body() body: { price: number },
+    @Request() req: { user: { id: string } },
+    @Body() body: UpdatePriceDto,
   ) {
-    const userId = req.user?.id as string; // From JWT
-    return this.itemsService.updateItemPrice(id, userId, body.price);
+    return this.itemsService.updateItemPrice(id, req.user.id, body.price);
   }
 
   /**
-   * Mettre à jour un article (titre, description, etc.)
+   * Mettre à jour un article (authentifié uniquement)
    */
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async updateItem(
     @Param('id') id: string,
-    @Request() req: { user?: { id: string } },
-    @Body()
-    body: {
-      title?: string;
-      description?: string;
-      price?: number;
-      shippingCost?: number;
-      categoryId?: string;
-      shopId?: string;
-    },
+    @Request() req: { user: { id: string } },
+    @Body() body: UpdateItemDto,
   ) {
-    const userId = req.user?.id as string;
-    return this.itemsService.updateItem(id, userId, body);
+    return this.itemsService.updateItem(id, req.user.id, body);
   }
 }

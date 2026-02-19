@@ -9,3 +9,4 @@ resources:
   - frontend.yaml
   - prometheus.yaml
   - grafana.yaml
+  - hpa.yaml

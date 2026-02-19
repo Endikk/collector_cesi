@@ -2,13 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TwoFactorService } from './two-factor.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { ConfigService } from '@nestjs/config';
-
-// Mock otplib (not easy to mock functional import, so we test the wrapper logic or mock the module)
-// Since we use direct imports, jest.mock is needed.
-jest.mock('otplib', () => ({
-    generateSecret: jest.fn().mockReturnValue('mockSecret'),
-    verifySync: jest.fn().mockReturnValue(true),
-}));
+import { EncryptionService } from '../common/encryption.service';
 
 jest.mock('qrcode', () => ({
     toDataURL: jest.fn().mockResolvedValue('data:image/png;base64,mockQRCode'),
@@ -24,6 +18,11 @@ const mockConfigService = {
     get: jest.fn().mockReturnValue('Collector'),
 };
 
+const mockEncryptionService = {
+    encrypt: jest.fn().mockReturnValue('encrypted-secret'),
+    decrypt: jest.fn().mockReturnValue('decrypted-secret'),
+};
+
 describe('TwoFactorService', () => {
     let service: TwoFactorService;
     let prisma: PrismaService;
@@ -34,6 +33,7 @@ describe('TwoFactorService', () => {
                 TwoFactorService,
                 { provide: PrismaService, useValue: mockPrismaService },
                 { provide: ConfigService, useValue: mockConfigService },
+                { provide: EncryptionService, useValue: mockEncryptionService },
             ],
         }).compile();
 
@@ -75,7 +75,7 @@ describe('TwoFactorService', () => {
             expect(await service.enableTwoFactor('1', 'secret')).toEqual(mockUser);
             expect(mockPrismaService.user.update).toHaveBeenCalledWith({
                 where: { id: '1' },
-                data: { twoFactorSecret: 'secret', twoFactorEnabled: true },
+                data: { twoFactorSecret: 'encrypted-secret', twoFactorEnabled: true },
             });
         });
     });

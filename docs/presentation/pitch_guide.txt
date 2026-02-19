@@ -11,7 +11,7 @@ SLIDE 1 — TITRE
 Titre : Collector.shop
 Sous-titre : Superviser et assurer le développement d'applications logicielles
 En bas :
-  Lucas Labonde — Lead Developer
+  Lucas Labonde — Lead Developer en mission chez Collector.shop
   Soutenance de bloc — Février 2026
   20 min · Démo incluse
 
@@ -48,7 +48,12 @@ Colonne gauche — L'entreprise :
   • Levée de fonds par crowdfunding
   • Objets de collection vintage (sneakers édition limitée, figurines, posters dédicacés…)
   • Existant IT : Office 365, site vitrine WordPress, pas d'infra dev
-  • Équipe IT : 1 Lead Dev (moi) + 2 développeurs confirmés (5 ans exp.)
+  • Équipe IT : 1 Lead Dev en mission (moi, Lucas Labonde) + 2 développeurs confirmés (5 ans exp.)
+
+Ma mission :
+  Je suis missionné en tant que Lead Developer pour concevoir et piloter le développement
+  de la plateforme Collector.shop, de la définition de l'architecture jusqu'à la mise en production.
+  Responsable du processus qualité, de la sécurité et du déploiement cloud/k8s.
 
 Colonne droite — Ce que l'entreprise recherche :
   • Marketplace C2C sécurisée pour vente d'objets de collection
@@ -112,24 +117,26 @@ SLIDE 6 — POLITIQUE DE QUALITÉ (4 indicateurs ISO 25010)
 
 Tableau :
 
-  #  | Indicateur              | Exigence ISO     | Objectif    | Outil
-  ---|-------------------------|------------------|-------------|------------------
-  1  | Couverture de code      | Maintenabilité   | ≥ 70%       | jest --coverage
-  2  | Temps de build CI       | Performance      | < 5 min     | GitHub Actions
-  3  | Vulnérabilités critiques| Sécurité         | 0 CRITICAL  | Trivy
-  4  | Latence API P95         | Performance      | < 500ms     | Prometheus
+  #  | Indicateur                  | Dimension ISO 25010 | Objectif    | Outil
+  ---|-----------------------------|---------------------|-------------|------------------
+  1  | Couverture de code          | Maintenabilité      | ≥ 70%       | jest --coverage
+  2  | Latence API P95             | Performance         | < 500ms     | Prometheus
+  3  | Taux de succès des tests CI | Fonctionnalité      | 100%        | GitHub Actions
+  4  | Disponibilité applicative   | Fiabilité           | ≥ 99%       | K8s HPA + Probe
+
+Note : Les vulnérabilités CRITICAL (0 toléré, outil : Trivy) sont suivies en bonus comme 5e indicateur de sécurité.
 
 Lien avec la dette technique :
-  • Couverture → Zones non testées = régressions qui s'accumulent
-  • Build Time → Pipeline lent = intégrations moins fréquentes
-  • Vulnérabilités → Dépendances obsolètes = dette sécurité exponentielle
-  • Latence → Dégradation progressive = dette architecturale
+  • Couverture → Zones non testées = régressions silencieuses qui s'accumulent
+  • Latence → Dégradation progressive sous charge = dette architecturale
+  • Taux de succès → Régression fonctionnelle non détectée = dette fonctionnelle
+  • Disponibilité → Pannes répétées = dette infra (self-healing K8s limite l'impact)
 
 Comment les outils servent les indicateurs :
   • jest --coverage → Rapport HTML intégré au CI, seuil bloquant si < objectif
-  • GitHub Actions → Temps de chaque job visible, alerte si > 5 min
-  • Trivy → Scan auto en CI, bloque le merge si vulnérabilité CRITICAL
   • Prometheus + prom-client → Collecte latence P95 en temps réel, dashboard Grafana
+  • GitHub Actions → % tests verts visible par PR, bloquant avant merge
+  • K8s liveness/readiness probes + HPA → Détection pannes + auto-récupération
 
 
 ================================================================================
@@ -151,10 +158,9 @@ Tableau — Tests appliqués au POC :
   Type          | Framework      | CI
   --------------|----------------|----
   Unitaires     | Jest + ts-jest | ✅
-  Intégration   | Supertest      | ✅
+  Intégration   | Supertest      | 🔧 (local)
   Sécurité      | Trivy          | ✅
-  Accessibilité | jest-axe       | ✅
-  Charge        | hey (dans K8s) | 🔧
+  Charge        | hey (dans K8s) | 🔧 (local)
 
 Parties prenantes :
   • Lead Dev → Rédige tests unitaires + intégration, configure CI
@@ -293,8 +299,8 @@ Colonne gauche :
 >>> SCHÉMA ICI : Arbre des modules NestJS <<<
 
   AppModule
-    ├── Auth (JWT Guards)
-    ├── Users
+    ├── Auth (JWT + Passport + BruteForce Guard)
+    ├── Users (profils + 2FA otplib)
     ├── Items
     ├── Shops
     ├── Payment (Stripe)
@@ -303,8 +309,13 @@ Colonne gauche :
     ├── Fraud Detection
     ├── Reviews
     ├── Moderation
-    ├── Chat
-    └── Common (Guards, Pipes, DTOs)
+    ├── Interests
+    ├── Advertising
+    ├── Translation (i18n)
+    ├── Email
+    ├── Notification Preferences
+    ├── Validation
+    └── Common (Guards, Pipes, DTOs, Encryption, Prometheus)
 
 Colonne droite :
 
@@ -321,6 +332,25 @@ Tableau — Choix techniques justifiés :
 
 Note : Architecture monolithe modulaire — chaque module isolé, prêt pour extraction en microservices
 
+>>> SCHÉMA ICI : Communication interservice <<<
+
+  Frontend (Next.js)
+    │  REST/JSON over HTTP (fetch + axios)
+    ↓
+  Backend NestJS
+    ├── Modules internes → communication via Injection de Dépendances (DI NestJS)
+    ├── Bull Queue (Redis) → traitement asynchrone (notifications, emails)
+    ├── Prisma ORM ────────→ PostgreSQL (ACID, transactions financières)
+    └── Chat HTTP (server actions Next.js) → messagerie vendeur ↔ acheteur
+
+  Points clés POC validés :
+    ✅ Découpage applicatif : 17 modules métier indépendants
+    ✅ Communication synchrone : REST (Front→Back) + DI (inter-modules)
+    ✅ Communication asynchrone : Bull Queue (Redis) pour notifications
+    ✅ Sécurité : JWT Guards (Passport) sur chaque route protégée, CORS restreint
+    ✅ Hébergement : pods K8s isolés par service
+    ✅ Orchestration : Minikube, HPA, liveness probes
+
 
 ================================================================================
 SLIDE 14 — EXPÉRIMENTATION BAC À SABLE
@@ -330,7 +360,7 @@ SLIDE 14 — EXPÉRIMENTATION BAC À SABLE
 
 Carte 1 — Minikube (Kubernetes)
   Env : macOS, Docker driver
-  • Déploiement 6 services YAML
+  • Déploiement 8 manifests YAML (front, back, db, redis, prometheus, grafana, hpa, namespace)
   • HPA auto-scaling configuré
   • Test charge avec "hey"
   Difficulté : minikube tunnel instable
@@ -372,12 +402,12 @@ Colonne droite :
 
 Tableau — Tests d'acceptation :
 
-  Scénario                  | Méthode          | ✓
-  --------------------------|------------------|---
-  Créer un article          | POST /api/items  | ✅
-  Achat avec commission     | Stripe mock      | ✅
-  Accès catalogue non-auth  | GET /api/items   | ✅
-  Chat entre utilisateurs   | Test fonctionnel | ✅
+  Scénario                  | Méthode            | ✓
+  --------------------------|--------------------|---
+  Créer un article          | Server action /sell | ✅
+  Achat avec commission     | Stripe mock        | ✅
+  Accès catalogue non-auth  | GET /items         | ✅
+  Chat entre utilisateurs   | Server action chat | ✅
 
 
 ================================================================================
@@ -394,7 +424,7 @@ SLIDE 17 — AUDIT SÉCURITÉ & PLAN DE REMÉDIATION
 Colonne gauche :
 
 Bonnes pratiques déjà intégrées (≥ 2 exigées) :
-  Bcrypt · Rate Limiting · Helmet · class-validator · CORS · Trivy · JWT Guards · AES-256
+  Bcrypt · Rate Limiting · Helmet · class-validator · CORS · Trivy · JWT Guards (Passport) · AES-256 · 2FA (otplib)
 
 Analyse des résultats de tests :
   • Tests unitaires & intégration → 0 bug bloquant détecté
@@ -423,8 +453,8 @@ Plan de remédiation priorisé (actions justifiées) :
   P1  | WAF (Cloudflare)         | 3j      | Protection DDoS + injection
   P1  | Centraliser logs (Loki)  | 2j      | Détection intrusion impossible sans
   P1  | Backup PostgreSQL auto   | 1j      | Perte données = catastrophe
-  P2  | 2FA (otplib)             | 1j      | Renforcement auth vendeurs
   P2  | Network Policies K8s     | 1j      | Isolation pods = moindre privilège
+  P2  | Tests E2E intégrés CI   | 2j      | Supertest + Playwright dans le pipeline
   P3  | SAST (SonarQube)         | 2j      | Détection vulns code source
 
 
@@ -436,19 +466,23 @@ Colonne gauche :
 
 Tableau — Indicateurs mesurés :
 
-  Indicateur     | Objectif  | Actuel  | Status
-  ---------------|-----------|---------|-------
-  Couverture     | ≥ 70%     | ~65%    | 🟡
-  Build CI       | < 5 min   | ~3m30   | ✅
-  Vulns CRITICAL | 0         | 0       | ✅
-  Latence P95    | < 500ms   | ~180ms  | ✅
+  Indicateur                  | Dimension ISO  | Objectif | Actuel  | Status
+  ----------------------------|----------------|----------|---------|-------
+  Couverture de code          | Maintenabilité | ≥ 70%    | ~6%     | 🟡
+  Latence API P95             | Performance    | < 500ms  | ~180ms  | ✅
+  Taux de succès tests CI     | Fonctionnalité | 100%     | 100%    | ✅
+  Disponibilité (K8s probes)  | Fiabilité      | ≥ 99%    | ≥ 99%   | ✅
+  Vulns CRITICAL (bonus)      | Sécurité       | 0        | 0       | ✅
 
 Colonne droite :
 
-Axes d'amélioration :
-  • Couverture → Couvrir modules payment et fraud-detection
-  • Latence → Surveiller sous charge (cache Redis agressif)
-  • Prochain sprint : tests E2E (Playwright)
+Axes d'amélioration (dette technique) :
+  • Couverture 🟡 → Seulement 8 fichiers de test pour ~1 600 lignes de code
+    → Action P1 : ajouter 40+ tests unitaires sur modules payment, fraud-detection, moderation
+    → Objectif sprint +1 : atteindre 40%, sprint +3 : 70%
+  • Latence → Surveiller sous charge soutenue (>200 req/s) → activer cache Redis agressif
+  • Fonctionnalité → Intégrer tests E2E (Supertest + Playwright) dans le pipeline CI
+  • Prochain sprint : couverture modules critiques + tests E2E dans CI
 
 Suivi automatique :
   Les 4 indicateurs sont collectés via CI/CD et Prometheus → détection proactive de la dette technique
@@ -485,7 +519,7 @@ Colonne droite — Scalabilité (HPA) :
     --image=williamyeh/hey \
     --restart=Never --rm -it \
     -- -z 2m -c 50 \
-    http://backend.collector.svc:4000/api/items
+    https://backend.collector.svc:4000/api/items
 
   # Observer l'auto-scaling
   kubectl get hpa -n collector -w
@@ -501,8 +535,8 @@ SLIDE 21 — CONCLUSION & ROADMAP V2
 Colonne gauche — Bilan V1 :
   • Processus qualité : 4 indicateurs ISO 25010
   • Pipeline CI/CD : 4 jobs (lint, test, Trivy, deploy)
-  • Sécurité DevSecOps : 8 mesures intégrées
-  • Architecture modulaire : 15 modules NestJS
+  • Sécurité DevSecOps : 9 mesures intégrées (dont 2FA)
+  • Architecture modulaire : 17 modules NestJS
   • Orchestration K8s : HPA + self-healing
   • Observabilité : Prometheus + Grafana
   • 3 expérimentations bac à sable documentées
@@ -531,6 +565,65 @@ Questions ?
 
 Lucas Labonde — Lead Developer · Collector.shop · Février 2026
 
+
+================================================================================
+NOTES ORALES — Guide de prestation
+================================================================================
+
+CONSEILS GÉNÉRAUX :
+  • Durée cible : 14 min contenu + 5 min démo + 1 min conclusion = 20 min
+  • Se présenter dès le slide 1 : "Je m'appelle Lucas Labonde, Lead Developer en mission
+    chez Collector.shop. Ma mission : concevoir et piloter le développement complet
+    de la plateforme, de l'architecture à la mise en production."
+  • Transitions entre phases : annoncer clairement chaque changement de phase
+  • Garder un contact visuel, ne pas lire les slides mot à mot
+  • Pointer les schémas avec la main / pointeur
+
+PHRASES D'ACCROCHE PAR SECTION :
+
+  Slide 3 (Contexte) :
+    "Quand je suis arrivé en mission, l'entreprise n'avait aucune infrastructure de développement.
+     Mon premier travail a été de poser les bases : qualité, sécurité, et architecture."
+
+  Slide 6 (Indicateurs) :
+    "Pour piloter la qualité, j'ai défini 4 indicateurs couvrant les 4 dimensions ISO 25010
+     exigées : maintenabilité, performance, fonctionnalité, fiabilité. Chacun est mesuré
+     automatiquement dans le pipeline CI/CD."
+
+  Slide 9 (CI/CD) :
+    "Le pipeline est déclenché à chaque push — aucun code ne peut atteindre la production
+     sans passer par les 3 portes : qualité, sécurité, livraison."
+
+  Slide 14 (Bac à sable) :
+    "Avant toute décision technologique, j'ai expérimenté. Je vais vous présenter les 3 choix
+     les plus structurants et comment j'ai résolu les difficultés rencontrées."
+
+  Slide 15 (Fonctionnalité métier) :
+    "Le POC ne se limite pas à une infrastructure : il implémente une vraie fonctionnalité
+     métier — le parcours d'achat complet avec commission Stripe à 5%."
+
+  Slide 17 (Sécurité) :
+    "L'audit m'a permis d'identifier ce qui fonctionne — 9 mesures en place, dont la 2FA — et ce qui
+     manque. J'ai priorisé les actions de P0 à P3 selon l'impact réel."
+
+  Slide 20 (Démo) :
+    "Je vais maintenant vous montrer le POC en live. D'abord le parcours fonctionnel,
+     puis je vais déclencher un test de charge pour que vous voyiez K8s scaler en temps réel."
+
+VOCABULAIRE TECHNIQUE À EMPLOYER :
+  • "monolithe modulaire" (pas "monolithe" seul)
+  • "injection de dépendances" (pas "modules qui s'appellent")
+  • "indicateurs ISO 25010" (citer la norme)
+  • "mise en production continue" ou "livraison continue" (pas "déploiement auto")
+  • "dette technique" (lier chaque lacune à une dette)
+  • "observabilité" (pas "monitoring" seul)
+  • "self-healing" (K8s redémarre les pods défaillants automatiquement)
+
+SCHÉMAS — COMMENT LES PRÉSENTER À L'ORAL :
+  • Toujours introduire le schéma : "Sur ce schéma, vous voyez..."
+  • Décrire le flux de gauche à droite ou de haut en bas
+  • Pointer les éléments clés : "Ici, le frontend... là, le backend..."
+  • Conclure sur l'intérêt : "Ce qui valide que..."
 
 ================================================================================
 FIN — 22 slides total · ~15 min de contenu + ~5 min de démo live

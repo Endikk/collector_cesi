@@ -3,9 +3,10 @@
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Heart, Zap, CreditCard, ChevronRight, Trash2 } from "lucide-react";
+import { Heart, CreditCard, ChevronRight, Trash2, Star, ShieldCheck } from "lucide-react";
 import { PurchaseConfirmationModal } from "./PurchaseConfirmationModal";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
 import { deleteItemAsAdmin } from "@/app/actions/items";
 
@@ -25,12 +26,20 @@ interface ItemDetailsProps {
     isOwner: boolean;
     isAdmin?: boolean;
     currentUserId?: string;
+    sellerStats?: {
+        salesCount: number;
+        itemsCount: number;
+        reviewCount: number;
+        avgRating: number | null;
+    };
+    categoryName?: string;
 }
 
-export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetailsProps) {
+export function ItemDetails({ item, isOwner, isAdmin, currentUserId, sellerStats, categoryName }: ItemDetailsProps) {
     const router = useRouter();
     const [showConfirm, setShowConfirm] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
+    const isSold = item.status !== "AVAILABLE";
 
     const handleAction = (action: () => void) => {
         if (!currentUserId) {
@@ -41,11 +50,11 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
     };
 
     const handleBuyClick = () => {
+        if (isSold) return;
         handleAction(() => setShowConfirm(true));
     };
 
     const handleConfirmBuy = () => {
-        // Redirect to checkout page instead of direct purchase
         router.push(`/checkout/${item.id}`);
         setShowConfirm(false);
     };
@@ -72,6 +81,10 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
             setIsDeleting(false);
         }
     };
+
+    const ratingPercent = sellerStats?.avgRating
+        ? Math.round((sellerStats.avgRating / 5) * 100)
+        : null;
 
     return (
         <div className="space-y-6">
@@ -101,29 +114,53 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
                     )}
                 </div>
 
+                {/* Category Badge */}
+                {categoryName && (
+                    <Badge variant="secondary" className="mb-3">{categoryName}</Badge>
+                )}
+
+                {/* Status Badge */}
+                {isSold && (
+                    <Badge variant="destructive" className="mb-3 ml-2">Vendu</Badge>
+                )}
+
                 {/* Seller Info */}
                 <div className="flex items-center gap-2 text-sm text-foreground mb-4">
-                    <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center font-bold text-xs text-gray-600">
-                        {item.owner.name?.charAt(0) || "U"}
-                    </div>
+                    <Link href={`/shop/${item.ownerId}`} className="h-8 w-8 rounded-full bg-muted flex items-center justify-center font-bold text-xs text-muted-foreground hover:ring-2 ring-primary transition-all">
+                        {item.owner.name?.charAt(0)?.toUpperCase() || "U"}
+                    </Link>
                     <div className="flex flex-col">
                         <div className="flex items-center gap-1">
-                            <span className="font-bold underline cursor-pointer hover:text-blue-600">
+                            <Link href={`/shop/${item.ownerId}`} className="font-bold underline hover:text-primary">
                                 {item.owner.name || "Vendeur"}
-                            </span>
-                            <span className="text-muted-foreground">(3789)</span>
-                            <span className="text-muted-foreground">·</span>
-                            <span className="text-muted-foreground">Pro</span>
-                            <span className="text-muted-foreground">ℹ️</span>
+                            </Link>
+                            {sellerStats && sellerStats.reviewCount > 0 && (
+                                <>
+                                    <span className="text-muted-foreground">({sellerStats.reviewCount} avis)</span>
+                                </>
+                            )}
                         </div>
-                        <div className="flex items-center gap-1 text-xs">
-                            <span className="hover:underline cursor-pointer">97,7% d&apos;évaluations positives</span>
+                        <div className="flex items-center gap-1 text-xs flex-wrap">
+                            {ratingPercent !== null && (
+                                <span className="flex items-center gap-0.5">
+                                    <Star className="h-3 w-3 text-yellow-500 fill-yellow-500" />
+                                    {ratingPercent}% positif
+                                </span>
+                            )}
+                            {sellerStats && sellerStats.salesCount > 0 && (
+                                <>
+                                    <span className="text-muted-foreground">·</span>
+                                    <span className="text-muted-foreground">{sellerStats.salesCount} ventes</span>
+                                </>
+                            )}
                             <span className="text-muted-foreground">·</span>
-                            <Link href={`/shop/${item.ownerId}`} className="hover:underline cursor-pointer">Autres objets du vendeur</Link>
+                            <Link href={`/shop/${item.ownerId}`} className="hover:underline text-primary">
+                                Voir la boutique
+                            </Link>
                             <span className="text-muted-foreground">·</span>
                             <button
                                 onClick={() => handleAction(() => router.push(`/chat?userId=${item.ownerId}`))}
-                                className="hover:underline cursor-pointer text-[#3665f3] bg-transparent border-none p-0"
+                                className="hover:underline text-primary bg-transparent border-none p-0 cursor-pointer"
                             >
                                 Contacter le vendeur
                             </button>
@@ -141,13 +178,10 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
                     </span>
                 </div>
 
-                {/* Condition */}
-                <div className="flex gap-8 text-sm mb-6">
-                    <span className="text-muted-foreground w-20">État :</span>
-                    <div className="flex flex-col">
-                        <span className="font-bold">--</span>
-                        <span className="italic text-muted-foreground">&quot;Etat correct Bonne stabilité Traces d&apos;usure pour le vernis&quot;</span>
-                    </div>
+                {/* Description */}
+                <div className="mb-6">
+                    <h3 className="text-sm font-semibold text-muted-foreground mb-2">Description</h3>
+                    <p className="text-sm leading-relaxed whitespace-pre-wrap">{item.description}</p>
                 </div>
 
                 {/* Action Buttons */}
@@ -155,45 +189,32 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
                     <div className="space-y-3">
                         <Button
                             size="lg"
-                            className="w-full bg-[#3665f3] hover:bg-[#2b52c9] text-white font-bold rounded-full h-12 text-base"
+                            className="w-full bg-[#3665f3] hover:bg-[#2b52c9] text-white font-bold rounded-full h-12 text-base disabled:opacity-50"
                             onClick={handleBuyClick}
+                            disabled={isSold}
                         >
-                            {item.status === "AVAILABLE" ? "Achat immédiat" : "Vendu"}
+                            {isSold ? "Cet objet a été vendu" : "Achat immédiat"}
                         </Button>
-                        <Button
-                            size="lg"
-                            variant="outline"
-                            className="w-full border-[#3665f3] text-[#3665f3] hover:bg-blue-50 font-bold rounded-full h-12 text-base"
-                            onClick={() => handleAction(() => console.log("Add to cart"))}
-                        >
-                            Ajouter au panier
-                        </Button>
-                        <Button
-                            size="lg"
-                            variant="outline"
-                            className="w-full border-[#3665f3] text-[#3665f3] hover:bg-blue-50 font-bold rounded-full h-12 text-base flex items-center gap-2"
-                            onClick={() => handleAction(() => console.log("Watch item"))}
-                        >
-                            <Heart className="h-4 w-4" />
-                            Suivre cet objet
-                        </Button>
+                        {!isSold && (
+                            <Button
+                                size="lg"
+                                variant="outline"
+                                className="w-full border-[#3665f3] text-[#3665f3] hover:bg-blue-50 font-bold rounded-full h-12 text-base flex items-center gap-2"
+                                onClick={() => handleAction(() => router.push(`/chat?userId=${item.ownerId}`))}
+                            >
+                                <Heart className="h-4 w-4" />
+                                Contacter le vendeur
+                            </Button>
+                        )}
                     </div>
                 ) : (
                     <div className="p-4 bg-muted/50 rounded-lg text-center text-muted-foreground">
                         Vous êtes le vendeur de cet objet.
-                        <Link href="/profile/sales" className="block text-[#3665f3] hover:underline mt-2">
+                        <Link href="/profile/sales" className="block text-primary hover:underline mt-2">
                             Gérer mes ventes
                         </Link>
                     </div>
                 )}
-
-                {/* Social Proof */}
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg flex items-center gap-3">
-                    <Zap className="h-5 w-5 text-gray-700" />
-                    <span className="text-sm">
-                        <span className="font-bold">D&apos;autres personnes sont intéressées.</span> 11 personnes suivent cet objet.
-                    </span>
-                </div>
 
                 <Separator className="my-6" />
 
@@ -202,29 +223,31 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
                     <div className="flex gap-4">
                         <span className="text-muted-foreground w-24 shrink-0">Livraison :</span>
                         <div>
-                            <p>Livraison possible vers : États-Unis. Consultez la description de l&apos;objet ou <button onClick={() => handleAction(() => router.push(`/chat?userId=${item.ownerId}`))} className="underline cursor-pointer text-[#3665f3] bg-transparent border-none p-0 inline">contactez le vendeur</button> pour en savoir plus sur les options de livraison.</p>
-                            <span className="underline cursor-pointer text-[#3665f3] block mt-1">Afficher les détails</span>
-                            <p className="text-muted-foreground text-xs mt-1">Lieu où se trouve l&apos;objet : Paris, France</p>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-4">
-                        <span className="text-muted-foreground w-24 shrink-0">Délai :</span>
-                        <span>Varie</span>
-                    </div>
-
-                    <div className="flex gap-4">
-                        <span className="text-muted-foreground w-24 shrink-0">Retours :</span>
-                        <div>
-                            <span>Retours refusés.</span> <span className="underline cursor-pointer text-[#3665f3]">Afficher les détails</span>
+                            <p>Consultez la description ou{" "}
+                                <button
+                                    onClick={() => handleAction(() => router.push(`/chat?userId=${item.ownerId}`))}
+                                    className="underline text-primary bg-transparent border-none p-0 inline cursor-pointer"
+                                >
+                                    contactez le vendeur
+                                </button>{" "}
+                                pour les options de livraison.
+                            </p>
                         </div>
                     </div>
 
                     <div className="flex gap-4 items-center">
-                        <span className="text-muted-foreground w-24 shrink-0">Paiements :</span>
-                        <div className="flex gap-2">
-                            <CreditCard className="h-8 w-8 text-gray-400" />
-                            {/* Add payment icons here if needed */}
+                        <span className="text-muted-foreground w-24 shrink-0">Paiement :</span>
+                        <div className="flex items-center gap-2">
+                            <CreditCard className="h-5 w-5 text-muted-foreground" />
+                            <span>Paiement sécurisé via Collector</span>
+                        </div>
+                    </div>
+
+                    <div className="flex gap-4 items-center">
+                        <span className="text-muted-foreground w-24 shrink-0">Garantie :</span>
+                        <div className="flex items-center gap-2">
+                            <ShieldCheck className="h-5 w-5 text-emerald-500" />
+                            <span>Protection acheteur Collector</span>
                         </div>
                     </div>
                 </div>

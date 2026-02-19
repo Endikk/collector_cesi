@@ -140,15 +140,6 @@ export function TransactionCard({ transaction, type }: TransactionCardProps) {
                             <span>Noté {transaction.review.rating}/5</span>
                         </div>
                     )}
-                    
-                    <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        <span>{new Date(transaction.createdAt).toLocaleDateString("fr-FR")}</span>
-                    </div>
-                </div>
-
-                <div className="text-right font-bold text-xl md:border-l md:pl-6 md:h-12 flex items-center">
-                    {isSale ? "+" : "-"}{transaction.amount.toLocaleString("fr-FR", { style: "currency", currency: "EUR" })}
                 </div>
             </CardContent>
         </Card>

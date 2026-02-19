@@ -7,7 +7,7 @@ const getBackendUrl = () => {
         return process.env.BACKEND_URL;
     }
     // Otherwise use public URL for client-side or development
-    return process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:4000';
+    return process.env.NEXT_PUBLIC_BACKEND_URL || 'https://localhost:4000';
 };
 
 const BACKEND_URL = getBackendUrl();

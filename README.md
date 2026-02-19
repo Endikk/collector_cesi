@@ -78,8 +78,8 @@ La méthode la plus simple pour lancer le projet.
     ```
 
 3.  **Accéder à l'application**
-    *   Frontend : [http://localhost:3000](http://localhost:3000)
-    *   API Backend : [http://localhost:4000](http://localhost:4000)
+    *   Frontend : [https://localhost:3000](https://localhost:3000)
+    *   API Backend : [https://localhost:4000](https://localhost:4000)
     *   Base de données (Postgres) : `localhost:5432`
 
 4.  **Arrêter les services**

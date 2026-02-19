@@ -55,6 +55,9 @@ spec:
               value: "dev-jwt-secret-key"
             - name: NODE_OPTIONS
               value: "--max-old-space-size=768"
+            # Désactiver HTTPS dans le container (pas de certs)
+            - name: HTTPS_ENABLED
+              value: "false"
             # Chiffrement (obligatoire au démarrage)
             - name: ENCRYPTION_KEY
               value: "359fdc41e2148464203957aeb095265f07851619eb357c56df4d42b18cb3ce0c"
@@ -80,9 +83,25 @@ spec:
               value: "dev@collector.local"
             # Fraud detection (désactivé en dev)
             - name: FRAUD_DETECTION_WEBHOOK_URL
-              value: "http://localhost"
+              value: "https://localhost"
             - name: FRAUD_DETECTION_API_KEY
               value: "dev-key"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
           resources:
             requests:
               cpu: 100m

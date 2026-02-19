@@ -30,6 +30,7 @@ import { EventBusModule } from './common/event-bus.module';
 import { ConfigModule } from '@nestjs/config';
 import { PrometheusConfigModule } from './common/prometheus.module';
 import { HealthController } from './health.controller';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { HealthController } from './health.controller';
       },
     }),
     PrismaModule,
+    AuthModule,
     UsersModule,
     ShopsModule,
     AdminModule,

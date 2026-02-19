@@ -7,28 +7,27 @@ import {
   Param,
   Body,
   Request,
+  UseGuards,
 } from '@nestjs/common';
 import { ShopsService } from './shops.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateShopDto } from './dto/create-shop.dto';
+import { UpdateShopDto } from './dto/update-shop.dto';
 
 @Controller('shops')
 export class ShopsController {
   constructor(private readonly shopsService: ShopsService) {}
 
   /**
-   * Créer une boutique
+   * Créer une boutique (authentifié uniquement)
    */
+  @UseGuards(JwtAuthGuard)
   @Post()
   async createShop(
-    @Request() req: { user?: { id: string } },
-    @Body()
-    data: {
-      name: string;
-      description?: string;
-      logo?: string;
-    },
+    @Request() req: { user: { id: string } },
+    @Body() data: CreateShopDto,
   ) {
-    const userId = req.user?.id as string; // From JWT
-    return this.shopsService.createShop(userId, data);
+    return this.shopsService.createShop(req.user.id, data);
   }
 
   /**
@@ -40,12 +39,12 @@ export class ShopsController {
   }
 
   /**
-   * Obtenir les boutiques du vendeur connecté
+   * Obtenir les boutiques du vendeur connecté (authentifié uniquement)
    */
+  @UseGuards(JwtAuthGuard)
   @Get('my-shops')
-  async getMyShops(@Request() req: { user?: { id: string } }) {
-    const userId = req.user?.id as string;
-    return this.shopsService.getShopsByOwner(userId);
+  async getMyShops(@Request() req: { user: { id: string } }) {
+    return this.shopsService.getShopsByOwner(req.user.id);
   }
 
   /**
@@ -65,32 +64,27 @@ export class ShopsController {
   }
 
   /**
-   * Mettre à jour une boutique
+   * Mettre à jour une boutique (authentifié uniquement)
    */
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async updateShop(
     @Param('id') id: string,
-    @Request() req: { user?: { id: string } },
-    @Body()
-    data: {
-      name?: string;
-      description?: string;
-      logo?: string;
-    },
+    @Request() req: { user: { id: string } },
+    @Body() data: UpdateShopDto,
   ) {
-    const userId = req.user?.id as string;
-    return this.shopsService.updateShop(id, userId, data);
+    return this.shopsService.updateShop(id, req.user.id, data);
   }
 
   /**
-   * Supprimer une boutique
+   * Supprimer une boutique (authentifié uniquement)
    */
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteShop(
     @Param('id') id: string,
-    @Request() req: { user?: { id: string } },
+    @Request() req: { user: { id: string } },
   ) {
-    const userId = req.user?.id as string;
-    return this.shopsService.deleteShop(id, userId);
+    return this.shopsService.deleteShop(id, req.user.id);
   }
 }

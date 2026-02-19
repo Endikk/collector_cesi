@@ -40,9 +40,9 @@ export function CheckoutPage({ item }: CheckoutPageProps) {
 
         if (result.success) {
             setSuccess(true);
-            // Redirect to home after 2 seconds
+            // Redirect to success page after 2 seconds
             setTimeout(() => {
-                router.push("/");
+                router.push("/checkout/success");
             }, 2000);
         } else {
             setProcessing(false);

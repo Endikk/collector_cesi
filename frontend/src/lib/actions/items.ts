@@ -72,7 +72,7 @@ export async function createItem(prevState: State, formData: FormData) {
         });
 
         // Trigger notifications in background (don't wait for it)
-        fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001'}/notifications/trigger-new-item`, {
+        fetch(`${process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'https://localhost:4000'}/notifications/trigger-new-item`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

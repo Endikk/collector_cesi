@@ -7,24 +7,24 @@ import {
   Headers,
   Req,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import type { RawBodyRequest } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import type { Request } from 'express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreatePaymentIntentDto } from './dto/create-payment-intent.dto';
 
 @Controller('payment')
 export class PaymentController {
   constructor(private readonly paymentService: PaymentService) {}
 
   /**
-   * Créer un Payment Intent
+   * Créer un Payment Intent (authentifié uniquement)
    */
+  @UseGuards(JwtAuthGuard)
   @Post('create-intent')
-  async createPaymentIntent(@Body() body: { itemId: string; buyerId: string }) {
-    if (!body.itemId || !body.buyerId) {
-      throw new BadRequestException('itemId et buyerId sont requis');
-    }
-
+  async createPaymentIntent(@Body() body: CreatePaymentIntentDto) {
     return this.paymentService.createPaymentIntent(body.itemId, body.buyerId);
   }
 
