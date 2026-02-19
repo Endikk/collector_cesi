@@ -58,6 +58,10 @@ kubectl rollout status deployment/backend -n collector --timeout=120s
 echo "🗄️  Mise à jour du schéma de base de données..."
 kubectl exec deployment/backend -n collector -- npx prisma db push --accept-data-loss
 
+# 11. Peupler la base de données (Seed)
+echo "🌱  Peuplement de la base de données (Seeding)..."
+kubectl exec deployment/backend -n collector -- npx prisma db seed
+
 echo ""
 echo "✅ Déploiement terminé !"
 echo ""
