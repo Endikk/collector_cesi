@@ -7,7 +7,10 @@ export class JsonLoggerService implements LoggerService {
     }
 
     error(message: any, ...optionalParams: any[]) {
-        console.error(JSON.stringify({ level: 'error', message, timestamp: new Date().toISOString(), ...optionalParams }));
+        const serialized = message instanceof Error
+            ? { name: message.name, message: message.message, stack: message.stack }
+            : message;
+        console.error(JSON.stringify({ level: 'error', message: serialized, timestamp: new Date().toISOString(), ...optionalParams }));
     }
 
     warn(message: any, ...optionalParams: any[]) {

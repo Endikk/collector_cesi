@@ -1,43 +1,65 @@
 #!/bin/bash
 
-# Exit on error
+# Arrêter en cas d'erreur
 set -e
 
-echo "🚀 Starting Minikube Setup..."
+echo "🚀 Démarrage du setup Minikube..."
 
-# 1. Start Minikube if not running
+# 1. Démarrer Minikube si pas déjà en cours
 if minikube status | grep -q "Running"; then
-    echo "✅ Minikube is already running."
+    echo "✅ Minikube est déjà en cours d'exécution."
 else
-    echo "☕ Starting Minikube..."
+    echo "☕ Démarrage de Minikube..."
     minikube start --driver=docker
 fi
 
-# 2. Configure Docker environment to use Minikube's daemon
-echo "🔄 Configuring Docker environment..."
+# 2. Pointer Docker vers le daemon Minikube
+echo "🔄 Configuration de l'environnement Docker..."
 eval $(minikube docker-env)
 
-# 3. Build images inside Minikube
-echo "🔨 Building Docker images (this may take a while)..."
-docker-compose build
+# 3. Construire les images dans Minikube (avec les bons targets pour K8s)
+echo "🔨 Construction de l'image backend..."
+docker build -t collector-backend:latest -f backend/Dockerfile.dev --target development ./backend
 
-# 4. Apply Infrastructure via Terraform
-# Check if we are in root (simple check for package.json)
+echo "🔨 Construction de l'image frontend (production)..."
+docker build -t collector-frontend:latest -f frontend/Dockerfile --target runner .
+
+# 4. Vérifier qu'on est bien à la racine du projet
 if [ ! -f "package.json" ]; then
-    echo "❌ Please run this script from the project root!"
+    echo "❌ Veuillez lancer ce script depuis la racine du projet !"
     exit 1
 fi
 
-echo "🏗️ Provisioning infrastructure with Terraform..."
+# 5. Provisionner le namespace via Terraform
+echo "🏗️ Provisionnement de l'infrastructure avec Terraform..."
 cd infrastructure/terraform
-terraform init
+terraform init -input=false
 terraform apply -auto-approve
 cd ../..
 
-echo "⏳ Waiting for deployments to be ready..."
-kubectl rollout status deployment/collector-backend -n collector
-kubectl rollout status deployment/collector-frontend -n collector
+# 6. Déployer tous les manifestes Kubernetes
+echo "📦 Déploiement des manifestes Kubernetes..."
+kubectl apply -k infrastructure/k8s/base
 
-echo "✅ Deployment Complete!"
-echo "🌍 To access the application, run the following command in your terminal:"
-echo "   minikube service frontend-service -n collector"
+# 7. Attendre que les déploiements soient prêts
+echo "⏳ Attente que les déploiements soient prêts..."
+kubectl rollout status deployment/frontend -n collector
+
+# 8. Attendre que PostgreSQL soit prêt avant de lancer le backend
+echo "🗄️  Attente que PostgreSQL soit prêt..."
+kubectl wait --for=condition=Ready pod -l app=db -n collector --timeout=120s
+
+# 9. Redémarrer le backend (évite le crash Prisma au premier démarrage à froid)
+echo "🔄 Redémarrage du backend après initialisation de la base de données..."
+kubectl rollout restart deployment/backend -n collector
+kubectl rollout status deployment/backend -n collector --timeout=120s
+
+echo ""
+echo "✅ Déploiement terminé !"
+echo ""
+echo "🌍 Lance minikube tunnel dans un terminal séparé, puis accède aux services :"
+echo "   Frontend      → http://localhost:3000"
+echo "   Backend API   → http://localhost:4000"
+echo "   Prisma Studio → http://localhost:5555"
+echo "   Prometheus    → http://localhost:9090"
+echo "   Grafana       → http://localhost:3002 (admin / admin)"

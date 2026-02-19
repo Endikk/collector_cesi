@@ -1,65 +1,94 @@
 ---
 theme: penguin
+transition: slide-left
 themeConfig:
   logoHeader: '/collector.svg'
   eventLogo: ''
   eventUrl: ''
   twitter: ''
   twitterUrl: ''
+mermaid:
+  theme: neutral
+  themeVariables:
+    primaryColor: '#e0e7ff'
+    primaryTextColor: '#312e81'
+    primaryBorderColor: '#6366f1'
+    lineColor: '#6366f1'
+    secondaryColor: '#dcfce7'
+    tertiaryColor: '#fef3c7'
+    fontFamily: 'Inter, sans-serif'
+    fontSize: '13px'
 layout: intro
 ---
 
 # Projet Collector
-## Superviser et assurer le développement des applications logicielles
+## Architecture & Industrialisation
+### Plateforme E-Commerce C2C
+
+<div class="text-center mt-8 opacity-75">
+  <p>Lucas Labonde - Lead Developer</p>
+  <p class="text-sm">Présentation Technique - 20 minutes</p>
+</div>
 
 <!--
-⏱️ Durée estimée : 1 min
-- **Accroche** : "Bonjour, je suis Lucas Labonde, Lead Dev pour Collector."
-- **Objet** : Soutenance de validation du bloc "Superviser le développement".
-- **Plan** : Structuration (Qualité) -> Réalisation (MVP) -> Remédiation (Sécurité).
+ Durée estimée : 1 min
+- **Sujet** : Construction from scratch d'une plateforme C2C (Collector).
+- **Focus** : Qualité, Sécurité (DevSecOps) et Scalabilité.
+- **Rôle** : Architecte Logiciel & Lead Developer.
 -->
 
 ---
 layout: two-cols
 ---
 
-# L'Entreprise : Collector
+# Contexte & Enjeux
 
-<div class="text-sm">
+###  Le Projet
 
-### 🏢 Identité & Contexte
-- **Start-up** (5 ans) : Évènementiel (Salons objets pop-culture/vintage).
-- **Situation** : Incubateur, Wifi partagé, IT limité (Office 365, Exchange).
-- **Transition** : Levée de fonds pour lancer "Collector.shop".
+Collector est une plateforme de vente d'objets de collection entre particuliers. L'entreprise, initialement orientée événementiel, a levé des fonds pour développer une application web sécurisée et scalable.
 
-### 👥 L'Équipe & Ma Mission
-- **Direction** : 2 co-fondatrices (ex-Chefs de Projet IT).
-- **Squad IT** :
-  - **Moi : Lead Developer** (Pilotage, Architecture, Qualité).
-  - 2 Développeurs Confirmés.
-- **Support** : RH, Com/Marketing Digital.
+###  Mes Objectifs (Lead Dev)
 
-</div>
+En tant que Lead Developer, ma mission consiste à :
+- **Architecture** : Concevoir une solution modulaire et évolutive
+- **Industrialisation** : Mettre en place les bonnes pratiques dès le départ
+- **Sécurité** : Garantir une approche "Secure by Design"
 
 ::right::
 
-<div class="flex h-full items-center justify-center p-8">
-  <div class="bg-gray-100 p-6 rounded-xl text-center shadow-lg dark:bg-gray-800">
-    <div class="font-bold text-xl mb-4">De l'Évènementiel...</div>
-    <div class="text-5xl mb-4">🎪</div>
-    <div class="text-xs opacity-75 mb-6">Salons physiques, Partenariats</div>
-    <div class="text-2xl mb-6">⬇️</div>
-    <div class="text-5xl mb-4">💻</div>
-    <div class="font-bold text-xl">...au Digital</div>
-    <div class="text-xs opacity-75 mt-2">Collector.shop (V1)</div>
+<div class="flex h-full items-center justify-center p-6">
+  <div class="bg-gray-50 p-6 rounded-xl shadow-md border-t-4 border-blue-500 w-full dark:bg-gray-800">
+    <div class="font-bold text-xl mb-6 text-blue-700 dark:text-blue-300 text-center">Défis Techniques</div>
+    
+    <div class="space-y-6">
+        <div class="flex items-center space-x-4">
+            <div>
+                <div class="font-bold">Confiance & Sécurité</div>
+                <div class="text-sm opacity-75">Transactions financières sécurisées et prévention de la fraude</div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div>
+                <div class="font-bold">Dette Technique Maîtrisée</div>
+                <div class="text-sm opacity-75">Application des normes ISO 25010 et rigueur architecturale</div>
+            </div>
+        </div>
+        <div class="flex items-center space-x-4">
+            <div>
+                <div class="font-bold">Time-to-Market</div>
+                <div class="text-sm opacity-75">Automatisation complète via CI/CD</div>
+            </div>
+        </div>
+    </div>
+
   </div>
 </div>
 
 <!--
-⏱️ Durée estimée : 2 min
-- **Contexte** : Start-up mature en pivot digital (évènementiel -> web).
-- **Contrainte** : IT hérité faible (Wifi public, pas d'infra), besoin de tout construire.
-- **Mon Rôle** : Pas juste dev, mais *Lead* -> Structurer, Choisir les technos, Monter en compétence l'équipe (k8s).
+ Durée estimée : 2 min
+- **Contexte** : Greenfield project avec la responsabilité de faire les bons choix architecturaux dès le départ.
+- **Problématique** : Comment garantir qu'une application partagée entre plusieurs développeurs ne devienne pas difficile à maintenir ?
+- **Réponse** : Rigueur (Typage fort), Processus (CI/CD) et Standards (Architecture Modulaire).
 -->
 
 ---
@@ -68,38 +97,46 @@ layout: default
 
 # Vision & Exigences (V1)
 
-**Objectif** : Une plateforme C2C de vente d'objets de collection, sécurisée et scalable.
+<div class="text-center mb-6">
+  <p class="text-lg">Objectif : Construire une plateforme C2C sécurisée, scalable et conforme aux exigences métier.</p>
+</div>
 
-<div class="grid grid-cols-2 gap-8 mt-6">
+<div class="grid grid-cols-2 gap-8 mt-8">
 
-<div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
-  <h3 class="font-bold text-lg mb-2 text-blue-600">📦 Fonctionnel (MVP)</h3>
-  <ul class="text-xs space-y-2">
-    <li>👤 <strong>Profils</strong> : Acheteur / Vendeur / Admin.</li>
-    <li>💬 <strong>Social</strong> : Chat (Filtre info perso), Notifications.</li>
-    <li>🔍 <strong>Catalogue</strong> : Recommandations, Filtres.</li>
-    <li>💳 <strong>Transaction</strong> : Paiement CB, Commission 5%, Validation Articles.</li>
+<div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border-l-4 border-blue-500">
+  <h3 class="font-bold text-lg mb-3 text-blue-600"> Fonctionnel (MVP)</h3>
+  <ul class="text-sm space-y-2">
+    <li> <strong>Profils</strong> : Gestion des rôles Acheteur, Vendeur et Admin</li>
+    <li> <strong>Social</strong> : Chat sécurisé et système de notifications</li>
+    <li> <strong>Catalogue</strong> : Recherche avancée avec filtres par catégorie</li>
+    <li> <strong>Transaction</strong> : Paiement sécurisé par CB avec commission de 5%</li>
   </ul>
 </div>
 
-<div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border-l-4 border-purple-500">
-  <h3 class="font-bold text-lg mb-2 text-purple-600">⚙️ Technique & Contraintes</h3>
-  <ul class="text-xs space-y-2">
-    <li>🛡️ <strong>Sécurité (Critique)</strong> : HTTPS, Auth Forte, Détection Fraude (Prix).</li>
-    <li>🌍 <strong>Accessibilité</strong> : i18n, Responsive.</li>
-    <li>📈 <strong>Évolutivité</strong> : Architecture pour futures features (Enchères, Live).</li>
-    <li>🏗️ <strong>Env.</strong> : Passage du "Site Vitrine WP" à une "App Métier".</li>
+<div class="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border-l-4 border-purple-500">
+  <h3 class="font-bold text-lg mb-3 text-purple-600"> Socle Technique</h3>
+  <ul class="text-sm space-y-2">
+    <li> <strong>Sécurité</strong> : Authentification JWT, validation Zod, chiffrement Argon2</li>
+    <li> <strong>Architecture</strong> : Backend modulaire NestJS avec ORM Prisma</li>
+    <li> <strong>Infrastructure</strong> : Conteneurisation Docker, prêt pour Kubernetes</li>
+    <li> <strong>Frontend</strong> : Next.js pour le SEO et les performances</li>
   </ul>
 </div>
 
+</div>
+
+<div class="mt-8 text-center">
+   <div class="opacity-75 italic text-sm border rounded p-3 bg-gray-50 dark:bg-gray-800">
+     Architecture centrée sur la sécurité des transactions et la modularité pour faciliter l'évolution
+   </div>
 </div>
 
 <!--
-⏱️ Durée estimée : 2 min
-- **Vision** : MVP fonctionnel mais *secure by design* (Commission 5%, Paiement CB).
+ Durée estimée : 2 min
+- **Vision** : MVP fonctionnel mais *secure by design*.
 - **Points critiques** :
-    - Filtre Chat : "On ne veut pas que les gens échangent leurs numéros" (Perte de commission).
-    - Fraude prix : "Alerte si un objet à 100€ passe à 1€".
+    - Filtre Chat : Empêcher l'échange d'informations personnelles (email, téléphone)
+    - Détection fraude : Alertes sur les variations de prix suspectes
 -->
 
 ---
@@ -108,48 +145,44 @@ layout: default
 
 # Backlog & User Stories (MVP)
 
-Traduction des exigences en fonctionnalités concrètes.
+<div class="text-center mb-4">
+  <p>Traduction des exigences métier en fonctionnalités techniques concrètes.</p>
+</div>
 
 <div class="grid grid-cols-1 gap-4 mt-6">
 
 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border-l-4 border-green-500">
-  <h3 class="font-bold text-lg mb-1 text-green-600">📝 US-01 : Mise en vente</h3>
-  <p class="text-sm italic opacity-80 mb-2">"En tant que Vendeur, je veux publier une annonce avec des photos pour vendre un objet."</p>
-  <ul class="text-xs list-disc pl-5">
-    <li><strong>Critères d'acceptation</strong> : Au moins 1 photo, Description détaillée, Prix > 0€.</li>
-    <li><strong>Tech</strong> : Stockage S3/Local, Validation Zod.</li>
+  <h3 class="font-bold text-lg mb-1 text-green-600"> US-01 : Mise en vente</h3>
+  <p class="text-sm italic opacity-80 mb-2">"En tant que vendeur, je veux publier une annonce avec photos pour vendre mes objets."</p>
+  <ul class="text-sm list-disc pl-5">
+    <li><strong>Critères d'acceptation</strong> : Au moins 1 photo, prix supérieur à 0€, description obligatoire</li>
+    <li><strong>Implémentation technique</strong> : Stockage S3, validation Zod, modération automatique</li>
   </ul>
 </div>
 
 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
-  <h3 class="font-bold text-lg mb-1 text-blue-600">💳 US-02 : Transaction Sécurisée</h3>
-  <p class="text-sm italic opacity-80 mb-2">"En tant qu'Acheteur, je veux payer par carte sans partager mes données perso au vendeur."</p>
-  <ul class="text-xs list-disc pl-5">
-    <li><strong>Critères d'acceptation</strong> : Paiement Stripe, Commission 5% déduite, Statut "Vendu".</li>
-    <li><strong>Tech</strong> : Stripe Webhooks, Atomic Transaction (Prisma).</li>
+  <h3 class="font-bold text-lg mb-1 text-blue-600"> US-02 : Transaction Sécurisée</h3>
+  <p class="text-sm italic opacity-80 mb-2">"En tant qu'acheteur, je veux payer par CB sans partager mes données bancaires."</p>
+  <ul class="text-sm list-disc pl-5">
+    <li><strong>Critères d'acceptation</strong> : Paiement via Stripe, commission 5% automatique, atomicité garantie</li>
+    <li><strong>Implémentation technique</strong> : Webhooks Stripe, transactions Prisma, traçabilité complète</li>
   </ul>
 </div>
 
 <div class="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border-l-4 border-red-500">
-  <h3 class="font-bold text-lg mb-1 text-red-600">🛡️ US-03 : Détection de Fraude</h3>
-  <p class="text-sm italic opacity-80 mb-2">"En tant qu'Admin, je veux être notifié si un prix varie suspectement."</p>
-  <ul class="text-xs list-disc pl-5">
-    <li><strong>Critères d'acceptation</strong> : Notification si variation > 30%, Log de l'événement.</li>
-    <li><strong>Tech</strong> : Event Emitter, JSON Logger.</li>
+  <h3 class="font-bold text-lg mb-1 text-red-600"> US-03 : Détection de Fraude</h3>
+  <p class="text-sm italic opacity-80 mb-2">"En tant qu'admin, je veux être alerté automatiquement des prix suspects."</p>
+  <ul class="text-sm list-disc pl-5">
+    <li><strong>Critères d'acceptation</strong> : Alerte si variation de prix supérieure à 30%</li>
+    <li><strong>Implémentation technique</strong> : Event Emitter NestJS, logs structurés JSON</li>
   </ul>
 </div>
 
 </div>
 
 <!--
-- **Méthodo** : J'ai traduit le besoin métier en US techniques.
-- **Focus** : US-02 (Paiement) est la plus critique (Atomicité, Sécurité).
-- **Tech** : Choix de Prisma pour les transactions atomiques (ACID).
-
-💡 **Cheat Sheet : Definitions**
-- **User Story (US)** : Description courte d'une fonctionnalité vue par l'utilisateur ("En tant que... je veux... afin de...").
-- **Critère d'acceptation** : Conditions précises pour considérer l'US comme "terminée" (ex: "Le bouton est vert").
-- **Atomicité** : Tout ou rien. Si le paiement échoue, la commande n'est pas créée. Pas de demi-mesure.
+- **Méthode** : Transformation des besoins métier en User Stories techniques
+- **Focus** : US-02 (Paiement) est critique car elle implique l'atomicité des transactions
 -->
 
 ---
@@ -158,37 +191,36 @@ layout: default
 
 # Sommaire de la Mission
 
-Déroulement du projet en 3 phases structurantes :
+<div class="text-center mb-6">
+  <p>Déroulement du projet en 3 phases structurantes conformes aux exigences de l'évaluation.</p>
+</div>
 
-<div class="grid grid-cols-3 gap-6 mt-8 text-center">
+<div class="grid grid-cols-3 gap-6 mt-10 text-center">
 
-<div class="bg-blue-50 dark:bg-blue-900 p-4 rounded-xl shadow-lg border-t-4 border-blue-500">
-  <div class="text-4xl mb-3">🏗️</div>
-  <h3 class="font-bold text-lg mb-2 text-blue-700 dark:text-blue-300">1. Structuration</h3>
-  <div class="text-xs text-left space-y-2 opacity-90 px-2">
-    <p>✅ Qualité (ISO 25010)</p>
-    <p>✅ Cycle DevSecOps</p>
-    <p>✅ Compétences & Formation</p>
+<div class="bg-blue-50 dark:bg-blue-900 p-6 rounded-xl shadow-lg border-t-4 border-blue-500">
+  <h3 class="font-bold text-xl mb-3 text-blue-700 dark:text-blue-300">1. Structuration</h3>
+  <div class="text-sm text-left space-y-2 opacity-90 px-2 font-medium">
+    <p>Politique de qualité ISO 25010</p>
+    <p>Cycle DevSecOps formalisé</p>
+    <p>Cartographie des compétences</p>
   </div>
 </div>
 
-<div class="bg-green-50 dark:bg-green-900 p-4 rounded-xl shadow-lg border-t-4 border-green-500">
-  <div class="text-4xl mb-3">🚀</div>
-  <h3 class="font-bold text-lg mb-2 text-green-700 dark:text-green-300">2. Réalisation</h3>
-  <div class="text-xs text-left space-y-2 opacity-90 px-2">
-    <p>✅ Choix Techniques & POC</p>
-    <p>✅ Dév. Fonctionnalités</p>
-    <p>✅ Pipeline CI/CD</p>
+<div class="bg-green-50 dark:bg-green-900 p-6 rounded-xl shadow-lg border-t-4 border-green-500">
+  <h3 class="font-bold text-xl mb-3 text-green-700 dark:text-green-300">2. Réalisation</h3>
+  <div class="text-sm text-left space-y-2 opacity-90 px-2 font-medium">
+    <p>Expérimentation en bac à sable</p>
+    <p>Développement du POC</p>
+    <p>Pipeline CI/CD complet</p>
   </div>
 </div>
 
-<div class="bg-purple-50 dark:bg-purple-900 p-4 rounded-xl shadow-lg border-t-4 border-purple-500">
-  <div class="text-4xl mb-3">🛡️</div>
-  <h3 class="font-bold text-lg mb-2 text-purple-700 dark:text-purple-300">3. Remédiation</h3>
-  <div class="text-xs text-left space-y-2 opacity-90 px-2">
-    <p>✅ Audit de Sécurité</p>
-    <p>✅ Tests de Charge</p>
-    <p>✅ Plan d'Amélioration</p>
+<div class="bg-purple-50 dark:bg-purple-900 p-6 rounded-xl shadow-lg border-t-4 border-purple-500">
+  <h3 class="font-bold text-xl mb-3 text-purple-700 dark:text-purple-300">3. Remédiation</h3>
+  <div class="text-sm text-left space-y-2 opacity-90 px-2 font-medium">
+    <p>Audit de sécurité</p>
+    <p>Tests de charge</p>
+    <p>Plan d'action priorisé</p>
   </div>
 </div>
 
@@ -198,55 +230,228 @@ Déroulement du projet en 3 phases structurantes :
 layout: section
 ---
 
-# Phase 1 : Structuration du Processus
+# Phase 1 : Structuration
 ## Qualité, Méthodologie & Compétences
 
 ---
 layout: default
 ---
 
-# Qualité Logicielle & Indicateurs
+# Qualité Logicielle : Stratégie ISO 25010
 
-Approche basée sur la norme **ISO 25010** pour éviter la dette technique.
+<div class="text-center mb-4">
+  <p>Mise en place d'une démarche qualité standardisée pour éviter l'accumulation de dette technique.</p>
+</div>
 
-<div class="grid grid-cols-2 gap-8 mt-6">
+<div class="grid grid-cols-2 gap-8 mt-8">
 
-<div class="bg-blue-50 dark:bg-blue-900 p-5 rounded-xl">
-  <h3 class="font-bold text-xl mb-4 text-blue-700 dark:text-blue-300">📊 4 Indicateurs Clés</h3>
-  <ul class="space-y-3">
-    <li>🔹 <strong>Fiabilité</strong> : Couverture de Tests Unitaires (> 80%).</li>
-    <li>🔹 <strong>Maintenabilité</strong> : Respect des standards (ESLint/Prettier).</li>
-    <li>🔹 <strong>Sécurité</strong> : 0 Vulnérabilités critiques (Audit npm/Trivy).</li>
-    <li>🔹 <strong>Performance</strong> : Temps de réponse API < 200ms.</li>
+<div class="bg-blue-50 dark:bg-blue-900 p-6 rounded-xl border-l-4 border-blue-500">
+  <h3 class="font-bold text-xl mb-4 text-blue-700 dark:text-blue-300"> Pourquoi ISO 25010 ?</h3>
+  <ul class="space-y-4 text-sm">
+    <li>🔹 <strong>Langage Commun</strong> : Facilite l'alignement entre équipes techniques et métier sur les objectifs qualité</li>
+    <li>🔹 <strong>Exhaustivité</strong> : Couvre tous les aspects critiques (Performance, Sécurité, Maintenabilité, Fiabilité)</li>
+    <li>🔹 <strong>Mesurable</strong> : Permet de définir des indicateurs chiffrés et objectifs pour suivre la qualité</li>
   </ul>
 </div>
 
-<div class="bg-green-50 dark:bg-green-900 p-5 rounded-xl">
-  <h3 class="font-bold text-xl mb-4 text-green-700 dark:text-green-300">🔄 Une approche DevSecOps</h3>
-  <div class="text-sm opacity-90">
-    <p class="mb-2">Intégration de la sécurité à chaque étape :</p>
-    <ul class="list-disc pl-4 space-y-1">
-      <li><strong>Plan</strong> : Threat Modeling</li>
-      <li><strong>Code</strong> : Linters & Typos</li>
-      <li><strong>Build</strong> : SAST (Static Analysis)</li>
-      <li><strong>Test</strong> : DAST (Dynamic Analysis)</li>
-      <li><strong>Deploy</strong> : Hardening Infra</li>
+<div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl border-l-4 border-gray-500 text-center flex flex-col justify-center">
+    <div class="text-6xl mb-4">💎</div>
+    <div class="font-bold text-xl">Objectif Principal</div>
+    <div class="text-lg opacity-80 mt-2">Réduire la Dette Technique</div>
+    <div class="text-sm opacity-70 mt-4">En appliquant des standards de qualité dès la conception</div>
+</div>
+
+</div>
+
+---
+layout: default
+---
+
+# Indicateurs Qualité
+
+<div class="text-center mb-4">
+  <p>Quatre indicateurs clés pour mesurer et garantir la qualité logicielle du projet.</p>
+</div>
+
+<div class="mt-8">
+  <QualityIndicators />
+</div>
+
+<div class="mt-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-xl border-l-4 border-blue-500">
+  <h3 class="font-bold text-lg text-blue-700 dark:text-blue-300"> Lien avec la Dette Technique</h3>
+  <p class="text-sm mt-2">
+    Ces métriques permettent de détecter précocement les problèmes et d'éviter l'accumulation de dette technique :
+  </p>
+  <ul class="text-sm mt-2 space-y-1 list-disc pl-5">
+    <li>La couverture de tests garantit la non-régression lors des évolutions</li>
+    <li>Le temps de build rapide encourage les déploiements fréquents</li>
+    <li>Les vulnérabilités détectées tôt évitent les corrections coûteuses en production</li>
+    <li>Le temps de réponse surveille la dégradation des performances</li>
+  </ul>
+</div>
+
+<!--
+- **Qualité** : ISO 25010 n'est pas juste théorique, elle se traduit en métriques concrètes
+- **Fiabilité** : Couverture de tests > 80% pour garantir la stabilité
+- **Sécurité** : DevSecOps = Sécurité intégrée *pendant* le développement
+-->
+
+---
+layout: default
+---
+
+# Politique de Test : Stratégie Pyramidale
+
+<div class="text-center mb-4">
+  <p>Une approche structurée pour obtenir un feedback rapide et fiable à chaque niveau de l'application.</p>
+</div>
+
+<div class="grid grid-cols-2 gap-6 mt-4">
+
+<div class="h-80 flex items-center justify-center">
+  <TestPyramidChart />
+</div>
+
+<div class="flex flex-col justify-center">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border-l-4 border-green-500">
+    <h3 class="font-bold text-lg mb-4 text-green-700 dark:text-green-300"> Répartition Cible</h3>
+    <ul class="space-y-3 text-sm">
+      <li> <strong>80% Tests Unitaires (Jest)</strong><br><span class="opacity-75">Validation de la logique métier pure, exécution ultra-rapide (< 1s)</span></li>
+      <li> <strong>15% Tests d'Intégration (Supertest)</strong><br><span class="opacity-75">Validation des interactions avec la base de données (Prisma + PostgreSQL)</span></li>
+      <li> <strong>5% Tests E2E (Playwright)</strong><br><span class="opacity-75">Validation des parcours utilisateurs critiques (achat complet)</span></li>
     </ul>
   </div>
 </div>
 
 </div>
 
-<!--
-⏱️ Durée estimée : 2 min
-- **Qualité** : ISO 25010 n'est pas juste théorique.
-- **Fiabilité** : Tests unitaire > 80% (condition sine qua non pour le CI).
-- **Sécurité** : DevSecOps = Sécurité *pendant* le dev, pas à la fin.
+---
+layout: default
+---
 
-💡 **Cheat Sheet : Definitions**
-- **ISO 25010** : Norme internationale pour évaluer la qualité logicielle. Elle définit 8 critères (Fonctionnalité, Performance, Compatibilité, Utilisabilité, Fiabilité, Sécurité, Maintenabilité, Portabilité).
-- **Pourquoi l'utiliser ?** : Pour avoir un langage commun et ne rien oublier dans le cahier des charges.
-- **Dette Technique** : Coût futur de reprise du code "mal fait" aujourd'hui.
+# Implémentation des Tests
+
+<div class="text-center mb-4">
+  <p>Les outils et fichiers concrets utilisés pour chaque niveau de la pyramide de tests.</p>
+</div>
+
+<div class="grid grid-cols-1 gap-6 mt-8">
+
+<div class="bg-green-50 dark:bg-green-900 p-4 rounded-xl border-l-4 border-green-500 shadow-sm">
+  <h3 class="font-bold text-lg text-green-700 dark:text-green-300">Tests Unitaires (Jest)</h3>
+  <p class="text-sm opacity-90 mb-1">Validation de la logique métier pure sans dépendances externes.</p>
+  <code class="text-xs bg-white dark:bg-black px-2 py-1 rounded">tests/unit/commission.service.spec.ts</code>
+</div>
+
+<div class="bg-yellow-50 dark:bg-yellow-900 p-4 rounded-xl border-l-4 border-yellow-500 shadow-sm">
+  <h3 class="font-bold text-lg text-yellow-700 dark:text-yellow-300">Tests d'Intégration (Supertest)</h3>
+  <p class="text-sm opacity-90 mb-1">Validation des API et de leurs interactions avec la base de données (environnement Docker).</p>
+  <code class="text-xs bg-white dark:bg-black px-2 py-1 rounded">tests/integration/auth.controller.spec.ts</code>
+</div>
+
+<div class="bg-red-50 dark:bg-red-900 p-4 rounded-xl border-l-4 border-red-500 shadow-sm">
+  <h3 class="font-bold text-lg text-red-700 dark:text-red-300">Tests E2E (Playwright)</h3>
+  <p class="text-sm opacity-90 mb-1">Simulation complète du parcours utilisateur de bout en bout.</p>
+  <code class="text-xs bg-white dark:bg-black px-2 py-1 rounded">tests/e2e/purchase.spec.ts</code>
+</div>
+
+</div>
+
+<!--
+- **Stratégie** : Tests unitaires pour une base solide, intégration pour la BDD, E2E pour les parcours métier critiques
+-->
+
+---
+layout: default
+---
+
+# Tests & Métriques Qualité
+
+<div class="text-center mb-4">
+  <p>Comment les tests automatisés permettent de suivre nos 4 indicateurs qualité.</p>
+</div>
+
+<div class="grid grid-cols-2 gap-6 mt-6">
+
+<div class="bg-blue-50 dark:bg-blue-900 p-5 rounded-xl border-l-4 border-blue-500">
+  <h3 class="font-bold text-lg mb-3 text-blue-700 dark:text-blue-300">Couverture de Tests</h3>
+  <p class="text-sm mb-2"><strong>Indicateur :</strong> > 80%</p>
+  <p class="text-sm opacity-90"><strong>Mesure :</strong> Jest coverage report dans le pipeline CI/CD</p>
+  <p class="text-sm opacity-75 mt-2">Garantit la non-régression lors des évolutions</p>
+</div>
+
+<div class="bg-green-50 dark:bg-green-900 p-5 rounded-xl border-l-4 border-green-500">
+  <h3 class="font-bold text-lg mb-3 text-green-700 dark:text-green-300">Temps de Build</h3>
+  <p class="text-sm mb-2"><strong>Indicateur :</strong> < 5 min</p>
+  <p class="text-sm opacity-90"><strong>Mesure :</strong> GitHub Actions workflow duration</p>
+  <p class="text-sm opacity-75 mt-2">Encourage les déploiements fréquents</p>
+</div>
+
+<div class="bg-red-50 dark:bg-red-900 p-5 rounded-xl border-l-4 border-red-500">
+  <h3 class="font-bold text-lg mb-3 text-red-700 dark:text-red-300">Vulnérabilités</h3>
+  <p class="text-sm mb-2"><strong>Indicateur :</strong> 0 critique</p>
+  <p class="text-sm opacity-90"><strong>Mesure :</strong> Trivy scan + npm audit dans CI</p>
+  <p class="text-sm opacity-75 mt-2">Détection précoce avant production</p>
+</div>
+
+<div class="bg-purple-50 dark:bg-purple-900 p-5 rounded-xl border-l-4 border-purple-500">
+  <h3 class="font-bold text-lg mb-3 text-purple-700 dark:text-purple-300">Temps de Réponse</h3>
+  <p class="text-sm mb-2"><strong>Indicateur :</strong> p95 < 200ms</p>
+  <p class="text-sm opacity-90"><strong>Mesure :</strong> Artillery stress tests</p>
+  <p class="text-sm opacity-75 mt-2">Surveille la dégradation des performances</p>
+</div>
+
+</div>
+
+---
+layout: default
+---
+
+# Stratégie de Sécurité : Shift Left
+
+<div class="text-center mb-4">
+  <p>Approche DevSecOps : la sécurité est intégrée à chaque étape du cycle de développement, pas uniquement à la fin.</p>
+</div>
+
+<div class="h-96 mt-2">
+  <SecurityLifecycle />
+</div>
+
+---
+layout: default
+---
+
+# Implémentation de la Sécurité
+
+<div class="text-center mb-4">
+  <p>Mesures de sécurité concrètes appliquées au niveau du code, du pipeline et de l'infrastructure.</p>
+</div>
+
+<div class="grid grid-cols-2 gap-6 mt-6">
+
+<div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 border-blue-500">
+  <h3 class="font-bold text-lg mb-3 text-blue-700 dark:text-blue-300"> Code & Application</h3>
+  <ul class="space-y-3 text-sm">
+    <li><strong>Validation Zod</strong><br><span class="text-xs opacity-75">Rejet strict et automatique des entrées invalides côté backend</span></li>
+    <li><strong>Helmet (Headers HTTP)</strong><br><span class="text-xs opacity-75">Protection contre XSS, Clickjacking et autres attaques web courantes</span></li>
+    <li><strong>Argon2</strong><br><span class="text-xs opacity-75">Algorithme de hashing robuste et moderne pour les mots de passe</span></li>
+  </ul>
+</div>
+
+<div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 border-red-500">
+  <h3 class="font-bold text-lg mb-3 text-red-700 dark:text-red-300"> Pipeline & Infrastructure</h3>
+  <ul class="space-y-3 text-sm">
+    <li><strong>Trivy Scan</strong><br><span class="text-xs opacity-75">Analyse automatique des vulnérabilités dans les images Docker (blocage si critique)</span></li>
+    <li><strong>npm audit</strong><br><span class="text-xs opacity-75">Vérification continue des dépendances Node.js pour détecter les failles</span></li>
+    <li><strong>Rate Limiting (Redis)</strong><br><span class="text-xs opacity-75">Protection contre les attaques par force brute et les tentatives de DDoS</span></li>
+  </ul>
+</div>
+
+</div>
+
+<!--
+- **Message Clé** : MVP *Sécurisé* dès la V1
+- **Points forts** : Rate Limiting et Hashing robuste
 -->
 
 ---
@@ -255,105 +460,239 @@ layout: default
 
 # Équipe & Montée en Compétences
 
-Cartographie des compétences pour assurer la réussite du projet.
-
-<div class="grid grid-cols-2 gap-8 mt-6">
-
-<div class="bg-yellow-50 dark:bg-yellow-900 p-5 rounded-xl border-l-4 border-yellow-500">
-  <h3 class="font-bold text-xl mb-4 text-yellow-700 dark:text-yellow-300">👥 Compétences Actuelles</h3>
-  <ul class="space-y-3 text-sm">
-    <li>👨‍💻 <strong>Lead Dev (Moi)</strong> : Architecture, NestJS, DevOps (CI/CD).</li>
-    <li>👨‍💻 <strong>Devs Confirmés (x2)</strong> : Frontend (React), SQL.</li>
-    <li>🧪 <strong>Lacunes Identifiées</strong> : Kubernetes (K8s), Sécurité Avancée (Pentest).</li>
-  </ul>
+<div class="text-center mb-4">
+  <p>Cartographie des compétences actuelles et plan de formation pour garantir la réussite du projet.</p>
 </div>
 
-<div class="bg-blue-50 dark:bg-blue-900 p-5 rounded-xl border-l-4 border-blue-500">
-  <h3 class="font-bold text-xl mb-4 text-blue-700 dark:text-blue-300">🎓 Plan de Formation (Action)</h3>
-  <div class="text-sm opacity-90">
-    <p class="mb-2 font-bold">Action : "Kubernetes for Developers"</p>
-    <ul class="list-disc pl-4 space-y-1">
-      <li><strong>Objectif</strong> : Maîtriser le déploiement et le scaling.</li>
-      <li><strong>Format</strong> : Workshop pratique de 3 jours.</li>
-      <li><strong>Résultat attendu</strong> : Autonomie sur le cluster de production (V2).</li>
-    </ul>
-  </div>
+<div class="mt-6">
+
+| Compétence | Niveau Actuel | Niveau Cible | Action |
+| :--- | :---: | :---: | :--- |
+| **Développement React/Node** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | Veille technologique continue |
+| **DevOps (Docker)** | ⭐⭐⭐ | ⭐⭐⭐⭐ | Pratique sur le projet |
+| **Sécurité Applicative** | ⭐⭐ | ⭐⭐⭐⭐ | **Workshop OWASP Top 10** |
+| **Kubernetes** | ⭐ | ⭐⭐ | **Formation K8s certifiante** |
+
+<div class="mt-8 bg-blue-50 dark:bg-blue-900 p-6 rounded-xl border-l-4 border-blue-500">
+  <h3 class="font-bold text-lg text-blue-700 dark:text-blue-300">🎓 Plan d'Action Détaillé</h3>
+  <p class="text-sm mt-2">
+    <strong>Priorité immédiate</strong> : Formation intensive sur la sécurité applicative (OWASP Top 10) pour garantir la robustesse de la V1.<br>
+    <strong>Moyen terme</strong> : Formation Kubernetes (CKA) pour préparer la migration de la V2 vers une infrastructure orchestrée et hautement disponible.
+  </p>
 </div>
 
 </div>
 
 <!--
-- **Analyse** : on est bons en dev (React/Nest), mais faibles en Ops modernes (K8s).
-- **Action** : Formation K8s *maintenant* pour être prêt pour la V2 (qui sera sur K8s).
+- **Analyse** : L'équipe est solide en développement, mais nécessite un renforcement en sécurité et DevOps
+- **Action** : Formation K8s pour anticiper les besoins de la V2
 -->
 
 ---
 layout: section
 ---
 
-# Phase 2 : Réalisation & Déploiement
+# Phase 2 : Réalisation
 ## Architecture, Tech Stack & CI/CD
 
 ---
-layout: two-cols
+layout: default
 ---
 
 # Architecture Technique
 
-<div class="text-sm">
-
-L'architecture est **modulaire**, **conteneurisée** et séparée (Front/Back) pour la scalabilité.
-
-
-### 🎨 Frontend (Next.js)
-- **SSR/SEO** : Optimisé pour le référencement.
-- **UX** : React, TailwindCSS, ShadcnUI.
-
-### 🧠 Backend (NestJS)
-- **Robuste** : Architecture modulaire, TypeScript.
-- **Data** : Prisma ORM (Type-safe).
-- **Sécurité** : Throttler (Rate Limit), Helmet.
-
-### 💾 Data & Observabilité
-- **Data** : PostgreSQL, Redis (Cache).
-- **Logs** : JsonLogger (Structured Logging) pour traçabilité.
-- **Monitoring** : Health Checks (Terminus).
-
+<div class="text-center mb-4">
+  <p>Architecture conteneurisée et modulaire conçue pour la scalabilité et la maintenabilité.</p>
 </div>
 
-::right::
+<div class="h-96 mt-2">
+  <ArchitectureDiagram />
+</div>
 
-<div class="flex h-full items-center justify-center p-4">
-  <div class="bg-gray-100 p-4 rounded-xl shadow-lg dark:bg-gray-800 w-full text-center">
-    <div class="font-bold mb-4">Architecture Dockerisée</div>
-    <div class="grid grid-cols-1 gap-4">
-      <div class="p-3 bg-blue-100 dark:bg-blue-800 rounded">Frontend (Next.js)</div>
-      <div class="text-xl">⬇️ ⬆️</div>
-      <div class="p-3 bg-green-100 dark:bg-green-800 rounded">Backend (NestJS)</div>
-      <div class="grid grid-cols-2 gap-2">
-        <div class="text-xl">⬇️</div>
-        <div class="text-xl">⬇️</div>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div class="p-3 bg-indigo-100 dark:bg-indigo-800 rounded">PostgreSQL</div>
-        <div class="p-3 bg-red-100 dark:bg-red-800 rounded">Redis</div>
-      </div>
-    </div>
-  </div>
+---
+layout: default
+---
+
+# Détails de la Stack Technique
+
+<div class="text-center mb-4">
+  <p>Choix technologiques justifiés par le contexte du projet et les exigences de qualité.</p>
+</div>
+
+<div class="grid grid-cols-3 gap-6 mt-8">
+
+<div class="bg-blue-50 dark:bg-blue-900 p-5 rounded-xl border-t-4 border-blue-500 shadow-sm">
+  <h3 class="font-bold text-lg mb-3 text-blue-700 dark:text-blue-300"> Frontend</h3>
+  <div class="font-bold mb-2">Next.js</div>
+  <ul class="text-xs space-y-2 opacity-90">
+    <li> <strong>SSR/SEO</strong> : Améliore la visibilité sur les moteurs de recherche</li>
+    <li> <strong>UX</strong> : React avec Tailwind CSS pour une interface moderne</li>
+    <li> <strong>Performance</strong> : Optimisation automatique des images et fonts</li>
+  </ul>
+</div>
+
+<div class="bg-green-50 dark:bg-green-900 p-5 rounded-xl border-t-4 border-green-500 shadow-sm">
+  <h3 class="font-bold text-lg mb-3 text-green-700 dark:text-green-300"> Backend</h3>
+  <div class="font-bold mb-2">NestJS</div>
+  <ul class="text-xs space-y-2 opacity-90">
+    <li> <strong>Structure</strong> : Architecture modulaire et maintenable</li>
+    <li> <strong>Sécurité</strong> : Guards et intercepteurs intégrés</li>
+    <li> <strong>Typage</strong> : TypeScript de bout en bout</li>
+  </ul>
+</div>
+
+<div class="bg-purple-50 dark:bg-purple-900 p-5 rounded-xl border-t-4 border-purple-500 shadow-sm">
+  <h3 class="font-bold text-lg mb-3 text-purple-700 dark:text-purple-300">Data</h3>
+  <div class="font-bold mb-2">PostgreSQL + Redis</div>
+  <ul class="text-xs space-y-2 opacity-90">
+    <li> <strong>Fiabilité</strong> : Transactions ACID garanties</li>
+    <li> <strong>Vitesse</strong> : Cache Redis pour les performances</li>
+    <li> <strong>Logs</strong> : Logs structurés en JSON (Pino)</li>
+  </ul>
+</div>
+
 </div>
 
 <!--
-⏱️ Durée estimée : 3 min
-- **Choix Front** : Next.js pour le SEO (indispensable pour un site e-commerce).
-- **Choix Back** : NestJS pour le cadre stricte (Entreprise) et TypeScript de bout en bout.
-- **Data** : PostgreSQL (Fiable) + Redis (Rapide).
-
-💡 **Cheat Sheet : Definitions**
-- **SSR (Server-Side Rendering)** : Le serveur génère le HTML -> Google adore ça (SEO).
-- **SEO** : Optimisation pour les moteurs de recherche (être en haut sur Google).
-- **NestJS** : Framework Node.js structuré (comme Angular mais pour le back).
-- **Redis** : Base de données en mémoire ultra-rapide, utilisée ici pour le Cache et les Sessions.
+ Durée estimée : 3 min
+- **Choix Frontend** : Next.js pour le SEO (indispensable pour un site e-commerce)
+- **Choix Backend** : NestJS pour le cadre strict (Enterprise-grade) et TypeScript de bout en bout
+- **Data** : PostgreSQL (Fiable) + Redis (Rapide)
 -->
+
+---
+layout: default
+---
+
+# Expérimentation "Bac à Sable"
+
+<div class="text-center mb-4">
+  <p>Protocole de validation technique avant tout développement pour minimiser les risques.</p>
+</div>
+
+<div class="mt-6">
+  <SandboxProtocol />
+</div>
+
+<div class="mt-6 bg-blue-50 dark:bg-blue-900 p-4 rounded-xl border-l-4 border-blue-500">
+  <h3 class="font-bold text-lg text-blue-700 dark:text-blue-300"> Méthodologie d'Expérimentation</h3>
+  <p class="text-sm mt-2">
+    Chaque technologie critique est testée en <strong>isolation complète via Docker</strong> avant son adoption.<br>
+    <strong>Critères d'évaluation</strong> : Qualité de la documentation, type-safety, maturité de l'écosystème, facilité de test.
+  </p>
+</div>
+
+<!--
+- **Protocole** : On ne code pas à l'aveugle, chaque choix est validé
+- **Docker** : Environnement isolé pour des tests reproductibles
+-->
+
+---
+layout: default
+---
+
+# Résultats des Expérimentations
+
+<div class="text-center mb-4">
+  <p>Bilan des tests en bac à sable avant l'adoption définitive des technologies.</p>
+</div>
+
+<div class="grid grid-cols-2 gap-6 mt-6">
+
+<div class="bg-green-50 dark:bg-green-900 p-5 rounded-xl border-l-4 border-green-500">
+  <h3 class="font-bold text-lg mb-3 text-green-700 dark:text-green-300"> Technologies Validées</h3>
+  <ul class="space-y-3 text-sm">
+    <li>
+      <strong>Docker Compose</strong>
+      <br><span class="text-xs opacity-75">Solution simple et efficace pour la V1 (Kubernetes reporté à la V2)</span>
+    </li>
+    <li>
+      <strong>Prisma ORM</strong>
+      <br><span class="text-xs opacity-75">Meilleure productivité et sécurité comparé à TypeORM</span>
+    </li>
+    <li>
+      <strong>Stripe CLI</strong>
+      <br><span class="text-xs opacity-75">Simulation parfaite des webhooks de paiement en local</span>
+    </li>
+  </ul>
+</div>
+
+<div class="bg-orange-50 dark:bg-orange-900 p-5 rounded-xl border-l-4 border-orange-500">
+  <h3 class="font-bold text-lg mb-3 text-orange-700 dark:text-orange-300">Challenges Rencontrés & Solutions</h3>
+  <ul class="space-y-3 text-sm">
+    <li>
+      <strong>Réseau Docker</strong>
+      <br><span class="text-xs opacity-75"><strong>Problème :</strong> DNS interne instable entre conteneurs (backend ↔ postgres)</span>
+      <br><span class="text-xs opacity-75"><strong>Solution :</strong> Configuration explicite des networks dans docker-compose.yml</span>
+    </li>
+    <li>
+      <strong>Authentification Hybride</strong>
+      <br><span class="text-xs opacity-75"><strong>Problème :</strong> Synchronisation des sessions NextAuth (Frontend) avec NestJS Guards (Backend)</span>
+      <br><span class="text-xs opacity-75"><strong>Solution :</strong> JWT partagé avec validation côté backend via passport-jwt</span>
+    </li>
+    <li>
+      <strong>CI/CD</strong>
+      <br><span class="text-xs opacity-75"><strong>Problème :</strong> Client Prisma non généré dans l'environnement CI</span>
+      <br><span class="text-xs opacity-75"><strong>Solution :</strong> Ajout de <code>prisma generate</code> dans le script de build</span>
+    </li>
+  </ul>
+</div>
+
+</div>
+
+<div class="mt-4 text-center text-sm opacity-70 italic bg-gray-100 dark:bg-gray-800 p-2 rounded">
+  Stack validée et prête pour la production. Migration Kubernetes planifiée pour la V2.
+</div>
+
+---
+layout: default
+---
+
+# Focus Fonctionnel : La Commission
+
+<div class="text-center mb-4">
+  <p>Implémentation de la règle métier critique : prélèvement automatique de 5% sur chaque transaction.</p>
+</div>
+
+<div class="grid grid-cols-2 gap-8 mt-8 items-center">
+
+<div class="text-xs transform scale-90 origin-top-left">
+```mermaid
+sequenceDiagram
+    participant Acheteur
+    participant API
+    participant Stripe
+    participant DB
+    
+    Acheteur->>API: POST /buy (100€)
+    API->>API: Calcul Commission (5€)
+    API->>Stripe: PaymentIntent (100€)
+    Stripe-->>API: Success
+    
+    par Transaction Atomique
+        API->>DB: Status VENDU
+        API->>DB: Transaction (95€ / 5€)
+    end
+    
+    API-->>Acheteur: 200 OK
+```
+</div>
+
+<div class="bg-indigo-50 dark:bg-indigo-900 p-6 rounded-xl border-l-4 border-indigo-500">
+  <h3 class="font-bold text-lg mb-4 text-indigo-700 dark:text-indigo-300"> Modèle Économique</h3>
+  <ul class="space-y-4 text-sm">
+    <li>
+      <strong>Transaction Atomique</strong>
+      <br><span class="opacity-75">Garantie que soit tout réussit (paiement + commission), soit tout est annulé (rollback automatique)</span>
+    </li>
+    <li>
+      <strong>Traçabilité Complète</strong>
+      <br><span class="opacity-75">La commission est stockée dans une colonne dédiée <code>commission_amount</code> pour la facturation et la comptabilité</span>
+    </li>
+  </ul>
+</div>
+
+</div>
 
 ---
 layout: default
@@ -361,30 +700,12 @@ layout: default
 
 # Pipeline CI/CD (GitHub Actions)
 
-Automatisation complète de la validation et de la qualité.
+<div class="text-center mb-4">
+  <p>Automatisation complète du processus de qualité et de déploiement.</p>
+</div>
 
-```mermaid
-graph LR
-    A[Push Code] --> B(Install Deps)
-    B --> C{Qualité}
-    C -->|ESLint/Prettier| D[Linting]
-    C -->|NestJS/Next| E[Build Check]
-    
-    D --> F{Tests}
-    E --> F
-    F -->|Jest| G[Unit Tests]
-    
-    G --> H{Sécurité}
-    H -->|npm audit| I[Vuln Scan]
-    
-    I --> J[✅ Ready to Deploy]
-    J --> K[Docker Build]
-```
-
-<div class="mt-8 grid grid-cols-3 gap-4 text-center text-sm">
-  <div class="p-2 border border-green-500 rounded text-green-600 font-bold">1. Qualité</div>
-  <div class="p-2 border border-blue-500 rounded text-blue-600 font-bold">2. Validation</div>
-  <div class="p-2 border border-red-500 rounded text-red-600 font-bold">3. Sécurité</div>
+<div class="h-96 mt-2">
+  <PipelineDiagram />
 </div>
 
 ---
@@ -393,25 +714,27 @@ layout: default
 
 # Zoom Backend : NestJS & Prisma
 
-Structure modulaire et typage fort pour la maintenabilité.
+<div class="text-center mb-4">
+  <p>Structure modulaire et typage fort pour garantir la maintenabilité.</p>
+</div>
 
 <div class="grid grid-cols-2 gap-4">
 
 <div>
 
-### 🧱 Module Principal (`app.module.ts`)
-Configuration globale : Rate Limiting, Queues (Bull), Cache (Redis).
+###  Module Principal (`app.module.ts`)
+Configuration globale avec rate limiting et modules fonctionnels.
 
 ```typescript {all|9-12|5-6}
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    // 🛡️ Rate Limiting Global
+    //  Rate Limiting Global
     ThrottlerModule.forRoot([{
       ttl: 60000,
       limit: 10,
     }]),
-    // 📦 Modules Fonctionnels
+    //  Modules Fonctionnels
     PrismaModule,
     UsersModule,
     PaymentModule,
@@ -425,15 +748,15 @@ export class AppModule {}
 
 <div>
 
-### 💾 Modèle de Données (`schema.prisma`)
-Relationnel strict et intégrité des données.
+### Modèle (`schema.prisma`)
+Schéma relationnel strict avec traçabilité.
 
-```prisma {all|1-5|11}
+```prisma {all|4-7|11}
 model Transaction {
   id        String   @id @default(cuid())
   amount    Float
   status    String   @default("PENDING")
-  // 🔗 Relations
+  //  Relations
   buyer     User     @relation("Buyer", fields: [buyerId], references: [id])
   seller    User     @relation("Seller", fields: [sellerId], references: [id])
   item      Item     @relation(fields: [itemId], references: [id])
@@ -447,32 +770,34 @@ model Transaction {
 </div>
 
 <!--
-- **Preuve par le Code (Backend)** :
-- Montrer `app.module.ts` -> On voit `ThrottlerModule` (Rate Limit) -> Sécurité active.
-- Montrer `schema.prisma` -> Typage fort, relations claires (User <-> Transaction).
+- **Code Backend** :
+- `ThrottlerModule` = Protection active contre les abus
+- `schema.prisma` = Typage fort et relations explicites
 -->
 
 ---
 layout: default
 ---
 
-# Zoom Frontend : Next.js Server Components
+# Zoom Frontend : Server Components
 
-Performance et SEO grâce au rendu serveur (RSC).
+<div class="text-center mb-4">
+  <p>Performance et SEO optimisés grâce au rendu serveur (React Server Components).</p>
+</div>
 
 <div class="grid grid-cols-2 gap-4">
 
 <div>
 
-### ⚡ Page d'Accueil (`HomePage.tsx`)
-Accès direct à la BDD via Prisma (Secure Context).
+###  Page d'Accueil (`page.tsx`)
+Accès direct à la base de données dans un contexte sécurisé.
 
 ```tsx {all|2|12-19}
-// 🔒 Server Component (Code exécuté sur le serveur uniquement)
+//  Server Component
 import { prisma } from "@/lib/prisma";
 
-export async function HomePage({ searchParams }) {
-  // 🚀 Fetch items directly from DB
+export async function HomePage() {
+  //  Fetch direct en base de données
   const items = await prisma.item.findMany({
     where: { 
       status: "AVAILABLE",
@@ -482,7 +807,6 @@ export async function HomePage({ searchParams }) {
     orderBy: { createdAt: "desc" },
   });
 
-  // 🖼️ Pass data to Client Components
   return (
     <div className="grid grid-cols-3 gap-4">
        {items.map(item => <ProductCard item={item} />)}
@@ -495,19 +819,87 @@ export async function HomePage({ searchParams }) {
 
 <div>
 
-### 🎨 Pourquoi Next.js ?
-1.  **Zéro Bundle JS** pour le code serveur (Prisma, Secrets).
-2.  **SEO Natif** : Le HTML arrive pré-généré au navigateur.
-3.  **Performance** : Requêtes BDD locales (pas d'API REST interne).
+###  Avantages de Next.js
+
+<div class="space-y-4 text-sm mt-4">
+  <div class="bg-green-50 dark:bg-green-900 p-3 rounded">
+    <strong>1. Zero Bundle JS</strong><br>
+    <span class="text-xs opacity-75">Le code serveur n'est jamais envoyé au client</span>
+  </div>
+  <div class="bg-blue-50 dark:bg-blue-900 p-3 rounded">
+    <strong>2. SEO Natif</strong><br>
+    <span class="text-xs opacity-75">HTML pré-généré pour les moteurs de recherche</span>
+  </div>
+  <div class="bg-purple-50 dark:bg-purple-900 p-3 rounded">
+    <strong>3. Performance</strong><br>
+    <span class="text-xs opacity-75">Pas d'API intermédiaire inutile</span>
+  </div>
+</div>
 
 </div>
 
 </div>
 
 <!--
-- **Preuve par le Code (Frontend)** :
-- On fetch la donnée *directement* dans le composant (Server Component).
-- Résultat : Pas d'API publique exposée pour rien + SEO parfait pour Google.
+- **Code Frontend** :
+- Fetch direct dans le composant = Pas d'API publique inutile
+- SEO optimal pour une marketplace
+-->
+
+---
+layout: default
+---
+
+# Observabilité : Logs Structurés (Pino)
+
+<div class="text-center mb-4">
+  <p>Système de logging structuré pour faciliter le monitoring et le debug en production.</p>
+</div>
+
+<div class="grid grid-cols-2 gap-8 mt-6">
+
+<div class="bg-white dark:bg-gray-800 p-5 rounded-xl shadow-sm border-l-4 border-indigo-500">
+  <h3 class="font-bold text-lg mb-3 text-indigo-700 dark:text-indigo-300"> Avantages des Logs JSON</h3>
+  <ul class="space-y-3 text-sm">
+    <li>
+      <strong>Parsable</strong>
+      <br><span class="text-xs opacity-75">Facilement automatisable avec des outils comme ELK, Datadog ou Grafana Loki</span>
+    </li>
+    <li>
+      <strong>Contexte Riche</strong>
+      <br><span class="text-xs opacity-75">Inclusion automatique de `requestId`, `userId` pour tracer les requêtes</span>
+    </li>
+    <li>
+      <strong>Standard</strong>
+      <br><span class="text-xs opacity-75">Format unifié pour tous les microservices de l'application</span>
+    </li>
+  </ul>
+</div>
+
+<div>
+  <h3 class="font-bold text-lg mb-3"> Exemple de Log</h3>
+
+```json
+{
+  "level": "info",
+  "time": 1708185600000,
+  "requestId": "req-a1b2c3",
+  "msg": "Order created",
+  "amount": 100,
+  "commission": 5
+}
+```
+
+  <div class="mt-4 bg-green-50 dark:bg-green-900 p-3 rounded-lg text-sm">
+    <strong> Production</strong> : Collecte via `docker logs`, centralisation future avec ELK Stack.
+  </div>
+</div>
+
+</div>
+
+<!--
+- **Observabilité** : Logs JSON = Standard moderne et automatisable
+- **Pino** : Ultra-rapide et performant
 -->
 
 ---
@@ -515,16 +907,48 @@ layout: center
 class: text-center bg-green-600 text-white
 ---
 
-# 🎬 Démonstration
-*(Parcours complet : Vendeur - Acheteur - Admin)*
+#  Démonstration Live
+
+<div class="text-xl mt-8">
+  <p>Parcours complet : Vendeur → Acheteur → Admin</p>
+</div>
 
 <!--
-🛑 **STOP** : Lancer la démo ici.
-Scénario à jouer :
-1.  Vendeur met en vente un objet (upload photo).
-2.  Acheteur voit l'objet, l'ajoute au panier.
-3.  Admin reçoit une notif de prix suspect (optionnel).
+🛑 **STOP** : Lancer la démonstration en direct
 -->
+
+---
+layout: default
+---
+
+# Validation de la Performance
+
+<div class="text-center mb-4">
+  <p>Tests de charge avec Artillery : simulation de 50 utilisateurs simultanés.</p>
+</div>
+
+<div class="grid grid-cols-5 gap-6 mt-4">
+
+<div class="col-span-3 h-72">
+  <PerformanceChart />
+</div>
+
+<div class="col-span-2 flex flex-col justify-center space-y-4">
+  <div class="bg-green-50 dark:bg-green-900 p-4 rounded-xl border-l-4 border-green-500">
+    <p class="font-bold text-green-700 dark:text-green-300"> Résultats Obtenus</p>
+    <ul class="text-sm space-y-1 mt-2">
+      <li> <strong>100% de succès</strong> sur toutes les requêtes</li>
+      <li> <strong>p95 < 200ms</strong> (temps de réponse)</li>
+      <li> <strong>Rate Limiting fonctionnel</strong></li>
+    </ul>
+  </div>
+  <div class="p-3 bg-black text-green-400 font-mono text-xs rounded shadow-lg">
+    $ artillery run stress-test.yml<br>
+    ALL CHECKS PASSED 
+  </div>
+</div>
+
+</div>
 
 ---
 layout: section
@@ -537,127 +961,21 @@ layout: section
 layout: default
 ---
 
-# Stratégie de Sécurité
-  
-Une approche **Défense en Profondeur** pour protéger les données.
+# Audit de Sécurité et Remédiation
 
-<div class="grid grid-cols-1 gap-8 mt-6">
-
-<div class="bg-red-50 dark:bg-red-900 p-6 rounded-xl border-l-4 border-red-500">
-  <h3 class="font-bold text-xl mb-4 text-red-700 dark:text-red-300">🛡️ Mesures Implémentées</h3>
-  <div class="grid grid-cols-2 gap-4">
-    <ul class="space-y-3 text-sm">
-      <li>🔒 <strong>Transport & Données</strong> : HTTPS (Self-signed), Secrets chiffrés (AES).</li>
-      <li>🔑 <strong>Authentification</strong> : JWT (Stateless) + 2FA (TOTP Admin).</li>
-    </ul>
-    <ul class="space-y-3 text-sm">
-      <li>🚫 <strong>Protection DoS</strong> : Rate Limiting (Throttler + Redis).</li>
-      <li>🛡️ <strong>Hardening</strong> : Helmet (CSP, XSS, Clickjacking).</li>
-    </ul>
-  </div>
+<div class="text-center mb-4">
+  <p>Analyse des vulnérabilités détectées et plan d'action priorisé pour la V2.</p>
 </div>
 
-</div>
+| Vulnérabilité | Sévérité | Statut V1 | Solution Implémentée / Planifiée |
+| :--- | :---: | :---: | :--- |
+| **Injection SQL** |  Critique |  Protégé | Prisma ORM avec requêtes paramétrées |
+| **Faille XSS** |  Élevée |  Protégé | React automatic escaping + Helmet |
+| **Brute Force** |  Élevée |  Protégé | Rate Limiting Redis (10 req/min) |
+| **DDoS** |  Moyenne | ❌ V2 | WAF Cloudflare (planifié) |
 
-<!--
-⏱️ Durée estimée : 2 min
-- **Message Clé** : On a dépassé le MVP fonctionnel pour avoir un MVP *Sécurisé*.
-- **Points forts** : Le Rate Limiting (crucial pour le e-commerce) et le 2FA Admin.
-
-💡 **Cheat Sheet : Definitions**
-- **Défense en Profondeur** : Ne pas compter sur une seule barrière. On sécurise le réseau, l'app, les données...
-- **Rate Limiting** : Limiter le nombre de requêtes par seconde pour éviter de se faire spammer (DDoS).
-- **JWT (JSON Web Token)** : Jeton d'identité sécurisé. "Le passeport numérique de l'utilisateur".
-- **Self-signed HTTPS** : HTTPS créé par nous-mêmes (pas par une autorité officielle) pour le dev local.
--->
-
----
-layout: default
----
-
-# Validation de la Performance
-
-Tests de charge pour garantir la scalabilité (Artillery).
-
-<div class="grid grid-cols-1 gap-8 mt-6">
-
-<div class="bg-purple-50 dark:bg-purple-900 p-6 rounded-xl border-l-4 border-purple-500">
-  <h3 class="font-bold text-xl mb-4 text-purple-700 dark:text-purple-300">📉 Résultats des Tests de Charge</h3>
-  <div class="grid grid-cols-2 gap-8 items-center">
-    <div class="text-sm opacity-90">
-      <p class="mb-2 font-bold">Scénario de Stress :</p>
-      <ul class="list-disc pl-4 space-y-2">
-        <li>👥 <strong>Charge</strong> : 50 utilisateurs simultanés sur 1 min.</li>
-        <li>🌊 <strong>Flux</strong> : Login -> Recherche -> Ajout Panier.</li>
-      </ul>
-    </div>
-    <div class="text-sm opacity-90">
-      <p class="mb-2 font-bold">Métriques Clés :</p>
-      <ul class="list-disc pl-4 space-y-2">
-        <li>✅ <strong>Succès</strong> : 100% des requêtes valides (sous la limite).</li>
-        <li>⏱️ <strong>Latence</strong> : p95 < 150ms (Objectif < 200ms).</li>
-        <li>🛡️ <strong>Comportement</strong> : Rejet immédiat (429) si > limite.</li>
-      </ul>
-      <div class="mt-4 p-2 bg-black text-green-400 font-mono text-xs rounded shadow-lg">
-        > artillery run stress-test.yml<br>
-        ALL CHECKS PASSED ✅
-      </div>
-    </div>
-  </div>
-</div>
-
-</div>
-
----
-layout: default
----
-
-# Zoom Sécurité : Défense en Profondeur
-
-Comment nous protégeons l'application (`main.ts`).
-
-<div class="grid grid-cols-2 gap-6">
-
-<div>
-### 🛡️ Hardening HTTP (Helmet)
-Protection contre XSS, Clickjacking et Sniffing.
-
-```typescript
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", 'js.stripe.com'],
-        // ...
-      },
-    },
-    frameguard: { action: 'deny' }, // Anti-Clickjacking
-    xssFilter: true,
-  }),
-);
-```
-</div>
-
-<div>
-### ✅ Validation & Sanitization
-Nettoyage automatique des entrées/sorties.
-
-```typescript
-// Validation des DTOs (Data Transfer Objects)
-app.useGlobalPipes(
-  new ValidationPipe({
-    whitelist: true, // 🗑️ Rejette les champs inconnus
-    forbidNonWhitelisted: true,
-  }),
-);
-
-// 🧼 Sanitization (Interceptor)
-// Supprime les mots de passe des réponses JSON
-app.useGlobalInterceptors(new SanitizeInterceptor());
-```
-</div>
-
+<div class="mt-4 h-56">
+  <SecurityRadarChart />
 </div>
 
 ---
@@ -666,25 +984,28 @@ layout: default
 
 # Bilan du Projet (V1)
 
-Retour d'expérience sur le cycle de développement.
+<div class="text-center mb-4">
+  <p>Rétrospective sur les réussites et les apprentissages du projet.</p>
+</div>
 
 <div class="grid grid-cols-2 gap-8 mt-8">
 
 <div class="bg-green-50 dark:bg-green-900 p-5 rounded-xl border-l-4 border-green-500">
-  <h3 class="font-bold text-xl mb-4 text-green-700 dark:text-green-300">✅ Objectifs Atteints</h3>
+  <h3 class="font-bold text-xl mb-4 text-green-700 dark:text-green-300"> Succès</h3>
   <ul class="space-y-3 text-sm">
-    <li>🎯 **Architecture** : Modulaire (NestJS), découplée et conteneurisée.</li>
-    <li>🚀 **DevOps** : Pipeline CI/CD complet (Qualité, Tests, Secu).</li>
-    <li>🛡️ **Sécurité** : Bases saines (Auth, Nettoyage, Chiffrement).</li>
+    <li> <strong>Architecture</strong> : Solution modulaire et conteneurisée réussie</li>
+    <li> <strong>DevOps</strong> : Pipeline CI/CD complet et fonctionnel</li>
+    <li> <strong>Sécurité</strong> : Fondations saines avec DevSecOps</li>
+    <li> <strong>Qualité</strong> : Couverture de tests > 80%</li>
   </ul>
 </div>
 
 <div class="bg-orange-50 dark:bg-orange-900 p-5 rounded-xl border-l-4 border-orange-500">
-  <h3 class="font-bold text-xl mb-4 text-orange-700 dark:text-orange-300">💡 Apprentissage & Défis</h3>
+  <h3 class="font-bold text-xl mb-4 text-orange-700 dark:text-orange-300"> Leçons Apprises</h3>
   <ul class="space-y-3 text-sm">
-    <li>⚡ **Injection de Dépendance** : Compréhension fine du cycle de vie NestJS.</li>
-    <li>🐳 **Docker Networking** : Communication inter-conteneurs (App <-> DB <-> Redis).</li>
-    <li>🧪 **Tests E2E** : Mocking des services externes (Stripe).</li>
+    <li> <strong>NestJS</strong> : Courbe d'apprentissage de l'injection de dépendances</li>
+    <li>🐳 <strong>Docker</strong> : Complexité de la communication réseau inter-conteneurs</li>
+    <li>🧪 <strong>Tests</strong> : Difficulté du mocking des services externes (Stripe)</li>
   </ul>
 </div>
 
@@ -694,25 +1015,27 @@ Retour d'expérience sur le cycle de développement.
 layout: default
 ---
 
-# Roadmap & Remédiation (Future V2)
+# Roadmap 2026 (Vers la V2)
 
-Plan d'action pour passer à l'échelle industrielle.
+<div class="text-center mb-4">
+  <p>Plan d'action priorisé pour passer à l'échelle industrielle.</p>
+</div>
 
 <div class="grid grid-cols-3 gap-6 mt-8 text-sm">
 
-<div class="p-5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-  <div class="font-bold text-lg mb-3 text-blue-600">1. Infrastructure 🏗️</div>
-  <p class="opacity-80">Migration vers <strong>Kubernetes</strong> (K8s) pour gérer la haute disponibilité (ReplicaSets) et le scaling automatique (HPA).</p>
+<div class="p-5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm">
+  <div class="font-bold text-lg mb-3 text-blue-600">1. Infrastructure </div>
+  <p class="opacity-80">Migration vers <strong>Kubernetes</strong> pour le scaling automatique et la haute disponibilité.</p>
 </div>
 
-<div class="p-5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-  <div class="font-bold text-lg mb-3 text-purple-600">2. Observabilité 📊</div>
-  <p class="opacity-80">Stack complète <strong>ELK</strong> (Elasticsearch, Logstash, Kibana) ou Loki/Grafana pour centraliser les logs et tracer les erreurs.</p>
+<div class="p-5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm">
+  <div class="font-bold text-lg mb-3 text-purple-600">2. Observabilité </div>
+  <p class="opacity-80">Déploiement d'une stack <strong>ELK</strong> ou Loki pour la centralisation des logs et métriques.</p>
 </div>
 
-<div class="p-5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm hover:shadow-md transition-shadow">
-  <div class="font-bold text-lg mb-3 text-green-600">3. Fonctionnel 🌟</div>
-  <p class="opacity-80">Implémentation du module d'<strong>Enchères</strong> en Temps Réel (WebSockets) et validation KYC.</p>
+<div class="p-5 border border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 shadow-sm">
+  <div class="font-bold text-lg mb-3 text-green-600">3. Fonctionnalités </div>
+  <p class="opacity-80">Ajout des <strong>enchères en temps réel</strong> (WebSockets) et système KYC.</p>
 </div>
 
 </div>
@@ -722,17 +1045,16 @@ layout: center
 class: text-center bg-blue-900 text-white
 ---
 
-# Merci de votre écoute ! 🎤
+# Merci de votre écoute ! 
 
 <div class="mt-8 opacity-80">
-  <p class="text-xl">Place aux Questions / Réponses</p>
-  <p class="mt-4 text-sm">Lucas Labonde - Lead Developer Collector</p>
+  <p class="text-xl font-bold">Place aux Questions</p>
+  <p class="mt-4 text-sm opacity-75">Lucas Labonde - Lead Developer Collector</p>
 </div>
 
 <!--
-- **Conclusion** : La V1 est solide (Tech, processus, sécurité).
-- **Avenir** : La V2 passera à l'échelle industrielle avec K8s.
-- **Merci** : "Je suis prêt pour vos questions."
+- **Conclusion** : V1 solide et prête pour la production
+- **V2** : Préparée pour le passage à l'échelle avec Kubernetes
 -->
 
 <!-- global-bottom -->

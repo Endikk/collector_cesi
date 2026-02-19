@@ -6,13 +6,14 @@ metadata:
   labels:
     app: backend
 spec:
+  type: LoadBalancer
   ports:
-    - port: 3000
-      name: http
+    - port: 4000
       targetPort: 3000
+      name: http
     - port: 5555
-      name: debug
       targetPort: 5555
+      name: prisma-studio
   selector:
     app: backend
 ---
@@ -52,10 +53,40 @@ spec:
             # Secrets should be mounted via Secret/ConfigMap in prod
             - name: JWT_SECRET
               value: "dev-jwt-secret-key"
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=768"
+            # Chiffrement (obligatoire au démarrage)
+            - name: ENCRYPTION_KEY
+              value: "359fdc41e2148464203957aeb095265f07851619eb357c56df4d42b18cb3ce0c"
+            # Stripe (valeurs de test)
+            - name: STRIPE_SECRET_KEY
+              value: "sk_test_placeholder"
+            - name: STRIPE_PUBLISHABLE_KEY
+              value: "pk_test_placeholder"
+            - name: STRIPE_WEBHOOK_SECRET
+              value: "whsec_placeholder"
+            # SMTP (désactivé en dev)
+            - name: SMTP_HOST
+              value: "localhost"
+            - name: SMTP_PORT
+              value: "1025"
+            - name: SMTP_SECURE
+              value: "false"
+            - name: SMTP_USER
+              value: "dev"
+            - name: SMTP_PASSWORD
+              value: "dev"
+            - name: SMTP_FROM
+              value: "dev@collector.local"
+            # Fraud detection (désactivé en dev)
+            - name: FRAUD_DETECTION_WEBHOOK_URL
+              value: "http://localhost"
+            - name: FRAUD_DETECTION_API_KEY
+              value: "dev-key"
           resources:
             requests:
               cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
               memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi

@@ -6,8 +6,9 @@ metadata:
   labels:
     app: frontend
 spec:
+  type: LoadBalancer
   ports:
-    - port: 80
+    - port: 3000
       targetPort: 3000
   selector:
     app: frontend
@@ -39,7 +40,14 @@ spec:
               value: "http://backend:3000"
             # Backend URL for client-side calls (public URL)
             - name: NEXT_PUBLIC_BACKEND_URL
-              value: "http://api.collector.local" 
+              value: "http://api.collector.local"
+            # NextAuth — obligatoire en mode production
+            - name: NEXTAUTH_SECRET
+              value: "dev-nextauth-secret-key"
+            - name: NEXTAUTH_URL
+              value: "http://localhost:3000"
+            - name: DATABASE_URL
+              value: "postgresql://user:password@db:5432/collector?schema=public"
           resources:
             requests:
               cpu: 100m

@@ -1,0 +1,193 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: collector
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus:9090
+        isDefault: true
+        access: proxy
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboards-provider
+  namespace: collector
+data:
+  dashboards.yaml: |
+    apiVersion: 1
+    providers:
+      - name: default
+        folder: Collector
+        type: file
+        options:
+          path: /var/lib/grafana/dashboards
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-backend
+  namespace: collector
+data:
+  backend.json: |
+    {
+      "title": "Collector — Backend API",
+      "uid": "collector-backend",
+      "schemaVersion": 38,
+      "refresh": "10s",
+      "time": { "from": "now-30m", "to": "now" },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Requêtes HTTP — Total",
+          "type": "stat",
+          "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
+          "targets": [{
+            "expr": "sum(http_requests_total)",
+            "legendFormat": "Total"
+          }]
+        },
+        {
+          "id": 2,
+          "title": "Requêtes HTTP — Taux (req/s)",
+          "type": "timeseries",
+          "gridPos": { "x": 6, "y": 0, "w": 18, "h": 8 },
+          "targets": [{
+            "expr": "rate(http_requests_total[1m])",
+            "legendFormat": "{{method}} {{route}} {{status_code}}"
+          }]
+        },
+        {
+          "id": 3,
+          "title": "Latence HTTP (p95)",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+          "targets": [{
+            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "p95 {{route}}"
+          }]
+        },
+        {
+          "id": 4,
+          "title": "Erreurs HTTP (4xx/5xx)",
+          "type": "timeseries",
+          "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+          "targets": [{
+            "expr": "rate(http_requests_total{status_code=~\"4..|5..\"}[1m])",
+            "legendFormat": "{{status_code}} {{route}}"
+          }]
+        },
+        {
+          "id": 5,
+          "title": "Mémoire Node.js (heap utilisé)",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+          "targets": [{
+            "expr": "nodejs_heap_size_used_bytes",
+            "legendFormat": "Heap utilisé"
+          }]
+        },
+        {
+          "id": 6,
+          "title": "CPU Node.js",
+          "type": "timeseries",
+          "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+          "targets": [{
+            "expr": "rate(process_cpu_seconds_total[1m])",
+            "legendFormat": "CPU %"
+          }]
+        },
+        {
+          "id": 7,
+          "title": "Event Loop Lag",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
+          "targets": [{
+            "expr": "nodejs_eventloop_lag_seconds",
+            "legendFormat": "Event Loop Lag (s)"
+          }]
+        },
+        {
+          "id": 8,
+          "title": "Connexions actives DB (Prisma)",
+          "type": "stat",
+          "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
+          "targets": [{
+            "expr": "prisma_client_queries_active",
+            "legendFormat": "Queries actives"
+          }]
+        }
+      ]
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: collector
+spec:
+  type: LoadBalancer
+  selector:
+    app: grafana
+  ports:
+    - port: 3002
+      targetPort: 3000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+    spec:
+      containers:
+        - name: grafana
+          image: grafana/grafana:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_USER
+              value: "admin"
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: "admin"
+            - name: GF_AUTH_ANONYMOUS_ENABLED
+              value: "true"
+            - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+              value: "Viewer"
+          volumeMounts:
+            - name: grafana-datasources
+              mountPath: /etc/grafana/provisioning/datasources
+            - name: grafana-dashboards-provider
+              mountPath: /etc/grafana/provisioning/dashboards
+            - name: grafana-dashboard-backend
+              mountPath: /var/lib/grafana/dashboards
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
+      volumes:
+        - name: grafana-datasources
+          configMap:
+            name: grafana-datasources
+        - name: grafana-dashboards-provider
+          configMap:
+            name: grafana-dashboards-provider
+        - name: grafana-dashboard-backend
+          configMap:
+            name: grafana-dashboard-backend

@@ -8,3 +8,4 @@ resources:
   - backend.yaml
   - frontend.yaml
   - prometheus.yaml
+  - grafana.yaml
