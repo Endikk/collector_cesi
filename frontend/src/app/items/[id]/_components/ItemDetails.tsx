@@ -121,7 +121,12 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
                             <span className="text-muted-foreground">·</span>
                             <Link href={`/shop/${item.ownerId}`} className="hover:underline cursor-pointer">Autres objets du vendeur</Link>
                             <span className="text-muted-foreground">·</span>
-                            <Link href={`/chat?userId=${item.ownerId}`} className="hover:underline cursor-pointer text-[#3665f3]">Contacter le vendeur</Link>
+                            <button
+                                onClick={() => handleAction(() => router.push(`/chat?userId=${item.ownerId}`))}
+                                className="hover:underline cursor-pointer text-[#3665f3] bg-transparent border-none p-0"
+                            >
+                                Contacter le vendeur
+                            </button>
                         </div>
                     </div>
                     <ChevronRight className="h-4 w-4 text-muted-foreground ml-auto" />
@@ -197,7 +202,7 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId }: ItemDetai
                     <div className="flex gap-4">
                         <span className="text-muted-foreground w-24 shrink-0">Livraison :</span>
                         <div>
-                            <p>Livraison possible vers : États-Unis. Consultez la description de l&apos;objet ou <Link href={`/chat?userId=${item.ownerId}`} className="underline cursor-pointer text-[#3665f3]">contactez le vendeur</Link> pour en savoir plus sur les options de livraison.</p>
+                            <p>Livraison possible vers : États-Unis. Consultez la description de l&apos;objet ou <button onClick={() => handleAction(() => router.push(`/chat?userId=${item.ownerId}`))} className="underline cursor-pointer text-[#3665f3] bg-transparent border-none p-0 inline">contactez le vendeur</button> pour en savoir plus sur les options de livraison.</p>
                             <span className="underline cursor-pointer text-[#3665f3] block mt-1">Afficher les détails</span>
                             <p className="text-muted-foreground text-xs mt-1">Lieu où se trouve l&apos;objet : Paris, France</p>
                         </div>

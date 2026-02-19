@@ -25,6 +25,12 @@ export function ChatPage() {
                     setIsRedirecting(false);
                     initiationRef.current = false;
                     console.error("Failed to start conversation:", result.message);
+
+                    if (result.message === "Non autorisé") {
+                        router.push(`/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`);
+                    } else {
+                        alert(result.message || "Erreur lors de la création de la conversation");
+                    }
                 }
             });
         }

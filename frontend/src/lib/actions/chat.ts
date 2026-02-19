@@ -178,10 +178,10 @@ export async function sendMessage(conversationId: string, content: string) {
 
     // Modération du contenu
     const moderationResult = await moderateContent(content);
-    
+
     if (!moderationResult.allowed) {
-        return { 
-            success: false, 
+        return {
+            success: false,
             message: moderationResult.message || "Message bloqué par la modération"
         };
     }
@@ -278,8 +278,12 @@ export async function startConversation(targetUserId: string) {
         revalidatePath("/chat");
         return { success: true, conversationId: newConversation.id };
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Erreur création conversation:", error);
+        // P2025: Record to connect not found (l'utilisateur de la session n'existe plus en base)
+        if (error.code === "P2025") {
+            return { success: false, message: "Non autorisé" };
+        }
         return { success: false, message: "Erreur serveur" };
     }
 }
