@@ -1,0 +1,537 @@
+================================================================================
+COLLECTOR.SHOP — GUIDE SLIDES PITCH
+Soutenance technique · 20 min (démo incluse)
+================================================================================
+
+
+================================================================================
+SLIDE 1 — TITRE
+================================================================================
+
+Titre : Collector.shop
+Sous-titre : Superviser et assurer le développement d'applications logicielles
+En bas :
+  Lucas Labonde — Lead Developer
+  Soutenance de bloc — Février 2026
+  20 min · Démo incluse
+
+
+================================================================================
+SLIDE 2 — SOMMAIRE
+================================================================================
+
+Phase 1 — Structuration
+  • Contexte & consignes
+  • Qualité · Tests · Sécurité
+  • Pipeline CI/CD
+  • Compétences équipe
+
+Phase 2 — Développement
+  • Architecture & choix techniques
+  • Expérimentation bac à sable
+  • Backlog & fonctionnalité métier
+
+Phase 3 — Remédiation
+  • Audit sécurité & plan de remédiation
+  • Analyse des métriques
+
+Démo Live
+  • POC fonctionnel + Scalabilité K8s
+
+
+================================================================================
+SLIDE 3 — CONTEXTE
+================================================================================
+
+Colonne gauche — L'entreprise :
+  • Start-up française (5 ans), pivot événementiel → digital
+  • Levée de fonds par crowdfunding
+  • Objets de collection vintage (sneakers édition limitée, figurines, posters dédicacés…)
+  • Existant IT : Office 365, site vitrine WordPress, pas d'infra dev
+  • Équipe IT : 1 Lead Dev (moi) + 2 développeurs confirmés (5 ans exp.)
+
+Colonne droite — Ce que l'entreprise recherche :
+  • Marketplace C2C sécurisée pour vente d'objets de collection
+  • Paiement intégré via la plateforme (pas de paiement direct entre particuliers)
+  • Commission 5% sur chaque transaction
+  • Modération automatisée des articles avant mise en vente
+  • Détection de fraudes / anomalies (prix suspects, vendeurs abusifs)
+  • Recommandations personnalisées selon les centres d'intérêt
+  • Notifications temps réel (nouveaux articles, baisses de prix)
+  • Chat intégré vendeur ↔ acheteur
+  • Architecture évolutive (V2 prévue : enchères, événements live, pub ciblée)
+  • Internationalisation & accessibilité
+
+>>> SCHÉMA ICI : Diagramme de flux du marketplace <<<
+  Acheteur → Parcours catalogue → collector.shop
+  Vendeur → Publie articles → collector.shop
+  collector.shop → Commission 5% → Stripe
+  collector.shop → Modération → Admin
+  collector.shop → Notifications → Acheteur
+  Acheteur ↔ Chat ↔ Vendeur
+
+
+================================================================================
+SLIDE 4 — RAPPEL DES CONSIGNES
+================================================================================
+
+3 cartes côte à côte :
+
+Carte 1 — Phase 1 : Structuration
+  • 4 indicateurs qualité ISO 25010
+  • Cycle DevSecOps + CI/CD
+  • Politique tests + sécurité
+  • Cartographie compétences + formation
+
+Carte 2 — Phase 2 : Développement & Déploiement
+  • Architecture technique + backlog
+  • Expérimentation bac à sable
+  • POC avec ≥1 fonctionnalité métier
+  • ≥2 types de tests en CI
+  • Démo montée en charge
+
+Carte 3 — Phase 3 : Remédiation
+  • Audit sécurité de la V1
+  • Identification vulnérabilités
+  • Plan de remédiation priorisé
+
+Note en bas : Évaluation technique — L'auditoire est composé de spécialistes du développement
+
+
+================================================================================
+SLIDE 5 — SLIDE DE SECTION : PHASE 1
+================================================================================
+
+Phase 1 — Structuration
+Qualité · Tests · Sécurité
+
+
+================================================================================
+SLIDE 6 — POLITIQUE DE QUALITÉ (4 indicateurs ISO 25010)
+================================================================================
+
+Tableau :
+
+  #  | Indicateur              | Exigence ISO     | Objectif    | Outil
+  ---|-------------------------|------------------|-------------|------------------
+  1  | Couverture de code      | Maintenabilité   | ≥ 70%       | jest --coverage
+  2  | Temps de build CI       | Performance      | < 5 min     | GitHub Actions
+  3  | Vulnérabilités critiques| Sécurité         | 0 CRITICAL  | Trivy
+  4  | Latence API P95         | Performance      | < 500ms     | Prometheus
+
+Lien avec la dette technique :
+  • Couverture → Zones non testées = régressions qui s'accumulent
+  • Build Time → Pipeline lent = intégrations moins fréquentes
+  • Vulnérabilités → Dépendances obsolètes = dette sécurité exponentielle
+  • Latence → Dégradation progressive = dette architecturale
+
+Comment les outils servent les indicateurs :
+  • jest --coverage → Rapport HTML intégré au CI, seuil bloquant si < objectif
+  • GitHub Actions → Temps de chaque job visible, alerte si > 5 min
+  • Trivy → Scan auto en CI, bloque le merge si vulnérabilité CRITICAL
+  • Prometheus + prom-client → Collecte latence P95 en temps réel, dashboard Grafana
+
+
+================================================================================
+SLIDE 7 — POLITIQUE DE TEST
+================================================================================
+
+Colonne gauche :
+
+>>> SCHÉMA ICI : Pyramide de tests <<<
+  Sommet : E2E / Smoke (Manuel)
+  Milieu : Intégration (Supertest)
+  Base large : Unitaires (Jest)
+  Fondation : Analyse statique (ESLint + TypeScript)
+
+Colonne droite :
+
+Tableau — Tests appliqués au POC :
+
+  Type          | Framework      | CI
+  --------------|----------------|----
+  Unitaires     | Jest + ts-jest | ✅
+  Intégration   | Supertest      | ✅
+  Sécurité      | Trivy          | ✅
+  Accessibilité | jest-axe       | ✅
+  Charge        | hey (dans K8s) | 🔧
+
+Parties prenantes :
+  • Lead Dev → Rédige tests unitaires + intégration, configure CI
+  • Dev 1 → Rédige tests unitaires modules qu'il développe
+  • Dev 2 → Rédige tests front, accessibilité
+  • Tous → Code review (tests inclus avant merge)
+
+Critères de passage :
+  ✅ Tests passent avant merge
+  ✅ 0 vulnérabilité CRITICAL
+  ✅ Lint + Build TypeScript OK
+
+
+================================================================================
+SLIDE 8 — POLITIQUE DE SÉCURITÉ
+================================================================================
+
+Colonne gauche :
+
+Tableau — Mesures implémentées :
+
+  Couche   | Mesure         | Outil
+  ---------|----------------|------------------
+  Auth     | JWT signé      | NestJS Guards
+  Passwords| Hashing        | Bcrypt
+  API      | Rate Limiting  | @nestjs/throttler
+  Headers  | Protection     | Helmet
+  Entrées  | Validation     | class-validator
+  Réseau   | CORS restreint | NestJS
+  Pipeline | Scan images    | Trivy
+  Données  | Chiffrement    | AES-256
+
+Colonne droite :
+
+>>> SCHÉMA ICI : Cycle DevSecOps <<<
+  Plan (Analyse menaces) → Code (Lint, review) → Build (Trivy scan) → Test (Unit + Intég) → Deploy (K8s, Secrets) → Monitor (Prometheus) → retour vers Plan (Feedback)
+
+Citation : "Sécurité intégrée à chaque étape du cycle de vie"
+
+
+================================================================================
+SLIDE 9 — PIPELINE CI/CD (GitHub Actions)
+================================================================================
+
+>>> SCHÉMA ICI : Pipeline CI/CD <<<
+
+  ┌─ Quality Gate ────────────────┐
+  │  Backend : Lint · Test · Build│
+  │  Frontend : Lint · Test · Build│
+  └──────────┬────────────────────┘
+             ↓
+  ┌─ Security ────────────────────┐
+  │  Docker Build (Front + Back)  │
+  │  Trivy Scan (CRITICAL + HIGH) │
+  └──────────┬────────────────────┘
+             ↓
+  ┌─ Delivery ────────────────────┐
+  │  develop → Recette            │
+  │  main → Production            │
+  └───────────────────────────────┘
+
+Note : Déclencheurs : push main/develop + PR · Annulation auto des exécutions précédentes
+
+
+================================================================================
+SLIDE 10 — COMPÉTENCES & FORMATION
+================================================================================
+
+Colonne gauche :
+
+Tableau — Matrice de compétences :
+
+  Compétence       | Lead  | Dev 1 | Dev 2
+  -----------------|-------|-------|------
+  TypeScript/Node  | ⭐⭐⭐ | ⭐⭐⭐ | ⭐⭐
+  React/Next.js    | ⭐⭐⭐ | ⭐⭐   | ⭐⭐⭐
+  NestJS           | ⭐⭐⭐ | ⭐⭐   | ⭐
+  PostgreSQL/Prisma| ⭐⭐   | ⭐⭐⭐ | ⭐⭐
+  Docker           | ⭐⭐⭐ | ⭐⭐   | ⭐⭐
+  Kubernetes       | ⭐⭐   | ⭐    | ⭐
+  CI/CD            | ⭐⭐⭐ | ⭐⭐   | ⭐
+
+Colonne droite :
+
+Gap identifié : Kubernetes
+  Aucun expert K8s → risque pour la production
+
+Formation proposée : "Kubernetes pour développeurs — 3 jours"
+  Jour 1 : Pods, Services, Deployments
+  Jour 2 : Helm, Secrets, HPA
+  Jour 3 : Observabilité + CI/CD K8s
+
+ROI : Autonomie déploiement + debug prod
+
+
+================================================================================
+SLIDE 11 — SLIDE DE SECTION : PHASE 2
+================================================================================
+
+Phase 2 — Développement
+Architecture · Expérimentation · POC
+
+
+================================================================================
+SLIDE 12 — ARCHITECTURE TECHNIQUE
+================================================================================
+
+>>> SCHÉMA ICI : Architecture globale dans Kubernetes <<<
+
+  ┌─────────────── Kubernetes Cluster (Minikube) ──────────────┐
+  │                                                             │
+  │  Frontend (Next.js 16, React 19) :3000                     │
+  │       │ API REST                                            │
+  │       ↓                                                     │
+  │  Backend (NestJS 11, Prisma) :4000                         │
+  │       │              │                                      │
+  │       ↓              ↓                                      │
+  │  PostgreSQL 15    Redis 7                                   │
+  │  :5432            (Cache + Queue) :6379                     │
+  │                                                             │
+  │  Prometheus :9090 → Grafana :3001                          │
+  └─────────────────────────────────────────────────────────────┘
+
+En bas, 3 colonnes résumé :
+  Frontend : Next.js 16, Tailwind, NextAuth, Stripe.js
+  Backend : NestJS 11, Prisma, Bull Queue, Helmet, Throttler
+  Infra : Docker, Minikube, Prometheus, Grafana, GitHub Actions
+
+
+================================================================================
+SLIDE 13 — MODULES BACKEND
+================================================================================
+
+Colonne gauche :
+
+>>> SCHÉMA ICI : Arbre des modules NestJS <<<
+
+  AppModule
+    ├── Auth (JWT Guards)
+    ├── Users
+    ├── Items
+    ├── Shops
+    ├── Payment (Stripe)
+    ├── Notifications (Bull Queue)
+    ├── Recommendations
+    ├── Fraud Detection
+    ├── Reviews
+    ├── Moderation
+    ├── Chat
+    └── Common (Guards, Pipes, DTOs)
+
+Colonne droite :
+
+Tableau — Choix techniques justifiés :
+
+  Choix       | Justification
+  ------------|--------------------------------------------
+  NestJS      | Architecture modulaire, DI, TypeScript natif
+  Prisma      | Type-safe, migrations auto, seeding
+  PostgreSQL  | ACID (transactions financières)
+  Redis       | Cache + file d'attente (Bull)
+  Stripe      | PCI-DSS compliant
+  Minikube    | HPA, self-healing
+
+Note : Architecture monolithe modulaire — chaque module isolé, prêt pour extraction en microservices
+
+
+================================================================================
+SLIDE 14 — EXPÉRIMENTATION BAC À SABLE
+================================================================================
+
+3 cartes côte à côte :
+
+Carte 1 — Minikube (Kubernetes)
+  Env : macOS, Docker driver
+  • Déploiement 6 services YAML
+  • HPA auto-scaling configuré
+  • Test charge avec "hey"
+  Difficulté : minikube tunnel instable
+  ✅ Adopté — Orchestration validée
+
+Carte 2 — Prometheus + Grafana
+  Env : Docker Compose + K8s
+  • prom-client dans NestJS
+  • Endpoint /metrics
+  • Dashboards Grafana
+  Difficulté : Config réseau K8s
+  ✅ Adopté — Observabilité opérationnelle
+
+Carte 3 — Prisma + PostgreSQL
+  Env : Docker, PostgreSQL 15
+  • Schéma relationnel complet
+  • Migrations + seeding
+  • Tests performances
+  Difficulté : Prisma generate en CI
+  ✅ Adopté — Couche données robuste
+
+
+================================================================================
+SLIDE 15 — BACKLOG / FONCTIONNALITÉ MÉTIER
+================================================================================
+
+Colonne gauche :
+
+User Stories du POC :
+  🟢 US-01 — Parcourir le catalogue (non authentifié)
+  🟢 US-02 — Acheter un article (paiement Stripe, commission 5%)
+  🟢 US-03 — Créer une boutique et publier des articles
+  🔵 US-04 — Chat vendeur ↔ acheteur
+
+Parcours démontré :
+  1. Navigation catalogue → 2. Inscription → 3. Connexion → 4. Achat → 5. Chat
+
+Colonne droite :
+
+Tableau — Tests d'acceptation :
+
+  Scénario                  | Méthode          | ✓
+  --------------------------|------------------|---
+  Créer un article          | POST /api/items  | ✅
+  Achat avec commission     | Stripe mock      | ✅
+  Accès catalogue non-auth  | GET /api/items   | ✅
+  Chat entre utilisateurs   | Test fonctionnel | ✅
+
+
+================================================================================
+SLIDE 16 — SLIDE DE SECTION : PHASE 3
+================================================================================
+
+Phase 3 — Audit & Remédiation
+
+
+================================================================================
+SLIDE 17 — AUDIT SÉCURITÉ & PLAN DE REMÉDIATION
+================================================================================
+
+Colonne gauche :
+
+Bonnes pratiques déjà intégrées (≥ 2 exigées) :
+  Bcrypt · Rate Limiting · Helmet · class-validator · CORS · Trivy · JWT Guards · AES-256
+
+Analyse des résultats de tests :
+  • Tests unitaires & intégration → 0 bug bloquant détecté
+  • Trivy scan → 0 vulnérabilité CRITICAL, quelques HIGH sur images de base
+  • Test de charge (hey) → API stable à 50 req/s, dégradation à 200 req/s sans cache
+  • Résultat → V1 fonctionnelle mais lacunes infra sécurité identifiées ↓
+
+Vulnérabilités identifiées :
+
+  Risque                       | Sévérité  | Source détection
+  -----------------------------|-----------|------------------
+  Secrets en dur (K8s YAML)    | 🔴 Critique| Audit manuel
+  Pas de HTTPS (dev)           | 🟠 Élevé  | Analyse archi
+  Pas de WAF                   | 🟡 Moyen  | Analyse archi
+  Logs non centralisés         | 🟡 Moyen  | Analyse archi
+  Images Docker non minimales  | 🟡 Moyen  | Trivy scan
+
+Colonne droite :
+
+Plan de remédiation priorisé (actions justifiées) :
+
+  P   | Action                   | Effort  | Justification
+  ----|--------------------------|---------|---------------------------
+  P0  | K8s Secrets / Vault      | 1j      | Secrets exposés = fuite données
+  P0  | HTTPS cert-manager       | 2j      | Trafic en clair = interception
+  P1  | WAF (Cloudflare)         | 3j      | Protection DDoS + injection
+  P1  | Centraliser logs (Loki)  | 2j      | Détection intrusion impossible sans
+  P1  | Backup PostgreSQL auto   | 1j      | Perte données = catastrophe
+  P2  | 2FA (otplib)             | 1j      | Renforcement auth vendeurs
+  P2  | Network Policies K8s     | 1j      | Isolation pods = moindre privilège
+  P3  | SAST (SonarQube)         | 2j      | Détection vulns code source
+
+
+================================================================================
+SLIDE 18 — RÉSULTATS DES MÉTRIQUES
+================================================================================
+
+Colonne gauche :
+
+Tableau — Indicateurs mesurés :
+
+  Indicateur     | Objectif  | Actuel  | Status
+  ---------------|-----------|---------|-------
+  Couverture     | ≥ 70%     | ~65%    | 🟡
+  Build CI       | < 5 min   | ~3m30   | ✅
+  Vulns CRITICAL | 0         | 0       | ✅
+  Latence P95    | < 500ms   | ~180ms  | ✅
+
+Colonne droite :
+
+Axes d'amélioration :
+  • Couverture → Couvrir modules payment et fraud-detection
+  • Latence → Surveiller sous charge (cache Redis agressif)
+  • Prochain sprint : tests E2E (Playwright)
+
+Suivi automatique :
+  Les 4 indicateurs sont collectés via CI/CD et Prometheus → détection proactive de la dette technique
+
+
+================================================================================
+SLIDE 19 — SLIDE DE SECTION : DÉMO
+================================================================================
+
+Démo Live
+POC Fonctionnel & Scalabilité
+
+
+================================================================================
+SLIDE 20 — DÉMO (aide-mémoire)
+================================================================================
+
+Colonne gauche — Parcours fonctionnel :
+  1. Catalogue — Navigation sans auth
+  2. Inscription / Connexion — NextAuth
+  3. Détail article — Photos, prix
+  4. Achat — Stripe Checkout (mode test)
+  5. Chat — Discussion vendeur ↔ acheteur
+
+Colonne droite — Scalabilité (HPA) :
+
+  Commandes à montrer :
+
+  # État initial : 1 pod
+  kubectl get pods -n collector
+
+  # Test de charge (50 concurrent, 2 min)
+  kubectl run load-generator \
+    --image=williamyeh/hey \
+    --restart=Never --rm -it \
+    -- -z 2m -c 50 \
+    http://backend.collector.svc:4000/api/items
+
+  # Observer l'auto-scaling
+  kubectl get hpa -n collector -w
+  # → REPLICAS: 1 → 2 → 3
+
+  Résultat attendu : K8s scale automatiquement, 0 downtime
+
+
+================================================================================
+SLIDE 21 — CONCLUSION & ROADMAP V2
+================================================================================
+
+Colonne gauche — Bilan V1 :
+  • Processus qualité : 4 indicateurs ISO 25010
+  • Pipeline CI/CD : 4 jobs (lint, test, Trivy, deploy)
+  • Sécurité DevSecOps : 8 mesures intégrées
+  • Architecture modulaire : 15 modules NestJS
+  • Orchestration K8s : HPA + self-healing
+  • Observabilité : Prometheus + Grafana
+  • 3 expérimentations bac à sable documentées
+  • Plan de remédiation priorisé (P0 → P3)
+
+Colonne droite — Roadmap V2 :
+
+  Chantier                       | Priorité
+  -------------------------------|----------
+  HTTPS + Cert-Manager           | P0
+  Secrets Vault                  | P0
+  Tests E2E (Playwright)         | P1
+  Système d'enchères (WebSocket) | P1
+  Recommandations ML             | P2
+  Logs centralisés (Loki)        | P2
+  CDN + WAF                      | P2
+
+
+================================================================================
+SLIDE 22 — MERCI
+================================================================================
+
+Merci
+
+Questions ?
+
+Lucas Labonde — Lead Developer · Collector.shop · Février 2026
+
+
+================================================================================
+FIN — 22 slides total · ~15 min de contenu + ~5 min de démo live
+================================================================================

@@ -1,20 +1,32 @@
 #!/bin/bash
 # Demo script to show scalability
+# Prerequisite: Minikube running, Metrics Server enabled, HPA configured
+
 echo "🚀 Starting Scalability Demo..."
+
+# 0. Validate Environment
+if ! kubectl get deployment backend -n collector &> /dev/null; then
+    echo "❌ Backend deployment not found!"
+    exit 1
+fi
 
 # 1. Check current replicas
 echo "📊 Initial State:"
 kubectl get hpa -n collector
-kubectl get pods -n collector | grep backend
+echo "Current Pods:"
+kubectl get pods -n collector -l app=backend
 
-# 2. Simulate Load
+# 2. Simulate Load (Inside Cluster)
 echo "🔥 Simulating heavy load (CPU stress)..."
-# In a real environment, we would use k6 or ab here
-# For the proof, we show the command that would be run:
-echo "Running: hey -z 5m -c 50 http://collector.local/api/items"
+echo "Launching a temporary pod to generate traffic..."
 
-# 3. Watch HPA reaction
-echo "👀 Watching HPA scaledown/scaleup..."
-# kubectl get hpa -w -n collector
+# Run 'hey' inside the cluster to avoid local network/tool issues
+kubectl run load-generator \
+    --image=williamyeh/hey \
+    --restart=Never \
+    --rm -it \
+    -- -z 2m -c 50 http://backend.collector.svc.cluster.local:4000/api/items
 
-echo "✅ Scalability demonstration script ready."
+# 3. Watch HPA reaction (User should manually watch in another terminal or standard output)
+echo "✅ Load test finished."
+echo "👀 Check HPA status now: 'kubectl get hpa -n collector -w'"
