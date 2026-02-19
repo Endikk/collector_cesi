@@ -34,93 +34,106 @@ metadata:
   name: grafana-dashboard-backend
   namespace: collector
 data:
-  backend.json: |
+  developer.json: |
     {
-      "title": "Collector — Backend API",
-      "uid": "collector-backend",
+      "title": "Collector — Developer",
+      "uid": "collector-developer",
       "schemaVersion": 38,
-      "refresh": "10s",
+      "refresh": "5s",
       "time": { "from": "now-30m", "to": "now" },
       "panels": [
         {
           "id": 1,
           "title": "Requêtes HTTP — Total",
           "type": "stat",
-          "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 },
-          "targets": [{
-            "expr": "sum(http_requests_total)",
-            "legendFormat": "Total"
-          }]
+          "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+          "targets": [{ "expr": "sum(http_requests_total)", "legendFormat": "Total" }]
         },
         {
           "id": 2,
-          "title": "Requêtes HTTP — Taux (req/s)",
-          "type": "timeseries",
-          "gridPos": { "x": 6, "y": 0, "w": 18, "h": 8 },
-          "targets": [{
-            "expr": "rate(http_requests_total[1m])",
-            "legendFormat": "{{method}} {{route}} {{status_code}}"
-          }]
-        },
-        {
-          "id": 3,
-          "title": "Latence HTTP (p95)",
-          "type": "timeseries",
-          "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
-          "targets": [{
-            "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))",
-            "legendFormat": "p95 {{route}}"
-          }]
-        },
-        {
-          "id": 4,
           "title": "Erreurs HTTP (4xx/5xx)",
-          "type": "timeseries",
-          "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
-          "targets": [{
-            "expr": "rate(http_requests_total{status_code=~\"4..|5..\"}[1m])",
-            "legendFormat": "{{status_code}} {{route}}"
-          }]
-        },
-        {
-          "id": 5,
-          "title": "Mémoire Node.js (heap utilisé)",
-          "type": "timeseries",
-          "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
-          "targets": [{
-            "expr": "nodejs_heap_size_used_bytes",
-            "legendFormat": "Heap utilisé"
-          }]
-        },
-        {
-          "id": 6,
-          "title": "CPU Node.js",
-          "type": "timeseries",
-          "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
-          "targets": [{
-            "expr": "rate(process_cpu_seconds_total[1m])",
-            "legendFormat": "CPU %"
-          }]
-        },
-        {
-          "id": 7,
-          "title": "Event Loop Lag",
-          "type": "timeseries",
-          "gridPos": { "x": 0, "y": 24, "w": 12, "h": 8 },
-          "targets": [{
-            "expr": "nodejs_eventloop_lag_seconds",
-            "legendFormat": "Event Loop Lag (s)"
-          }]
+          "type": "stat",
+          "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+          "targets": [{ "expr": "sum(rate(http_requests_total{status_code=~\"4..|5..\"}[1m]))", "legendFormat": "Erreurs/s" }],
+          "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 0.1 }] } } }
         },
         {
           "id": 8,
-          "title": "Connexions actives DB (Prisma)",
+          "title": "DB Queries Active",
           "type": "stat",
-          "gridPos": { "x": 12, "y": 24, "w": 12, "h": 8 },
-          "targets": [{
-            "expr": "prisma_client_queries_active",
-            "legendFormat": "Queries actives"
-          }]
+          "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+          "targets": [{ "expr": "prisma_client_queries_active", "legendFormat": "Active" }]
+        },
+        {
+          "id": 3,
+          "title": "Latence par Route (p95)",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+          "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, route))", "legendFormat": "{{route}}" }]
+        },
+        {
+          "id": 4,
+          "title": "Trafic par Code HTTP",
+          "type": "timeseries",
+          "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+          "targets": [{ "expr": "sum(rate(http_requests_total[1m])) by (status_code)", "legendFormat": "{{status_code}}" }]
+        },
+        {
+          "id": 6,
+          "title": "Utilisation CPU & Event Loop",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+          "targets": [
+            { "expr": "rate(process_cpu_seconds_total[1m])", "legendFormat": "CPU User" },
+            { "expr": "nodejs_eventloop_lag_seconds", "legendFormat": "Event Loop Lag" }
+          ]
+        },
+        {
+          "id": 5,
+          "title": "Utilisation Mémoire (Heap)",
+          "type": "timeseries",
+          "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+          "targets": [{ "expr": "nodejs_heap_size_used_bytes", "legendFormat": "Used Heap" }]
+        }
+      ]
+    }
+  manager.json: |
+    {
+      "title": "Collector — Manager",
+      "uid": "collector-manager",
+      "schemaVersion": 38,
+      "refresh": "10s",
+      "time": { "from": "now-24h", "to": "now" },
+      "panels": [
+        {
+          "id": 1,
+          "title": "Disponibilité du Service (Uptime)",
+          "type": "stat",
+          "gridPos": { "x": 0, "y": 0, "w": 8, "h": 6 },
+          "targets": [{ "expr": "(sum(rate(http_requests_total{status_code!~\"5..\"}[5m])) / sum(rate(http_requests_total[5m]))) * 100", "legendFormat": "Uptime %" }],
+          "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "steps": [{ "color": "red", "value": null }, { "color": "green", "value": 99 }] } } }
+        },
+        {
+          "id": 2,
+          "title": "Volume de Trafic (Requêtes/min)",
+          "type": "stat",
+          "gridPos": { "x": 8, "y": 0, "w": 8, "h": 6 },
+          "targets": [{ "expr": "sum(rate(http_requests_total[1m])) * 60", "legendFormat": "Req/min" }]
+        },
+        {
+          "id": 3,
+          "title": "Utilisateurs Actifs (Estimés sur 5m)",
+          "type": "stat",
+          "gridPos": { "x": 16, "y": 0, "w": 8, "h": 6 },
+          "targets": [{ "expr": "sum(rate(http_requests_total[5m])) * 10", "legendFormat": "Utilisateurs (est.)" }],
+          "description": "Estimation basée sur le trafic"
+        },
+        {
+          "id": 4,
+          "title": "Tendance du Trafic (24h)",
+          "type": "timeseries",
+          "gridPos": { "x": 0, "y": 6, "w": 24, "h": 10 },
+          "targets": [{ "expr": "sum(rate(http_requests_total[1h]))", "legendFormat": "Requêtes/seconde (moyenne 1h)" }]
         }
       ]
     }

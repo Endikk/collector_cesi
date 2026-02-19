@@ -37,10 +37,10 @@ spec:
           env:
             # Backend URL for server-side calls (internal cluster DNS)
             - name: BACKEND_URL
-              value: "http://backend:3000"
-            # Backend URL for client-side calls (public URL)
+              value: "http://backend:4000"
+            # Backend URL for client-side calls (public URL via minikube tunnel)
             - name: NEXT_PUBLIC_BACKEND_URL
-              value: "http://api.collector.local"
+              value: "http://localhost:4000"
             # NextAuth — obligatoire en mode production
             - name: NEXTAUTH_SECRET
               value: "dev-nextauth-secret-key"

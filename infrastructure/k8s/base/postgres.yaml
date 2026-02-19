@@ -42,6 +42,17 @@ spec:
               value: user
             - name: POSTGRES_PASSWORD
               value: password # In production, use a Secret
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - user
+                - -d
+                - collector
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
