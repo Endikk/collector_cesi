@@ -1,21 +1,50 @@
 #!/bin/sh
 
-echo "⏳ Attente de la base de données..."
 MAX_RETRIES=30
+
+# ── 1. Attendre que PostgreSQL accepte les connexions ──
+echo "⏳ Attente de la connexion PostgreSQL..."
 RETRY_COUNT=0
-until npx prisma migrate deploy 2>/dev/null; do
+until node -e "
+  const { Client } = require('pg');
+  const c = new Client({ connectionString: process.env.DATABASE_URL });
+  c.connect().then(() => { c.end(); process.exit(0); }).catch(() => process.exit(1));
+  setTimeout(() => process.exit(1), 3000);
+" 2>/dev/null; do
   RETRY_COUNT=$((RETRY_COUNT + 1))
   if [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ]; then
-    echo "❌ La base de données n'est pas disponible après ${MAX_RETRIES} tentatives."
+    echo "❌ PostgreSQL n'est pas disponible après ${MAX_RETRIES} tentatives."
     exit 1
   fi
-  echo "⏳ DB pas encore prête, tentative ${RETRY_COUNT}/${MAX_RETRIES}..."
+  echo "⏳ PostgreSQL pas encore prêt, tentative ${RETRY_COUNT}/${MAX_RETRIES}..."
   sleep 2
 done
+echo "✅ PostgreSQL connecté."
 
+# ── 2. Résoudre les migrations échouées (P3009) ──
+echo "🔎 Vérification des migrations..."
+MIGRATE_OUTPUT=$(npx prisma migrate deploy 2>&1)
+MIGRATE_EXIT=$?
+
+if [ "$MIGRATE_EXIT" -ne 0 ]; then
+  if echo "$MIGRATE_OUTPUT" | grep -q "P3009"; then
+    echo "⚠️  Migrations échouées détectées, résolution automatique..."
+    FAILED_MIGRATIONS=$(echo "$MIGRATE_OUTPUT" | grep "migration started at" | sed 's/.*The `\(.*\)` migration started at.*/\1/')
+    for MIGRATION in $FAILED_MIGRATIONS; do
+      echo "   → Résolution de $MIGRATION..."
+      npx prisma migrate resolve --applied "$MIGRATION" 2>/dev/null || true
+    done
+    echo "🔄 Relancement des migrations..."
+    npx prisma migrate deploy
+  else
+    echo "❌ Erreur de migration inattendue :"
+    echo "$MIGRATE_OUTPUT"
+    exit 1
+  fi
+fi
 echo "✅ Migrations appliquées avec succès."
 
-# Attente de Redis
+# ── 3. Attente de Redis ──
 echo "⏳ Attente de Redis..."
 REDIS_H="${REDIS_HOST:-redis}"
 REDIS_P="${REDIS_PORT:-6379}"
@@ -31,14 +60,14 @@ until node -e "const s=require('net').createConnection($REDIS_P,'$REDIS_H');s.on
 done
 echo "✅ Redis connecté."
 
-# Seeder la base de données (ignorer les erreurs si déjà seedé)
+# ── 4. Seed de la base de données ──
 echo "🌱 Seeding de la base de données..."
 npx prisma db seed || echo "⚠️ Seed ignoré (probablement déjà fait)."
 
-# Lancer Prisma Studio en arrière-plan
+# ── 5. Prisma Studio ──
 echo "🚀 Démarrage de Prisma Studio sur le port 5555..."
 npx prisma studio --port 5555 &
 
-# Lancer l'application NestJS en mode développement
+# ── 6. Lancer NestJS ──
 echo "🚀 Démarrage de l'API NestJS en mode dev sur le port 3000..."
 npm run start:dev

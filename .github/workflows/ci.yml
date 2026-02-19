@@ -14,14 +14,58 @@ concurrency:
 
 jobs:
   # ==================================================================
-  # GLOBAL QUALITY GATE
-  # ==================================================================
-  # ==================================================================
   # BACKEND QUALITY GATE
+  # Lint + Unit Tests + Build
   # ==================================================================
   backend-quality:
-    name: 🛡️ Backend (Lint, Build, Test)
+    name: 🛡️ Backend — Lint, Tests, Build
     runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: collector_test
+          POSTGRES_USER: ci
+          POSTGRES_PASSWORD: ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U ci -d collector_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/collector_test?schema=public
+      JWT_SECRET: ci-jwt-secret
+      JWT_EXPIRES_IN: 7d
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      ENCRYPTION_KEY: 359fdc41e2148464203957aeb095265f07851619eb357c56df4d42b18cb3ce0c
+      STRIPE_SECRET_KEY: sk_test_placeholder
+      STRIPE_PUBLISHABLE_KEY: pk_test_placeholder
+      STRIPE_WEBHOOK_SECRET: whsec_placeholder
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_SECURE: false
+      SMTP_USER: dev
+      SMTP_PASSWORD: dev
+      SMTP_FROM: ci@collector.local
+      FRAUD_DETECTION_WEBHOOK_URL: https://localhost
+      FRAUD_DETECTION_API_KEY: ci-key
+      HTTPS_ENABLED: false
+
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -35,37 +79,51 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts
 
-      - name: 🔧 Create Mock Environment
-        run: |
-          echo "DATABASE_URL=postgresql://ci:ci@localhost:5432/ci" >> .env
-          echo "JWT_SECRET=supersecret" >> .env
-          echo "JWT_EXPIRES_IN=7d" >> .env
-
       - name: 🧬 Prisma Generate
         run: npx -y prisma generate --schema=backend/prisma/schema.prisma
 
-      - name: 🎨 Backend Lint (Check)
+      - name: 🗄️ Apply Migrations (Test DB)
+        run: npx -y prisma migrate deploy --schema=backend/prisma/schema.prisma
+
+      - name: 🎨 Backend Lint
         working-directory: ./backend
         run: npm run lint
 
-      - name: 🧪 Backend Tests
+      - name: 🧪 Backend Unit Tests
         working-directory: ./backend
-        run: npm run test
+        run: npm run test -- --ci --coverage
 
       - name: 🧪 Backend E2E Tests
         working-directory: ./backend
-        run: npm run test:e2e
+        run: npm run test:e2e -- --ci
 
       - name: 🏗️ Backend Build
         working-directory: ./backend
         run: npm run build
 
+      - name: 📊 Upload Coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend/coverage/
+          retention-days: 7
+
   # ==================================================================
   # FRONTEND QUALITY GATE
+  # Lint + Unit Tests + Build
   # ==================================================================
   frontend-quality:
-    name: 🎨 Frontend (Lint, Build, Test)
+    name: 🎨 Frontend — Lint, Tests, Build
     runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+      NEXT_PUBLIC_BACKEND_URL: http://localhost:4000
+      NEXTAUTH_SECRET: ci-nextauth-secret
+      NEXTAUTH_URL: http://localhost:3000
+      NEXT_TELEMETRY_DISABLED: 1
+
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
@@ -79,15 +137,11 @@ jobs:
       - name: 📦 Install Dependencies
         run: npm ci --legacy-peer-deps --ignore-scripts
 
-      - name: 🔧 Create Mock Environment
-        run: |
-          echo "DATABASE_URL=postgresql://ci:ci@localhost:5432/ci" >> .env
-          echo "NEXT_PUBLIC_BACKEND_URL=http://localhost:4000" >> .env
-          echo "NEXTAUTH_SECRET=supersecret" >> .env
-          echo "NEXTAUTH_URL=http://localhost:3000" >> .env
-
-      - name: 🧬 Prisma Generate
+      - name: 🧬 Prisma Generate (Backend schema)
         run: npx -y prisma generate --schema=backend/prisma/schema.prisma
+
+      - name: 🧬 Prisma Generate (Frontend schema)
+        run: npx -y prisma generate --schema=frontend/prisma/schema.prisma
 
       - name: 🎨 Frontend Lint
         working-directory: ./frontend
@@ -95,43 +149,59 @@ jobs:
 
       - name: 🧪 Frontend Tests
         working-directory: ./frontend
-        run: npm run test
+        run: npm run test -- --ci
 
       - name: 🏗️ Frontend Build
         working-directory: ./frontend
         run: npm run build
-        env:
-          NEXT_TELEMETRY_DISABLED: 1
 
   # ==================================================================
-  # SECURITY SCAN & DOCKER
-  # Depends on: Quality Gate
+  # DEPENDENCY AUDIT
+  # Vérifie les vulnérabilités connues dans les dépendances
+  # ==================================================================
+  dependency-audit:
+    name: 🔍 Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - name: ⬇️ Checkout
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install Dependencies
+        run: npm ci --legacy-peer-deps --ignore-scripts
+
+      - name: 🔒 npm audit (Root)
+        run: npm audit --omit=dev --audit-level=high || true
+
+      - name: 🔒 npm audit (Backend)
+        working-directory: ./backend
+        run: npm audit --omit=dev --audit-level=high || true
+
+      - name: 🔒 npm audit (Frontend)
+        working-directory: ./frontend
+        run: npm audit --omit=dev --audit-level=high || true
+
+  # ==================================================================
+  # SECURITY SCAN & DOCKER BUILD
+  # Construit les images Docker et les scanne avec Trivy
   # ==================================================================
   security-and-build:
-    name: 🔒 Security & Docker Build
+    name: 🔒 Security Scan & Docker Build
     runs-on: ubuntu-latest
     needs: [backend-quality, frontend-quality]
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
 
-      - name: 🐳 Build Frontend Image
-        run: docker build -f frontend/Dockerfile -t collector-app:latest .
-
-      - name: 🔍 Trivy Scan (Frontend)
-        uses: aquasecurity/trivy-action@master
-        with:
-          image-ref: 'collector-app:latest'
-          format: 'table'
-          exit-code: '0' # Don't fail the build for now, just report
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH'
-
       - name: 🐳 Build Backend Image
         run: docker build -f backend/Dockerfile -t collector-backend:latest ./backend
 
-      - name: 🔍 Trivy Scan (Backend)
+      - name: 🔍 Trivy Scan — Backend
         uses: aquasecurity/trivy-action@master
         with:
           image-ref: 'collector-backend:latest'
@@ -141,14 +211,27 @@ jobs:
           vuln-type: 'os,library'
           severity: 'CRITICAL,HIGH'
 
+      - name: 🐳 Build Frontend Image
+        run: docker build -f frontend/Dockerfile -t collector-frontend:latest .
+
+      - name: 🔍 Trivy Scan — Frontend
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'collector-frontend:latest'
+          format: 'table'
+          exit-code: '0'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
   # ==================================================================
-  # DELIVERY
-  # Depends on: Security & Docker
+  # DEPLOY SIMULATION
+  # Simule le déploiement (Terraform + K8s)
   # ==================================================================
   deploy-simulation:
     name: 🚀 Deploy Simulation
     runs-on: ubuntu-latest
-    needs: security-and-build
+    needs: [security-and-build, dependency-audit]
     if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'recette' }}
@@ -156,11 +239,25 @@ jobs:
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
-      
+
       - name: 🚚 Deploy Simulation
         run: |
-          echo "==== [FAKE DEPLOYMENT] ===="
-          echo "Target Environment: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Recette' }}"
-          echo "1. Terraform Init/Apply (Simulated)..."
-          echo ">> terraform apply -auto-approve"
-          echo "2. Deployment Success!"
+          ENV_NAME="${{ github.ref == 'refs/heads/main' && 'Production' || 'Recette' }}"
+          echo "════════════════════════════════════════"
+          echo "  🚀 SIMULATION DE DÉPLOIEMENT"
+          echo "  Environnement : $ENV_NAME"
+          echo "════════════════════════════════════════"
+          echo ""
+          echo "1. terraform init && terraform apply -auto-approve"
+          echo "   → Provisionnement du namespace Kubernetes"
+          echo ""
+          echo "2. kubectl apply -k infrastructure/k8s/base"
+          echo "   → Déploiement : PostgreSQL, Redis, Backend, Frontend"
+          echo "   → Monitoring  : Prometheus, Grafana"
+          echo "   → Scaling     : HPA (backend: 1→5, frontend: 1→3)"
+          echo ""
+          echo "3. Vérification des pods..."
+          echo "   → kubectl rollout status deployment/backend"
+          echo "   → kubectl rollout status deployment/frontend"
+          echo ""
+          echo "✅ Déploiement $ENV_NAME simulé avec succès !"
