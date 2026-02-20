@@ -1,6 +1,0 @@
-{
-    "chat.tools.terminal.autoApprove": {
-        "kubectl exec": true,
-        "kubectl rollout": true
-    }
-}
