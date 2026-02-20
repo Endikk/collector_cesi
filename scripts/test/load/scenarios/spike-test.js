@@ -26,11 +26,34 @@ export const options = {
 const BASE_URL = __ENV.BASE_URL || 'http://host.docker.internal:4000';
 
 export default function () {
-    const res = http.get(`${BASE_URL}/health`);
-
-    check(res, {
-        'status is 200': (r) => r.status === 200,
+    // ── 1. Health check (rapide, faible coût) ──
+    const healthRes = http.get(`${BASE_URL}/health`);
+    check(healthRes, {
+        'health: status 200': (r) => r.status === 200,
     });
 
-    sleep(1);
+    // ── 2. Parcours catalogue (scénario réaliste : afflux de visiteurs) ──
+    const categoriesRes = http.get(`${BASE_URL}/items/categories`);
+    check(categoriesRes, {
+        'categories: responds': (r) => r.status === 200 || r.status < 500,
+    });
+
+    // ── 3. Vérification modération (simule un afflux de messages) ──
+    const moderationRes = http.post(`${BASE_URL}/moderation/check`, JSON.stringify({
+        content: 'Je veux acheter cette figurine rare ! Mon email est test@test.com',
+    }), { headers: { 'Content-Type': 'application/json' } });
+    check(moderationRes, {
+        'moderation: responds': (r) => r.status === 200 || r.status === 201 || r.status < 500,
+    });
+
+    // ── 4. Recommandations (endpoint avec logique DB) ──
+    const recoRes = http.get(`${BASE_URL}/recommendations`, {
+        headers: { 'x-user-id': 'spike-test-user' },
+    });
+    check(recoRes, {
+        'recommendations: responds': (r) => r.status < 500,
+    });
+
+    // Pause minimale pour maximiser le pic
+    sleep(0.3);
 }

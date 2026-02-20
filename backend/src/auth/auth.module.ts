@@ -18,7 +18,10 @@ import { PrismaModule } from '../prisma/prisma.module';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET', 'dev-jwt-secret-key'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '7d') as `${number}d`,
+          expiresIn: configService.get<string>(
+            'JWT_EXPIRES_IN',
+            '7d',
+          ) as `${number}d`,
         },
       }),
     }),

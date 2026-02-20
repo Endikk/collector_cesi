@@ -14,7 +14,7 @@ export class UsersController {
   constructor(
     private readonly usersService: UsersService,
     private readonly twoFactorService: TwoFactorService,
-  ) { }
+  ) {}
 
   @Get(':id/profile')
   getProfile(@Param('id') id: string) {
@@ -24,7 +24,7 @@ export class UsersController {
   @Post('2fa/generate')
   async generateTwoFactor(@Body() body: { email: string }) {
     const { secret, otpauthUrl } =
-      await this.twoFactorService.generateTwoFactorSecret(body.email);
+      this.twoFactorService.generateTwoFactorSecret(body.email);
     const qrCodeUrl =
       await this.twoFactorService.generateQrCodeDataURL(otpauthUrl);
     return { secret, qrCodeUrl };
@@ -46,9 +46,7 @@ export class UsersController {
   }
 
   @Post('2fa/verify')
-  async verifyTwoFactor(
-    @Body() body: { token: string; secret: string },
-  ) {
+  verifyTwoFactor(@Body() body: { token: string; secret: string }) {
     const isValid = this.twoFactorService.verifyTwoFactorToken(
       body.token,
       body.secret,

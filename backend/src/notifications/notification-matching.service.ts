@@ -19,7 +19,7 @@ export class NotificationMatchingService {
     private prisma: PrismaService,
     @InjectQueue('email') private emailQueue: Queue,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-  ) { }
+  ) {}
 
   /**
    * Find all users who should be notified about a new item

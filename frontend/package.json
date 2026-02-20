@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --experimental-https",
+    "dev": "node server.js",
+    "dev:next": "next dev --experimental-https",
     "build": "next build",
     "lint": "eslint .",
     "snyk": "snyk test",

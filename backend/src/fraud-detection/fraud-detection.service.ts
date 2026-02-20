@@ -1,4 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { InjectMetric } from '@willsoto/nestjs-prometheus';
+import { Counter } from 'prom-client';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface PriceChangeEvent {
@@ -42,13 +44,24 @@ export class FraudDetectionService {
   private readonly FREQUENT_CHANGES_THRESHOLD = 5; // 5 changements en 24h
   private readonly FREQUENT_CHANGES_WINDOW = 24 * 60 * 60 * 1000; // 24h en ms
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @InjectMetric('fraud_analyses_total')
+    private fraudAnalysesTotal: Counter<string>,
+    @InjectMetric('fraud_alerts_total')
+    private fraudAlertsTotal: Counter<string>,
+    @InjectMetric('fraud_manual_reviews_total')
+    private fraudManualReviewsTotal: Counter<string>,
+  ) {}
 
   /**
    * Analyser un changement de prix et détecter les anomalies
    */
   async analyzePriceChange(event: PriceChangeEvent): Promise<FraudAlert[]> {
     const alerts: FraudAlert[] = [];
+
+    // Incrémenter le compteur d'analyses Prometheus
+    this.fraudAnalysesTotal.inc();
 
     this.logger.log(
       `Analyzing price change for item ${event.itemId}: ${event.oldPrice}€ → ${event.newPrice}€`,
@@ -150,12 +163,23 @@ export class FraudDetectionService {
       alerts.push(...suspiciousSellerAlerts);
     }
 
-    // Enregistrer les alertes dans les logs
+    // Enregistrer les alertes dans Prometheus et les logs
     if (alerts.length > 0) {
+      for (const alert of alerts) {
+        this.fraudAlertsTotal.inc({
+          severity: alert.severity,
+          type: alert.type,
+        });
+      }
       this.logger.warn(
         `Detected ${alerts.length} fraud alerts for item ${event.itemId}`,
         { alerts },
       );
+    }
+
+    // Vérifier si une review manuelle est nécessaire
+    if (this.requiresManualReview(alerts)) {
+      this.fraudManualReviewsTotal.inc();
     }
 
     return alerts;

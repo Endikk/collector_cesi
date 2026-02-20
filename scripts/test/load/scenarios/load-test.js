@@ -32,15 +32,38 @@ export const options = {
 const BASE_URL = __ENV.BASE_URL || 'http://host.docker.internal:4000';
 
 export default function () {
-    // On simule un appel utilisateur sur l'endpoint de santé (ou tout autre endpoint métier)
-    const res = http.get(`${BASE_URL}/health`);
-
-    // On valide que la réponse HTTP est bien un succès (200 OK)
-    check(res, {
-        'status is 200': (r) => r.status === 200,
+    // ── 1. Health check (baseline) ──
+    const healthRes = http.get(`${BASE_URL}/health`);
+    check(healthRes, {
+        'health: status 200': (r) => r.status === 200,
     });
 
-    // Pause de 1 seconde entre chaque itération de l'utilisateur virtuel
-    // (simule le temps de réflexion/lecture d'un vrai utilisateur)
+    // ── 2. Parcours catalogue (endpoint métier public) ──
+    const categoriesRes = http.get(`${BASE_URL}/items/categories`);
+    check(categoriesRes, {
+        'categories: status 200': (r) => r.status === 200,
+    });
+
+    // ── 3. Consultation des règles de validation ──
+    const validationRes = http.get(`${BASE_URL}/validation/rules`);
+    check(validationRes, {
+        'validation rules: status 200': (r) => r.status === 200,
+    });
+
+    // ── 4. Traductions (i18n) ──
+    const translationsRes = http.get(`${BASE_URL}/translations/fr`);
+    check(translationsRes, {
+        'translations: status 200 or 201': (r) => r.status === 200 || r.status === 201,
+    });
+
+    // ── 5. Modération de contenu (endpoint métier) ──
+    const moderationRes = http.post(`${BASE_URL}/moderation/check`, JSON.stringify({
+        content: 'Bonjour, je suis intéressé par cet objet de collection',
+    }), { headers: { 'Content-Type': 'application/json' } });
+    check(moderationRes, {
+        'moderation: status 200 or 201': (r) => r.status === 200 || r.status === 201,
+    });
+
+    // Pause de 1 seconde entre chaque itération (simule le temps de réflexion utilisateur)
     sleep(1);
 }

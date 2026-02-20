@@ -30,13 +30,32 @@ export const options = {
 const BASE_URL = __ENV.BASE_URL || 'http://host.docker.internal:4000';
 
 export default function () {
-    const res = http.get(`${BASE_URL}/health`);
-
-    check(res, {
-        'status is 200': (r) => r.status === 200,
+    // ── 1. Health check (baseline rapide) ──
+    const healthRes = http.get(`${BASE_URL}/health`);
+    check(healthRes, {
+        'health: status 200': (r) => r.status === 200,
     });
 
-    // Pause de 1 seconde => 1 requête / seconde / VU
-    // Pour augmenter artificiellement la charge sans augmenter les VUs, on peut réduire cette pause (ex: 0.1)
-    sleep(1);
+    // ── 2. Catalogue (parcours utilisateur classique) ──
+    const categoriesRes = http.get(`${BASE_URL}/items/categories`);
+    check(categoriesRes, {
+        'categories: status 200': (r) => r.status === 200,
+    });
+
+    // ── 3. Modération (logique métier CPU-intensive) ──
+    const moderationRes = http.post(`${BASE_URL}/moderation/moderate`, JSON.stringify({
+        content: 'Superbe figurine Star Wars originale en parfait état, contactez-moi pour plus de détails',
+    }), { headers: { 'Content-Type': 'application/json' } });
+    check(moderationRes, {
+        'moderation: status 200 or 201': (r) => r.status === 200 || r.status === 201,
+    });
+
+    // ── 4. Métriques Prometheus (vérifie que /metrics tient la charge) ──
+    const metricsRes = http.get(`${BASE_URL}/metrics`);
+    check(metricsRes, {
+        'metrics: status 200': (r) => r.status === 200,
+    });
+
+    // Pause réduite sous stress pour maximiser la charge
+    sleep(0.5);
 }

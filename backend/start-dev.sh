@@ -5,12 +5,12 @@ MAX_RETRIES=30
 # ── 1. Attendre que PostgreSQL accepte les connexions ──
 echo "⏳ Attente de la connexion PostgreSQL..."
 RETRY_COUNT=0
-until node -e "
-  const { Client } = require('pg');
-  const c = new Client({ connectionString: process.env.DATABASE_URL });
-  c.connect().then(() => { c.end(); process.exit(0); }).catch(() => process.exit(1));
-  setTimeout(() => process.exit(1), 3000);
-" 2>/dev/null; do
+# Extraire host et port depuis DATABASE_URL (format: postgresql://user:pass@host:port/db)
+DB_HOST=$(echo "$DATABASE_URL" | sed -n 's|.*@\([^:]*\):.*|\1|p')
+DB_PORT=$(echo "$DATABASE_URL" | sed -n 's|.*:\([0-9]*\)/.*|\1|p')
+DB_HOST="${DB_HOST:-db}"
+DB_PORT="${DB_PORT:-5432}"
+until node -e "const s=require('net').createConnection(${DB_PORT},'${DB_HOST}');s.on('connect',()=>{s.end();process.exit(0)});s.on('error',()=>process.exit(1));setTimeout(()=>process.exit(1),3000);" 2>/dev/null; do
   RETRY_COUNT=$((RETRY_COUNT + 1))
   if [ "$RETRY_COUNT" -ge "$MAX_RETRIES" ]; then
     echo "❌ PostgreSQL n'est pas disponible après ${MAX_RETRIES} tentatives."

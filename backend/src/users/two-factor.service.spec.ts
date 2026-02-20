@@ -5,78 +5,78 @@ import { ConfigService } from '@nestjs/config';
 import { EncryptionService } from '../common/encryption.service';
 
 jest.mock('qrcode', () => ({
-    toDataURL: jest.fn().mockResolvedValue('data:image/png;base64,mockQRCode'),
+  toDataURL: jest.fn().mockResolvedValue('data:image/png;base64,mockQRCode'),
 }));
 
 const mockPrismaService = {
-    user: {
-        update: jest.fn(),
-    },
+  user: {
+    update: jest.fn(),
+  },
 };
 
 const mockConfigService = {
-    get: jest.fn().mockReturnValue('Collector'),
+  get: jest.fn().mockReturnValue('Collector'),
 };
 
 const mockEncryptionService = {
-    encrypt: jest.fn().mockReturnValue('encrypted-secret'),
-    decrypt: jest.fn().mockReturnValue('decrypted-secret'),
+  encrypt: jest.fn().mockReturnValue('encrypted-secret'),
+  decrypt: jest.fn().mockReturnValue('decrypted-secret'),
 };
 
 describe('TwoFactorService', () => {
-    let service: TwoFactorService;
-    let prisma: PrismaService;
+  let service: TwoFactorService;
+  let prisma: PrismaService;
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                TwoFactorService,
-                { provide: PrismaService, useValue: mockPrismaService },
-                { provide: ConfigService, useValue: mockConfigService },
-                { provide: EncryptionService, useValue: mockEncryptionService },
-            ],
-        }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        TwoFactorService,
+        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: ConfigService, useValue: mockConfigService },
+        { provide: EncryptionService, useValue: mockEncryptionService },
+      ],
+    }).compile();
 
-        service = module.get<TwoFactorService>(TwoFactorService);
-        prisma = module.get<PrismaService>(PrismaService);
+    service = module.get<TwoFactorService>(TwoFactorService);
+    prisma = module.get<PrismaService>(PrismaService);
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  describe('generateTwoFactorSecret', () => {
+    it('should return secret and otpauthUrl', () => {
+      const result = service.generateTwoFactorSecret('test@example.com');
+      expect(result.secret).toBe('mockSecret');
+      expect(result.otpauthUrl).toContain('otpauth://totp/');
+      expect(result.otpauthUrl).toContain('secret=mockSecret');
     });
+  });
 
-    it('should be defined', () => {
-        expect(service).toBeDefined();
+  describe('generateQrCodeDataURL', () => {
+    it('should return data URL', async () => {
+      const result = await service.generateQrCodeDataURL('otpauth://...');
+      expect(result).toBe('data:image/png;base64,mockQRCode');
     });
+  });
 
-    describe('generateTwoFactorSecret', () => {
-        it('should return secret and otpauthUrl', async () => {
-            const result = await service.generateTwoFactorSecret('test@example.com');
-            expect(result.secret).toBe('mockSecret');
-            expect(result.otpauthUrl).toContain('otpauth://totp/');
-            expect(result.otpauthUrl).toContain('secret=mockSecret');
-        });
+  describe('verifyTwoFactorToken', () => {
+    it('should return true if token is valid', () => {
+      expect(service.verifyTwoFactorToken('123456', 'secret')).toBe(true);
     });
+  });
 
-    describe('generateQrCodeDataURL', () => {
-        it('should return data URL', async () => {
-            const result = await service.generateQrCodeDataURL('otpauth://...');
-            expect(result).toBe('data:image/png;base64,mockQRCode');
-        });
+  describe('enableTwoFactor', () => {
+    it('should update user with 2FA secret', async () => {
+      const mockUser = { id: '1', twoFactorEnabled: true };
+      mockPrismaService.user.update.mockResolvedValue(mockUser);
+
+      expect(await service.enableTwoFactor('1', 'secret')).toEqual(mockUser);
+      expect(mockPrismaService.user.update).toHaveBeenCalledWith({
+        where: { id: '1' },
+        data: { twoFactorSecret: 'encrypted-secret', twoFactorEnabled: true },
+      });
     });
-
-    describe('verifyTwoFactorToken', () => {
-        it('should return true if token is valid', () => {
-            expect(service.verifyTwoFactorToken('123456', 'secret')).toBe(true);
-        });
-    });
-
-    describe('enableTwoFactor', () => {
-        it('should update user with 2FA secret', async () => {
-            const mockUser = { id: '1', twoFactorEnabled: true };
-            mockPrismaService.user.update.mockResolvedValue(mockUser);
-
-            expect(await service.enableTwoFactor('1', 'secret')).toEqual(mockUser);
-            expect(mockPrismaService.user.update).toHaveBeenCalledWith({
-                where: { id: '1' },
-                data: { twoFactorSecret: 'encrypted-secret', twoFactorEnabled: true },
-            });
-        });
-    });
+  });
 });

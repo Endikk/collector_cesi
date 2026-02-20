@@ -1,4 +1,10 @@
-import { IsString, IsNumber, IsOptional, Min, MaxLength } from 'class-validator';
+import {
+  IsString,
+  IsNumber,
+  IsOptional,
+  Min,
+  MaxLength,
+} from 'class-validator';
 
 export class UpdateItemDto {
   @IsOptional()
@@ -8,7 +14,9 @@ export class UpdateItemDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(2000, { message: 'La description ne peut pas dépasser 2000 caractères' })
+  @MaxLength(2000, {
+    message: 'La description ne peut pas dépasser 2000 caractères',
+  })
   description?: string;
 
   @IsOptional()

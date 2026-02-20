@@ -9,10 +9,17 @@ import * as path from 'path';
 import { JsonLoggerService } from './common/json-logger.service';
 
 async function bootstrap() {
-  const httpsOptions = process.env.HTTPS_ENABLED === 'true' ? {
-    key: fs.readFileSync(path.join(__dirname, '..', 'secrets', 'key.pem')),
-    cert: fs.readFileSync(path.join(__dirname, '..', 'secrets', 'cert.pem')),
-  } : undefined;
+  const httpsOptions =
+    process.env.HTTPS_ENABLED === 'true'
+      ? {
+          key: fs.readFileSync(
+            path.join(__dirname, '..', 'secrets', 'key.pem'),
+          ),
+          cert: fs.readFileSync(
+            path.join(__dirname, '..', 'secrets', 'cert.pem'),
+          ),
+        }
+      : undefined;
 
   const app = await NestFactory.create(AppModule, {
     httpsOptions,
@@ -90,7 +97,9 @@ async function bootstrap() {
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
 
-  console.log(`🚀 Backend running on port ${port}`);
+  const protocol = httpsOptions ? 'https' : 'http';
+  console.log(`🚀 Backend running on ${protocol}://0.0.0.0:${port}`);
+  console.log(`🔒 Security: HTTPS ${httpsOptions ? 'ENABLED' : 'DISABLED'}`);
   console.log(`🔒 Security: Helmet enabled`);
   console.log(
     `🔒 Security: CORS ${isProduction ? 'STRICT' : 'PERMISSIVE'} (${isProduction ? process.env.FRONTEND_URL : '*'})`,

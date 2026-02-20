@@ -1,4 +1,10 @@
-import { IsString, MinLength, MaxLength, IsOptional, IsUrl } from 'class-validator';
+import {
+  IsString,
+  MinLength,
+  MaxLength,
+  IsOptional,
+  IsUrl,
+} from 'class-validator';
 
 export class UpdateShopDto {
   @IsOptional()
@@ -9,7 +15,9 @@ export class UpdateShopDto {
 
   @IsOptional()
   @IsString()
-  @MaxLength(500, { message: 'La description ne peut pas dépasser 500 caractères' })
+  @MaxLength(500, {
+    message: 'La description ne peut pas dépasser 500 caractères',
+  })
   description?: string;
 
   @IsOptional()

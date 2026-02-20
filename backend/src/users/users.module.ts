@@ -9,4 +9,4 @@ import { EncryptionService } from '../common/encryption.service';
   providers: [UsersService, TwoFactorService, EncryptionService],
   exports: [UsersService, TwoFactorService],
 })
-export class UsersModule { }
+export class UsersModule {}

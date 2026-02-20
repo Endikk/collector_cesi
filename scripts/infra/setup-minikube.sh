@@ -87,9 +87,11 @@ kubectl apply -k infrastructure/k8s/base
 # ── 8. Nettoyer les anciens ReplicaSets ──
 echo "🧹 Nettoyage des anciens ReplicaSets..."
 for deploy in backend frontend grafana prometheus redis; do
-    OLD_RS=$(kubectl get rs -n collector -l app="$deploy" --sort-by='.metadata.creationTimestamp' -o name 2>/dev/null | head -n -1)
-    if [ -n "$OLD_RS" ]; then
-        echo "$OLD_RS" | xargs -r kubectl delete -n collector 2>/dev/null || true
+    RS_LIST=$(kubectl get rs -n collector -l app="$deploy" --sort-by='.metadata.creationTimestamp' -o name 2>/dev/null)
+    RS_COUNT=$(echo "$RS_LIST" | grep -c . 2>/dev/null || echo 0)
+    if [ "$RS_COUNT" -gt 1 ]; then
+        OLD_RS=$(echo "$RS_LIST" | sed '$d')
+        echo "$OLD_RS" | xargs kubectl delete -n collector 2>/dev/null || true
     fi
 done
 

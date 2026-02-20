@@ -278,10 +278,11 @@ export async function startConversation(targetUserId: string) {
         revalidatePath("/chat");
         return { success: true, conversationId: newConversation.id };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const prismaError = error as { code?: string };
         console.error("Erreur création conversation:", error);
         // P2025: Record to connect not found (l'utilisateur de la session n'existe plus en base)
-        if (error.code === "P2025") {
+        if (prismaError.code === "P2025") {
             return { success: false, message: "Non autorisé" };
         }
         return { success: false, message: "Erreur serveur" };
