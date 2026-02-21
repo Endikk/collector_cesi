@@ -21,20 +21,36 @@ until node -e "const s=require('net').createConnection(${DB_PORT},'${DB_HOST}');
 done
 echo "✅ PostgreSQL connecté."
 
-# ── 2. Résoudre les migrations échouées (P3009) ──
+# ── 2. Résoudre les migrations échouées (P3009 / P3018) ──
 echo "🔎 Vérification des migrations..."
 MIGRATE_OUTPUT=$(npx prisma migrate deploy 2>&1)
 MIGRATE_EXIT=$?
 
 if [ "$MIGRATE_EXIT" -ne 0 ]; then
   if echo "$MIGRATE_OUTPUT" | grep -q "P3009"; then
-    echo "⚠️  Migrations échouées détectées, résolution automatique..."
+    echo "⚠️  Migrations échouées détectées (P3009), résolution automatique..."
     FAILED_MIGRATIONS=$(echo "$MIGRATE_OUTPUT" | grep "migration started at" | sed 's/.*The `\(.*\)` migration started at.*/\1/')
     for MIGRATION in $FAILED_MIGRATIONS; do
       echo "   → Résolution de $MIGRATION..."
       npx prisma migrate resolve --applied "$MIGRATION" 2>/dev/null || true
     done
     echo "🔄 Relancement des migrations..."
+    npx prisma migrate deploy
+  elif echo "$MIGRATE_OUTPUT" | grep -q "P3018"; then
+    echo "⚠️  Migration échouée (P3018) — reset de la base de données..."
+    # Extraire les infos de connexion pour psql
+    DB_NAME=$(echo "$DATABASE_URL" | sed -n 's|.*/\([^?]*\).*|\1|p')
+    DB_USER=$(echo "$DATABASE_URL" | sed -n 's|.*://\([^:]*\):.*|\1|p')
+    # Reset du schéma public
+    node -e "
+      const { Client } = require('pg');
+      const c = new Client({ connectionString: process.env.DATABASE_URL });
+      c.connect().then(() =>
+        c.query('DROP SCHEMA IF EXISTS public CASCADE; CREATE SCHEMA public; GRANT ALL ON SCHEMA public TO \"$DB_USER\";')
+      ).then(() => { console.log('✅ Schema reset'); c.end(); process.exit(0); })
+      .catch(e => { console.error('❌', e.message); c.end(); process.exit(1); });
+    " 2>/dev/null || true
+    echo "🔄 Relancement des migrations sur base propre..."
     npx prisma migrate deploy
   else
     echo "❌ Erreur de migration inattendue :"

@@ -1,87 +1,59 @@
 # Lancer le projet avec Docker Compose
 
-## Prérequis
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) installé et démarré
-- Fichier `.env` présent à la racine du projet (voir `.env.example`)
+> **Pour la soutenance, utiliser Minikube** (voir `LANCER_MINIKUBE.md`).
+> Docker Compose est une alternative pour le développement local uniquement.
 
 ---
 
-## Démarrage
+## Lancement rapide (copier-coller)
 
 ```bash
-# 1. Cloner le dépôt (si pas déjà fait)
-git clone https://github.com/Endikk/collector.git
-cd collector
+# 1. Se placer à la racine du projet
+cd /Users/lucaslabonde/Documents/Développement/collector
 
-# 2. Lancer tous les services (build + démarrage en arrière-plan)
+# 2. Lancer tout (build + démarrage)
 docker compose up -d --build
-```
 
-> Le backend attend automatiquement que **PostgreSQL** et **Redis** soient prêts avant de démarrer (healthchecks + scripts d'attente intégrés).
-
----
-
-## Vérifier que tout tourne
-
-```bash
+# 3. Vérifier que tout tourne (6 conteneurs Up healthy)
 docker compose ps
 ```
 
-Tous les conteneurs doivent être en état **Up (healthy)** :
-
-| Conteneur              | Rôle                           |
-| :--------------------- | :----------------------------- |
-| `collector-frontend`   | Application Next.js            |
-| `collector-backend`    | API NestJS                     |
-| `collector-db`         | Base de données PostgreSQL     |
-| `collector-redis`      | Cache et files d'attente Redis |
-| `collector-prometheus` | Collecte des métriques         |
-| `collector-grafana`    | Tableaux de bord monitoring    |
+> Le backend attend automatiquement PostgreSQL et Redis avant de démarrer.
+> Les migrations Prisma et le seed s'exécutent automatiquement.
+> En cas d'erreur de migration (P3009/P3018), le script reset la DB et relance.
 
 ---
 
 ## Accès aux services
 
-| Service         | URL                                                  | Identifiants      |
-| :-------------- | :--------------------------------------------------- | :----------------- |
-| **Frontend**    | [https://localhost:3000](https://localhost:3000)        | —                  |
-| **Backend API** | [https://localhost:4000](https://localhost:4000)        | —                  |
-| **Prisma Studio** | [http://localhost:5555](http://localhost:5555)      | —                  |
-| **Prometheus**  | [http://localhost:9090](http://localhost:9090)        | —                  |
-| **Grafana**     | [http://localhost:3002](http://localhost:3002)        | admin / admin      |
-| **PostgreSQL**  | `localhost:5432`                                     | voir `.env`        |
-| **Redis**       | `localhost:6379`                                     | —                  |
+| Service           | URL                    | Identifiants  |
+| :---------------- | :--------------------- | :------------ |
+| **Frontend**      | https://localhost:3000  | —             |
+| **Backend API**   | https://localhost:4000  | —             |
+| **Prisma Studio** | http://localhost:5555   | —             |
+| **Prometheus**    | http://localhost:9090   | —             |
+| **Grafana**       | http://localhost:3002   | admin / admin |
 
-### Dashboards Grafana
-
-Deux tableaux de bord sont provisionnés automatiquement :
-
-- **Collector — Développeur** : métriques HTTP, latence, CPU, mémoire, Event Loop, handles
-- **Collector — Gestionnaire** : KPIs métier (disponibilité SLA, trafic, taux d'erreurs)
+> Grafana : 2 dashboards provisionnés automatiquement ("Développeur" + "Gestionnaire")
 
 ---
 
 ## Commandes utiles
 
 ```bash
-# Voir les logs en temps réel (tous les services)
-docker compose logs -f
-
-# Logs d'un service spécifique
+# Logs en temps réel
 docker compose logs -f backend
-docker compose logs -f frontend
 
 # Redémarrer un service
 docker compose restart backend
 
-# Reconstruire un seul service après modification
+# Reconstruire après modification de code
 docker compose up -d --build backend
 
-# Arrêter tous les services
+# Tout arrêter
 docker compose down
 
-# Arrêter et supprimer les volumes (remise à zéro complète)
+# Remise à zéro complète (supprime les volumes = DB vidée)
 docker compose down -v
 ```
 
@@ -89,9 +61,9 @@ docker compose down -v
 
 ## Dépannage
 
-| Problème | Solution |
-| :--- | :--- |
-| Le backend redémarre en boucle | Vérifier que Redis est healthy : `docker compose logs redis` |
-| Grafana affiche "No data" | Attendre ~30s que Prometheus scrape le backend. Vérifier la target sur http://localhost:9090/targets |
-| Erreur Prisma / DB | Relancer : `docker compose restart backend` |
-| Port déjà utilisé | Arrêter le service local qui utilise le port, ou modifier le mapping dans `docker-compose.yml` |
+| Problème                   | Solution                                                       |
+| :------------------------- | :------------------------------------------------------------- |
+| Backend redémarre en boucle | `docker compose logs backend` → lire l'erreur                 |
+| Grafana "No data"          | Attendre ~30s, vérifier http://localhost:9090/targets           |
+| Migration cassée           | `docker compose down -v && docker compose up -d --build`       |
+| Port déjà utilisé          | Arrêter le service local ou modifier le port dans `docker-compose.yml` |
