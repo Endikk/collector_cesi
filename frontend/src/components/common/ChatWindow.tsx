@@ -43,6 +43,39 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, oth
         setMessages(initialMessages);
     }, [initialMessages]);
 
+    // Real-time updates via Server-Sent Events (SSE)
+    useEffect(() => {
+        if (!conversationId) return;
+
+        const eventSource = new EventSource(`/api/chat/${conversationId}/stream`);
+
+        eventSource.onmessage = (event) => {
+            try {
+                const data = JSON.parse(event.data);
+
+                // Ignore connection messages
+                if (data.type === "connected") return;
+
+                setMessages((prev) => {
+                    // Check if message already exists (from optimistic UI or previous load)
+                    if (prev.some((msg) => msg.id === data.id)) return prev;
+                    return [...prev, data as Message];
+                });
+            } catch (error) {
+                console.error("Error parsing real-time message:", error);
+            }
+        };
+
+        eventSource.onerror = (error) => {
+            console.error("SSE Error:", error);
+            eventSource.close();
+        };
+
+        return () => {
+            eventSource.close();
+        };
+    }, [conversationId]);
+
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newMessage.trim() || isLoading) return;

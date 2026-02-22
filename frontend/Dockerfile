@@ -13,7 +13,7 @@ COPY frontend/package.json frontend/package-lock.json* ./
 COPY backend/prisma/schema.prisma ./prisma/schema.prisma
 
 # Install deps but skip postinstall (which uses ../backend path)
-RUN npm ci --ignore-scripts
+RUN npm install --ignore-scripts
 
 # Generate client using local schema path
 RUN npx prisma generate --schema=./prisma/schema.prisma

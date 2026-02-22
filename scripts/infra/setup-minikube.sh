@@ -168,7 +168,7 @@ for i in $(seq 1 60); do
     if [ "$NEW_PODS" = "Running" ]; then
         # Tester /health depuis l'intérieur du pod
         HEALTH=$(kubectl exec -n collector deployment/backend -- \
-            node -e "const h=require('http');h.get('http://localhost:3000/health',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{console.log(r.statusCode);process.exit(r.statusCode===200?0:1)})}).on('error',()=>process.exit(1))" 2>/dev/null)
+            node -e "const h=require('http');h.get('http://localhost:3000/health',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>{console.log(r.statusCode);process.exit(r.statusCode===200?0:1)})}).on('error',()=>process.exit(1))" 2>/dev/null || echo "fail")
         if [ "$HEALTH" = "200" ]; then
             BACKEND_READY=true
             break

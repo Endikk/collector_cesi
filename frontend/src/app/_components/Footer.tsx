@@ -3,9 +3,26 @@
 import Link from "next/link";
 import { ChevronDown, ChevronUp, MessageCircle } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useLocale } from "@/lib/i18n/LocaleProvider";
+import { i18n, localeNames, localeFlags, type Locale } from "@/lib/i18n/config";
+import { useState, useRef, useEffect } from "react";
 
 export function Footer() {
     const pathname = usePathname();
+    const { locale, setLocale } = useLocale();
+    const [isLangOpen, setIsLangOpen] = useState(false);
+    const langRef = useRef<HTMLDivElement>(null);
+
+    // Close dropdown on outside click
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (langRef.current && !langRef.current.contains(event.target as Node)) {
+                setIsLangOpen(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     // Logic to show footer only on Home and Catalog pages
     const shouldShowFooter =
@@ -110,12 +127,36 @@ export function Footer() {
                             </ul>
 
                             <h3 className="font-bold text-[#111] mb-2 text-xs uppercase tracking-wide">Sites Collector</h3>
-                            <div className="relative inline-block border border-gray-300 rounded bg-white px-3 py-1.5 cursor-pointer hover:bg-gray-50">
-                                <div className="flex items-center gap-2">
-                                    <span className="text-lg leading-none">🇫🇷</span>
-                                    <span className="text-[#333] text-sm font-medium">France</span>
-                                    <ChevronDown className="w-3 h-3 text-gray-500" />
-                                </div>
+                            <div className="relative inline-block" ref={langRef}>
+                                <button
+                                    onClick={() => setIsLangOpen(!isLangOpen)}
+                                    className="flex items-center gap-2 border border-gray-300 rounded bg-white px-3 py-1.5 cursor-pointer hover:bg-gray-50 focus:outline-none"
+                                >
+                                    <span className="text-lg leading-none">{localeFlags[locale]}</span>
+                                    <span className="text-[#333] text-sm font-medium">{localeNames[locale]}</span>
+                                    <ChevronDown className={`w-3 h-3 text-gray-500 transition-transform ${isLangOpen ? 'rotate-180' : ''}`} />
+                                </button>
+
+                                {isLangOpen && (
+                                    <div className="absolute bottom-full mb-1 left-0 w-48 bg-white border border-gray-200 shadow-lg rounded-md overflow-hidden z-50">
+                                        <ul className="py-1">
+                                            {i18n.locales.map((l: Locale) => (
+                                                <li key={l}>
+                                                    <button
+                                                        onClick={() => {
+                                                            setLocale(l);
+                                                            setIsLangOpen(false);
+                                                        }}
+                                                        className={`w-full text-left px-4 py-2 text-sm flex items-center gap-3 hover:bg-gray-100 ${locale === l ? 'bg-blue-50 text-blue-600 font-medium' : 'text-gray-700'}`}
+                                                    >
+                                                        <span className="text-lg leading-none">{localeFlags[l]}</span>
+                                                        <span>{localeNames[l]}</span>
+                                                    </button>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -137,15 +178,15 @@ export function Footer() {
 
             {/* Floating Buttons */}
             <div className="fixed bottom-6 right-6 flex flex-col gap-3 z-50">
-                <button 
-                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
+                <button
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="bg-white p-3 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] border border-gray-100 hover:bg-gray-50 transition-shadow"
                     aria-label="Retour en haut"
                 >
                     <ChevronUp className="w-5 h-5 text-gray-700" />
                 </button>
-                <Link 
-                    href="/chat/" 
+                <Link
+                    href="/chat/"
                     className="bg-[#3665f3] hover:bg-[#2b54d6] p-3 rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.15)] border border-[#3665f3] transition-all"
                     aria-label="Ouvrir le chat"
                 >

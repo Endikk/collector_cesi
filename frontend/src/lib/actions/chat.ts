@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { redis } from "@/lib/redis";
 
 // Fonction de modération du contenu
 async function moderateContent(content: string): Promise<{
@@ -211,12 +212,33 @@ export async function sendMessage(conversationId: string, content: string) {
                 conversationId,
                 senderId: session.user.id,
             },
+            include: {
+                sender: {
+                    select: {
+                        id: true,
+                        name: true,
+                        image: true,
+                    },
+                },
+            },
         });
 
         await prisma.conversation.update({
             where: { id: conversationId },
             data: { updatedAt: new Date() },
         });
+
+        // Broadcast the new message via Redis Pub/Sub
+        await redis.publish(
+            `chat:${conversationId}`,
+            JSON.stringify({
+                id: newMessage.id,
+                content: newMessage.content,
+                createdAt: newMessage.createdAt,
+                senderId: newMessage.senderId,
+                sender: newMessage.sender,
+            })
+        ).catch((err) => console.error("Redis Publish Error:", err));
 
         revalidatePath(`/chat/${conversationId}`);
         revalidatePath("/chat");
