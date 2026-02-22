@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -9,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Lock, CheckCircle2, Loader2, CreditCard } from "lucide-react";
 import { buyItem } from "@/app/actions/transaction";
+import { toast } from "sonner";
 
 interface CheckoutPageProps {
     item: {
@@ -46,7 +48,7 @@ export function CheckoutPage({ item }: CheckoutPageProps) {
             }, 2000);
         } else {
             setProcessing(false);
-            alert("Erreur lors du paiement. Veuillez réessayer.");
+            toast.error("Erreur lors du paiement. Veuillez réessayer.");
         }
     };
 
@@ -174,12 +176,13 @@ export function CheckoutPage({ item }: CheckoutPageProps) {
                         </CardHeader>
                         <CardContent className="space-y-4">
                             {item.images[0] && (
-                                <div className="aspect-square rounded-lg overflow-hidden bg-muted">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
+                                <div className="relative aspect-square rounded-lg overflow-hidden bg-muted">
+                                    <Image
                                         src={item.images[0].url}
                                         alt={item.title}
-                                        className="w-full h-full object-cover"
+                                        fill
+                                        sizes="(max-width: 1024px) 100vw, 33vw"
+                                        className="object-cover"
                                     />
                                 </div>
                             )}

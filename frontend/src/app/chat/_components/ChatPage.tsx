@@ -4,6 +4,7 @@ import { MessageSquare } from "lucide-react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
 import { startConversation } from "@/lib/actions/chat";
+import { toast } from "sonner";
 
 export function ChatPage() {
     const searchParams = useSearchParams();
@@ -24,12 +25,10 @@ export function ChatPage() {
                 } else {
                     setIsRedirecting(false);
                     initiationRef.current = false;
-                    console.error("Failed to start conversation:", result.message);
-
                     if (result.message === "Non autorisé") {
                         router.push(`/auth/login?callbackUrl=${encodeURIComponent(window.location.href)}`);
                     } else {
-                        alert(result.message || "Erreur lors de la création de la conversation");
+                        toast.error(result.message || "Erreur lors de la création de la conversation");
                     }
                 }
             });

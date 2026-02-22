@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import Stripe from 'stripe';
 import { PrismaService } from '../prisma/prisma.service';
@@ -9,6 +10,7 @@ import { PrismaService } from '../prisma/prisma.service';
 @Injectable()
 export class PaymentService {
   private stripe: Stripe;
+  private readonly logger = new Logger(PaymentService.name);
   private readonly COMMISSION_RATE = 0.05; // 5% commission
 
   constructor(private prisma: PrismaService) {
@@ -134,7 +136,7 @@ export class PaymentService {
         await this.handlePaymentCanceled(event.data.object);
         break;
       default:
-        console.log(`Unhandled event type: ${event.type}`);
+        this.logger.warn(`Unhandled event type: ${event.type}`);
     }
 
     return { received: true };
@@ -150,7 +152,7 @@ export class PaymentService {
     });
 
     if (!transaction) {
-      console.error(
+      this.logger.error(
         `Transaction not found for PaymentIntent: ${paymentIntent.id}`,
       );
       return;
@@ -173,7 +175,7 @@ export class PaymentService {
       }),
     ]);
 
-    console.log(`Payment succeeded for transaction ${transaction.id}`);
+    this.logger.log(`Payment succeeded for transaction ${transaction.id}`);
 
     // TODO: Envoyer une notification à l'acheteur et au vendeur
   }
@@ -198,7 +200,7 @@ export class PaymentService {
       },
     });
 
-    console.log(`Payment failed for transaction ${transaction.id}`);
+    this.logger.warn(`Payment failed for transaction ${transaction.id}`);
   }
 
   /**
@@ -221,7 +223,7 @@ export class PaymentService {
       },
     });
 
-    console.log(`Payment canceled for transaction ${transaction.id}`);
+    this.logger.log(`Payment canceled for transaction ${transaction.id}`);
   }
 
   /**

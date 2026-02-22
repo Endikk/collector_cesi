@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 export enum NotificationType {
@@ -45,8 +49,11 @@ export class NotificationsService {
       where: { id: notificationId },
     });
 
-    if (!notification || notification.userId !== userId) {
-      throw new Error('Notification non trouvée ou accès refusé');
+    if (!notification) {
+      throw new NotFoundException('Notification non trouvée');
+    }
+    if (notification.userId !== userId) {
+      throw new ForbiddenException('Accès refusé à cette notification');
     }
 
     return this.prisma.notification.update({
@@ -81,8 +88,11 @@ export class NotificationsService {
       where: { id: notificationId },
     });
 
-    if (!notification || notification.userId !== userId) {
-      throw new Error('Notification non trouvée ou accès refusé');
+    if (!notification) {
+      throw new NotFoundException('Notification non trouvée');
+    }
+    if (notification.userId !== userId) {
+      throw new ForbiddenException('Accès refusé à cette notification');
     }
 
     return this.prisma.notification.delete({

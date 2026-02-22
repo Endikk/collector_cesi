@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Heart, CreditCard, ChevronRight, Trash2, Star, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
 import { PurchaseConfirmationModal } from "./PurchaseConfirmationModal";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -68,15 +69,14 @@ export function ItemDetails({ item, isOwner, isAdmin, currentUserId, sellerStats
         try {
             const result = await deleteItemAsAdmin(item.id);
             if (result.success) {
-                alert("Annonce supprimée avec succès");
+                toast.success("Annonce supprimée avec succès");
                 router.push("/");
                 router.refresh();
             } else {
-                alert(result.message || "Erreur lors de la suppression");
+                toast.error(result.message || "Erreur lors de la suppression");
             }
-        } catch (error) {
-            console.error("Error deleting item:", error);
-            alert("Erreur lors de la suppression");
+        } catch {
+            toast.error("Erreur lors de la suppression");
         } finally {
             setIsDeleting(false);
         }

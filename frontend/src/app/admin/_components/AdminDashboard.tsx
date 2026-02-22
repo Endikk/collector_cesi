@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trash2, Plus, Users, Package, TrendingUp, FolderTree, AlertCircle, MessageSquare } from 'lucide-react';
+import { toast } from 'sonner';
 import {
     getAdminStats,
     getAdminUsers,
@@ -185,7 +186,7 @@ export function AdminDashboard() {
         if (result.success) {
             setUsers(users.filter(u => u.id !== userId));
         } else {
-            alert(result.message);
+            toast.error(result.message);
         }
     };
 
@@ -196,7 +197,7 @@ export function AdminDashboard() {
             setNewCategoryName('');
             loadData();
         } else {
-            alert(result.message);
+            toast.error(result.message);
         }
     };
 
@@ -206,7 +207,7 @@ export function AdminDashboard() {
         if (result.success) {
             setCategories(categories.filter(c => c.id !== categoryId));
         } else {
-            alert(result.message);
+            toast.error(result.message);
         }
     };
 
@@ -216,7 +217,7 @@ export function AdminDashboard() {
         if (result.success) {
             setItems(items.filter(i => i.id !== itemId));
         } else {
-            alert(result.message);
+            toast.error(result.message);
         }
     };
 
@@ -226,7 +227,7 @@ export function AdminDashboard() {
         if (result.success) {
             setMessages(messages.filter(m => m.id !== messageId));
         } else {
-            alert(result.message);
+            toast.error(result.message);
         }
     };
 
@@ -236,7 +237,7 @@ export function AdminDashboard() {
         if (result.success) {
             setConversations(conversations.filter(c => c.id !== conversationId));
         } else {
-            alert(result.message);
+            toast.error(result.message);
         }
     };
 

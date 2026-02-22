@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 export interface ModerationResult {
   flagged: boolean;
@@ -8,12 +8,13 @@ export interface ModerationResult {
 
 @Injectable()
 export class ModerationService {
+  private readonly logger = new Logger(ModerationService.name);
   private readonly emailPattern =
     /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi;
   private readonly phonePatterns = [
     /\b0[1-9](?:[\s.-]*\d{2}){4}\b/g, // French format: 06 12 34 56 78
     /\b(?:\+33|0033)[1-9](?:[\s.-]*\d{2}){4}\b/g, // International format
-    /\b\d{10,}\b/g, // Any 10+ digit number
+    /\b\d{10,15}\b/g, // Any 10-15 digit number (phone numbers)
   ];
   private readonly urlPattern = /(https?:\/\/[^\s]+)/gi;
   private readonly suspiciousKeywords = [
@@ -127,11 +128,8 @@ export class ModerationService {
     userId: string,
     flaggedCount: number,
   ): { shouldWarn: boolean; shouldBan: boolean } {
-    console.log(
-      'Checking behavior for user:',
-      userId,
-      'flagged count:',
-      flaggedCount,
+    this.logger.log(
+      `Checking behavior for user: ${userId}, flagged count: ${flaggedCount}`,
     );
     // Seuil de warning : 3 tentatives
     const shouldWarn = flaggedCount >= 3 && flaggedCount < 10;

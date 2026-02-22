@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -101,13 +102,14 @@ export async function ShopPage({ params }: { params: Promise<{ id: string }> }) 
                     {user.items.map((item) => (
                         <Link key={item.id} href={`/items/${item.id}`} className="group">
                             <Card className="overflow-hidden hover:shadow-lg transition-all group-hover:scale-[1.02]">
-                                <div className="aspect-square bg-muted relative">
+                                <div className="relative aspect-square bg-muted">
                                     {item.images[0] ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img
+                                        <Image
                                             src={item.images[0].url}
                                             alt={item.title}
-                                            className="w-full h-full object-cover"
+                                            fill
+                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                                            className="object-cover"
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center">

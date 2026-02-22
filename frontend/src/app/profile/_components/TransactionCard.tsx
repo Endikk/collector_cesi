@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -65,13 +66,14 @@ export function TransactionCard({ transaction, type }: TransactionCardProps) {
         <Card className="hover:shadow-md transition-shadow">
             <CardContent className="p-4 flex flex-col gap-4">
                 <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
-                    <div className="h-20 w-20 rounded-md overflow-hidden bg-secondary/10 flex-shrink-0">
+                    <div className="relative h-20 w-20 rounded-md overflow-hidden bg-secondary/10 flex-shrink-0">
                         {transaction.item.images[0] ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
+                            <Image
                                 src={transaction.item.images[0].url}
                                 alt={transaction.item.title}
-                                className="h-full w-full object-cover"
+                                fill
+                                sizes="80px"
+                                className="object-cover"
                             />
                         ) : (
                             <div className="h-full w-full flex items-center justify-center">

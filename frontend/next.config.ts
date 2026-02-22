@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "**.imgur.com",
+        hostname: "i.imgur.com",
       },
       {
         protocol: "https",
@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "**.cloudinary.com",
+        hostname: "res.cloudinary.com",
       },
       {
         protocol: "https",
@@ -35,6 +35,7 @@ const nextConfig: NextConfig = {
       },
     ],
     dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 };
 

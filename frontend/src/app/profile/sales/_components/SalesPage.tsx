@@ -1,4 +1,5 @@
 
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "next-auth/next";
 import { Session } from "next-auth";
@@ -89,13 +90,14 @@ export async function SalesPageContent() {
                             <Card key={item.id} className="overflow-hidden hover:shadow-md transition-all">
                                 <CardContent className="p-0 flex h-32 md:h-40">
                                     {/* Image */}
-                                    <div className="w-32 md:w-48 bg-secondary/10 flex-shrink-0 relative">
+                                    <div className="relative w-32 md:w-48 bg-secondary/10 flex-shrink-0">
                                         {item.images[0] ? (
-                                            // eslint-disable-next-line @next/next/no-img-element
-                                            <img
+                                            <Image
                                                 src={item.images[0].url}
                                                 alt={item.title}
-                                                className="w-full h-full object-cover"
+                                                fill
+                                                sizes="(max-width: 768px) 128px, 192px"
+                                                className="object-cover"
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center">

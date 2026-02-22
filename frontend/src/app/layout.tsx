@@ -10,6 +10,7 @@ import { LocaleProvider } from "@/lib/i18n/LocaleProvider";
 import { SkipToContent } from "@/components/common/SkipToContent";
 import { AccessibilityProvider } from "@/components/common/AccessibilityProvider";
 import { RouteAnnouncer } from "@/components/common/RouteAnnouncer";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -41,6 +42,7 @@ export default async function RootLayout({
               <NavBar />
               <main id="main-content">{children}</main>
               <Footer />
+              <Toaster richColors position="top-right" />
             </Provider>
           </AccessibilityProvider>
         </LocaleProvider>

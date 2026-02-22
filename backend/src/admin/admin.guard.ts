@@ -4,15 +4,16 @@ import {
   ExecutionContext,
   ForbiddenException,
 } from '@nestjs/common';
-import { Request } from 'express';
 
 @Injectable()
 export class AdminGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest<Request>();
-    const userRole = request.headers['x-user-role'] as string;
+    const request = context
+      .switchToHttp()
+      .getRequest<{ user?: { role: string } }>();
+    const user = request.user;
 
-    if (userRole !== 'ADMIN') {
+    if (!user || user.role !== 'ADMIN') {
       throw new ForbiddenException('Accès réservé aux administrateurs');
     }
 

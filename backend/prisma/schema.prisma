@@ -46,6 +46,8 @@ model Shop {
   ownerId     String
   owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   items       Item[]
+
+  @@index([ownerId])
 }
 
 model Item {
@@ -72,6 +74,12 @@ model Item {
   owner            User           @relation(fields: [ownerId], references: [id])
   priceHistory     PriceHistory[]
   transaction      Transaction?
+
+  @@index([ownerId])
+  @@index([shopId])
+  @@index([categoryId])
+  @@index([validationStatus])
+  @@index([status, published])
 }
 
 model Image {
@@ -104,6 +112,10 @@ model Transaction {
   stripePaymentIntentId String?  @unique
   stripePaymentStatus   String?
   paymentMethod         String   @default("card")
+
+  @@index([buyerId])
+  @@index([sellerId])
+  @@index([status])
 }
 
 model Review {
@@ -117,6 +129,9 @@ model Review {
   author        User        @relation("ReviewAuthor", fields: [authorId], references: [id])
   target        User        @relation("ReviewTarget", fields: [targetId], references: [id])
   transaction   Transaction @relation(fields: [transactionId], references: [id])
+
+  @@index([targetId, createdAt])
+  @@index([authorId])
 }
 
 model Conversation {
@@ -138,6 +153,9 @@ model Message {
   sender         User         @relation(fields: [senderId], references: [id])
   flagged        Boolean      @default(false)
   moderationNote String?
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
 }
 
 model Notification {
@@ -148,6 +166,9 @@ model Notification {
   createdAt DateTime @default(now())
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
 }
 
 model PriceHistory {
@@ -156,6 +177,8 @@ model PriceHistory {
   recordedAt DateTime @default(now())
   itemId     String
   item       Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId, recordedAt])
 }
 
 model UserInterest {

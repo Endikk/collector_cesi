@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Star } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -31,7 +32,7 @@ export function ReviewDialog({ transactionId, otherPartyName, type }: ReviewDial
 
     const handleSubmit = async () => {
         if (rating === 0) {
-            alert("Veuillez sélectionner une note");
+            toast.warning("Veuillez sélectionner une note");
             return;
         }
 
@@ -42,7 +43,7 @@ export function ReviewDialog({ transactionId, otherPartyName, type }: ReviewDial
             setOpen(false);
             router.refresh();
         } else {
-            alert(result.message || "Erreur lors de la notation");
+            toast.error(result.message || "Erreur lors de la notation");
         }
         setSubmitting(false);
     };

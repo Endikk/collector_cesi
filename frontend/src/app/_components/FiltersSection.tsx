@@ -54,7 +54,9 @@ export function FiltersSection() {
             <CardContent className="space-y-4">
                 <div className="flex items-center gap-2">
                     <div className="relative flex-1">
+                        <label htmlFor="filter-min-price" className="sr-only">Prix minimum</label>
                         <Input
+                            id="filter-min-price"
                             type="number"
                             min="0"
                             placeholder="Min"
@@ -62,11 +64,13 @@ export function FiltersSection() {
                             onChange={(e) => setMinPrice(e.target.value)}
                             className="pl-8"
                         />
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">€</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" aria-hidden="true">€</span>
                     </div>
-                    <span className="text-muted-foreground">-</span>
+                    <span className="text-muted-foreground" aria-hidden="true">-</span>
                     <div className="relative flex-1">
+                        <label htmlFor="filter-max-price" className="sr-only">Prix maximum</label>
                         <Input
+                            id="filter-max-price"
                             type="number"
                             min="0"
                             placeholder="Max"
@@ -74,7 +78,7 @@ export function FiltersSection() {
                             onChange={(e) => setMaxPrice(e.target.value)}
                             className="pl-8"
                         />
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">€</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm" aria-hidden="true">€</span>
                     </div>
                 </div>
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { memo } from "react";
+import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,25 +22,24 @@ interface ProductCardProps {
     delay: number;
 }
 
-export function ProductCard({ item, delay }: ProductCardProps) {
+export const ProductCard = memo(function ProductCard({ item, delay }: ProductCardProps) {
     return (
         <BlurFade delay={delay} inView>
             <Card className="group relative overflow-hidden border-0 bg-white shadow-md transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/5">
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
                     {item.images.length > 0 ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
+                        <Image
                             src={item.images[0].url}
                             alt={item.title}
-                            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            className="object-cover transition-transform duration-500 group-hover:scale-110"
                         />
                     ) : (
                         <div className="flex h-full w-full items-center justify-center bg-secondary/50">
                             <Package className="h-12 w-12 text-muted-foreground/50" />
                         </div>
                     )}
-
-
 
                     <div className="absolute top-3 right-3">
                         <Badge className="bg-white/90 backdrop-blur text-foreground font-bold shadow-sm">
@@ -67,4 +68,4 @@ export function ProductCard({ item, delay }: ProductCardProps) {
             </Card>
         </BlurFade>
     );
-}
+});

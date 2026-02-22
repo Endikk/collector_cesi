@@ -3,6 +3,7 @@
 import { useState, useEffect, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -195,8 +196,13 @@ export function SellPage() {
 
                             {imageUrl && (
                                 <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={imageUrl} alt="Preview" className="h-full w-full object-cover" />
+                                    <Image
+                                        src={imageUrl}
+                                        alt="Aperçu de l'image"
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 672px"
+                                        className="object-cover"
+                                    />
                                 </div>
                             )}
 
