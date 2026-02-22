@@ -24,6 +24,15 @@ export interface CreateInterestData {
   categoryId?: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+}
+
+export async function getCategories(): Promise<Category[]> {
+  return fetchBackend<Category[]>('/items/categories');
+}
+
 export async function getUserInterests(): Promise<UserInterest[]> {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {

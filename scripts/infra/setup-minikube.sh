@@ -195,11 +195,6 @@ kubectl rollout status deployment/grafana -n collector --timeout=60s 2>/dev/null
 
 # ── Vérification finale : tous les pods doivent être Running ──
 step "Vérification finale — Santé du cluster"
-ALL_OK=true
-CRASH_PODS=""
-for pod_info in $(kubectl get pods -n collector --no-headers -o custom-columns="NAME:.metadata.name,STATUS:.status.phase,READY:.status.containerStatuses[0].ready" 2>/dev/null); do
-    : # parsed below
-done
 
 # Détection de pods en CrashLoopBackOff et restart automatique
 CRASH_PODS=$(kubectl get pods -n collector --no-headers 2>/dev/null | grep -E "CrashLoopBackOff|Error|ImagePullBackOff" | awk '{print $1}')

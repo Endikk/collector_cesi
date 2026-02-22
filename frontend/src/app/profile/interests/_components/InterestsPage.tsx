@@ -8,10 +8,11 @@ import {
   createInterest,
   updateInterest,
   deleteInterest,
+  getCategories,
   UserInterest,
   CreateInterestData,
+  Category,
 } from '@/app/actions/interests';
-import { fetchBackend } from '@/lib/backend-api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,11 +32,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import Link from 'next/link';
-
-interface Category {
-  id: string;
-  name: string;
-}
 
 export function InterestsPage() {
   const { data: session } = useSession();
@@ -69,7 +65,7 @@ export function InterestsPage() {
     try {
       const [interestsData, categoriesData] = await Promise.all([
         getUserInterests(),
-        fetchBackend<Category[]>('/items/categories'),
+        getCategories(),
       ]);
       setInterests(interestsData);
       setCategories(categoriesData);
