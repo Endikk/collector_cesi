@@ -193,6 +193,45 @@ echo "📊 Prometheus + Grafana..."
 kubectl rollout status deployment/prometheus -n collector --timeout=60s 2>/dev/null && ok "Prometheus prêt." || warn "Prometheus en cours."
 kubectl rollout status deployment/grafana -n collector --timeout=60s 2>/dev/null && ok "Grafana prêt." || warn "Grafana en cours."
 
+# ── Vérification finale : tous les pods doivent être Running ──
+step "Vérification finale — Santé du cluster"
+ALL_OK=true
+CRASH_PODS=""
+for pod_info in $(kubectl get pods -n collector --no-headers -o custom-columns="NAME:.metadata.name,STATUS:.status.phase,READY:.status.containerStatuses[0].ready" 2>/dev/null); do
+    : # parsed below
+done
+
+# Détection de pods en CrashLoopBackOff et restart automatique
+CRASH_PODS=$(kubectl get pods -n collector --no-headers 2>/dev/null | grep -E "CrashLoopBackOff|Error|ImagePullBackOff" | awk '{print $1}')
+if [ -n "$CRASH_PODS" ]; then
+    warn "Pods en erreur détectés, tentative de restart automatique..."
+    for pod in $CRASH_PODS; do
+        DEPLOY_NAME=$(echo "$pod" | sed 's/-[a-z0-9]*-[a-z0-9]*$//')
+        kubectl rollout restart deployment/"$DEPLOY_NAME" -n collector 2>/dev/null || true
+    done
+    echo "⏳ Attente 30s après restart..."
+    sleep 30
+fi
+
+# Compter les pods Running 1/1
+TOTAL_PODS=$(kubectl get pods -n collector --no-headers 2>/dev/null | wc -l | tr -d ' ')
+READY_PODS=$(kubectl get pods -n collector --no-headers 2>/dev/null | grep "1/1" | grep "Running" | wc -l | tr -d ' ')
+NOT_READY=$(kubectl get pods -n collector --no-headers 2>/dev/null | grep -v "1/1.*Running" || true)
+
+if [ "$READY_PODS" -ge 6 ]; then
+    ok "Tous les pods sont Running ($READY_PODS/$TOTAL_PODS) !"
+elif [ "$READY_PODS" -ge 4 ]; then
+    warn "$READY_PODS/$TOTAL_PODS pods prêts. Pods restants :"
+    echo "$NOT_READY"
+else
+    echo "${RED}⚠️  Seulement $READY_PODS/$TOTAL_PODS pods prêts. Vérifiez :${NC}"
+    echo "$NOT_READY"
+    echo ""
+    echo "${YELLOW}  Commandes de diagnostic :${NC}"
+    echo "    kubectl logs -n collector <pod-name>"
+    echo "    kubectl describe pod -n collector <pod-name>"
+fi
+
 # ── Résumé final ──
 TIMER_END=$(date +%s)
 DURATION=$((TIMER_END - TIMER_START))
@@ -200,20 +239,23 @@ MINUTES=$((DURATION / 60))
 SECONDS=$((DURATION % 60))
 
 echo ""
-echo "════════════════════════════════════════════════════════"
-echo "  ✅ Déploiement terminé en ${MINUTES}m${SECONDS}s !"
-echo "════════════════════════════════════════════════════════"
+if [ "$READY_PODS" -ge 6 ]; then
+    echo "════════════════════════════════════════════════════════"
+    echo "  ✅ Déploiement terminé en ${MINUTES}m${SECONDS}s !"
+    echo "════════════════════════════════════════════════════════"
+else
+    echo "════════════════════════════════════════════════════════"
+    echo "  ⚠️  Déploiement terminé en ${MINUTES}m${SECONDS}s (${READY_PODS}/6 pods prêts)"
+    echo "════════════════════════════════════════════════════════"
+fi
 echo ""
 
 # Tableau de bord
 echo "📊 ${BOLD}État du cluster :${NC}"
 echo ""
-kubectl get pods -n collector -o custom-columns=\
-"NOM:metadata.name,STATUS:status.phase,READY:status.containerStatuses[0].ready,RESTARTS:status.containerStatuses[0].restartCount,AGE:metadata.creationTimestamp" 2>/dev/null || kubectl get pods -n collector
+kubectl get pods -n collector -o wide 2>/dev/null || kubectl get pods -n collector
 echo ""
 kubectl get hpa -n collector 2>/dev/null
-echo ""
-kubectl get secrets -n collector 2>/dev/null
 echo ""
 
 echo "════════════════════════════════════════════════════════"
