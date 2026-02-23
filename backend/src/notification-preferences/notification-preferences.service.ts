@@ -1,6 +1,5 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
+import { CacheService } from '../cache';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface UpdatePreferencesDto {
@@ -16,9 +15,11 @@ export interface UpdatePreferencesDto {
 
 @Injectable()
 export class NotificationPreferencesService {
+  private readonly CACHE_TTL = 3600; // 1 hour in seconds
+
   constructor(
     private prisma: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private cacheService: CacheService,
   ) {}
 
   private getCacheKey(userId: string): string {
@@ -28,7 +29,7 @@ export class NotificationPreferencesService {
   async getPreferences(userId: string) {
     // Try to get from cache first
     const cacheKey = this.getCacheKey(userId);
-    const cached = await this.cacheManager.get(cacheKey);
+    const cached = await this.cacheService.get(cacheKey);
 
     if (cached) {
       console.log(`Cache HIT for user ${userId} preferences`);
@@ -49,7 +50,7 @@ export class NotificationPreferencesService {
     }
 
     // Cache for 1 hour
-    await this.cacheManager.set(cacheKey, prefs, 3600000);
+    await this.cacheService.set(cacheKey, prefs, this.CACHE_TTL);
 
     return prefs;
   }
@@ -67,7 +68,7 @@ export class NotificationPreferencesService {
 
     // Update cache
     const cacheKey = this.getCacheKey(userId);
-    await this.cacheManager.set(cacheKey, prefs, 3600000);
+    await this.cacheService.set(cacheKey, prefs, this.CACHE_TTL);
     console.log(`Cache UPDATED for user ${userId} preferences`);
 
     return prefs;
@@ -75,7 +76,7 @@ export class NotificationPreferencesService {
 
   async invalidateCache(userId: string) {
     const cacheKey = this.getCacheKey(userId);
-    await this.cacheManager.del(cacheKey);
+    await this.cacheService.del(cacheKey);
     console.log(`Cache INVALIDATED for user ${userId} preferences`);
   }
 }

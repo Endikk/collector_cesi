@@ -3,7 +3,7 @@
  * Usage: node stress-test.js
  */
 
-const TARGET_URL = 'https://localhost:4000'; // Adjust if needed
+const TARGET_URL = 'http://localhost:4000/health'; // Adjust if needed
 const CONCURRENT_USERS = 50;
 const TOTAL_REQUESTS = 500;
 

@@ -1,7 +1,6 @@
-import { Module } from '@nestjs/common';
-import { BullModule } from '@nestjs/bull';
-import { CacheModule } from '@nestjs/cache-manager';
-import { redisStore } from 'cache-manager-ioredis-yet';
+import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
+import { BullModule } from '@nestjs/bullmq';
+import { RedisCacheModule } from './cache';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 
@@ -30,6 +29,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PrometheusConfigModule } from './common/prometheus.module';
 import { HealthController } from './health.controller';
 import { AuthModule } from './auth/auth.module';
+import { LoggingModule, CorrelationIdMiddleware } from './logging';
 
 @Module({
   imports: [
@@ -38,6 +38,7 @@ import { AuthModule } from './auth/auth.module';
       envFilePath: ['../.env', '.env'],
     }),
     PrometheusConfigModule,
+    LoggingModule, // Centralized logging with Loki support
     EventBusModule, // Global event bus for modular architecture
     ThrottlerModule.forRoot([
       {
@@ -46,24 +47,12 @@ import { AuthModule } from './auth/auth.module';
       },
     ]),
     BullModule.forRoot({
-      redis: {
+      connection: {
         host: process.env.REDIS_HOST || 'localhost',
         port: parseInt(process.env.REDIS_PORT || '6379'),
       },
     }),
-    CacheModule.registerAsync({
-      isGlobal: true,
-      useFactory: async () => {
-        const store = await redisStore({
-          host: process.env.REDIS_HOST || 'redis',
-          port: parseInt(process.env.REDIS_PORT || '6379', 10),
-        });
-        return {
-          store,
-          ttl: 3600 * 1000, // 1 hour in milliseconds
-        };
-      },
-    }),
+    RedisCacheModule, // Direct ioredis cache (replaces deprecated cache-manager)
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -96,4 +85,13 @@ import { AuthModule } from './auth/auth.module';
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  /**
+   * Configure le middleware de correlation ID pour toutes les routes
+   */
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(CorrelationIdMiddleware)
+      .forRoutes({ path: '*splat', method: RequestMethod.ALL });
+  }
+}

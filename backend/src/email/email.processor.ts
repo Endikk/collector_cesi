@@ -1,5 +1,5 @@
-import { Processor, Process } from '@nestjs/bull';
-import type { Job } from 'bull';
+import { Processor, WorkerHost } from '@nestjs/bullmq';
+import { Job } from 'bullmq';
 import { EmailService } from '../email/email.service';
 
 export interface SendEmailJob {
@@ -24,12 +24,36 @@ export interface SendMatchingInterestEmailJob {
   matchReason: string;
 }
 
-@Processor('email')
-export class EmailProcessor {
-  constructor(private emailService: EmailService) {}
+export type EmailJobData =
+  | SendEmailJob
+  | SendNewItemEmailJob
+  | SendMatchingInterestEmailJob;
 
-  @Process('send-email')
-  async handleSendEmail(job: Job<SendEmailJob>) {
+@Processor('email')
+export class EmailProcessor extends WorkerHost {
+  constructor(private emailService: EmailService) {
+    super();
+  }
+
+  async process(job: Job<EmailJobData>): Promise<void> {
+    switch (job.name) {
+      case 'send-email':
+        await this.handleSendEmail(job as Job<SendEmailJob>);
+        break;
+      case 'send-new-item':
+        await this.handleNewItemEmail(job as Job<SendNewItemEmailJob>);
+        break;
+      case 'send-matching-interest':
+        await this.handleMatchingInterestEmail(
+          job as Job<SendMatchingInterestEmailJob>,
+        );
+        break;
+      default:
+        console.warn(`Unknown job name: ${job.name}`);
+    }
+  }
+
+  private async handleSendEmail(job: Job<SendEmailJob>): Promise<void> {
     const { to, subject, html, text } = job.data;
     console.log(`Processing email to ${to}: ${subject}`);
 
@@ -42,8 +66,9 @@ export class EmailProcessor {
     }
   }
 
-  @Process('send-new-item')
-  async handleNewItemEmail(job: Job<SendNewItemEmailJob>) {
+  private async handleNewItemEmail(
+    job: Job<SendNewItemEmailJob>,
+  ): Promise<void> {
     const { userEmail, userName, itemTitle, itemUrl } = job.data;
     console.log(`Processing new item email to ${userEmail}`);
 
@@ -61,8 +86,9 @@ export class EmailProcessor {
     }
   }
 
-  @Process('send-matching-interest')
-  async handleMatchingInterestEmail(job: Job<SendMatchingInterestEmailJob>) {
+  private async handleMatchingInterestEmail(
+    job: Job<SendMatchingInterestEmailJob>,
+  ): Promise<void> {
     const { userEmail, userName, itemTitle, itemUrl, matchReason } = job.data;
     console.log(`Processing matching interest email to ${userEmail}`);
 

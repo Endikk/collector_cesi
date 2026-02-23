@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { PrismaService } from '../prisma/prisma.service';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { CacheService } from '../cache';
 
 describe('NotificationPreferencesService', () => {
   let service: NotificationPreferencesService;
@@ -27,7 +27,7 @@ describe('NotificationPreferencesService', () => {
       providers: [
         NotificationPreferencesService,
         { provide: PrismaService, useValue: prisma },
-        { provide: CACHE_MANAGER, useValue: cache },
+        { provide: CacheService, useValue: cache },
       ],
     }).compile();
 
@@ -56,7 +56,7 @@ describe('NotificationPreferencesService', () => {
       expect(cache.set).toHaveBeenCalledWith(
         'notification-prefs:u1',
         prefs,
-        3600000,
+        3600, // TTL in seconds (not milliseconds)
       );
     });
 
@@ -85,7 +85,7 @@ describe('NotificationPreferencesService', () => {
       expect(cache.set).toHaveBeenCalledWith(
         'notification-prefs:u1',
         updated,
-        3600000,
+        3600, // TTL in seconds (not milliseconds)
       );
     });
   });

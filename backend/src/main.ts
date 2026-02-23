@@ -2,11 +2,12 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
 import { SanitizeInterceptor } from './common/sanitize.interceptor';
-import { ValidationPipe } from '@nestjs/common';
+import { ZodValidationPipe } from './common/zod-validation.pipe';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { JsonLoggerService } from './common/json-logger.service';
+import { LoggerService } from './logging';
 
 async function bootstrap() {
   const httpsOptions =
@@ -21,9 +22,13 @@ async function bootstrap() {
         }
       : undefined;
 
+  // Initialisation du logger centralisé
+  const logger = new LoggerService();
+  logger.setContext('Bootstrap');
+
   const app = await NestFactory.create(AppModule, {
     httpsOptions,
-    logger: new JsonLoggerService(),
+    logger,
   });
 
   // 🔒 Security: Helmet - Secure HTTP headers
@@ -82,29 +87,76 @@ async function bootstrap() {
   // 🔒 Security: Sanitize all responses (remove passwords, tokens, etc.)
   app.useGlobalInterceptors(new SanitizeInterceptor());
 
-  // ✅ Validation: Validate all DTOs
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true, // Strip non-whitelisted properties
-      forbidNonWhitelisted: true, // Throw error if non-whitelisted
-      transform: true, // Auto-transform to DTO instances
-      transformOptions: {
-        enableImplicitConversion: true,
+  // ✅ Validation: Zod schema validation for all DTOs
+  app.useGlobalPipes(new ZodValidationPipe());
+
+  // 📚 API Documentation: Swagger/OpenAPI
+  const swaggerConfig = new DocumentBuilder()
+    .setTitle('Collector API')
+    .setDescription(
+      `API de la marketplace Collector - Vente d'objets de collection entre particuliers.
+
+## Authentification
+L'API utilise JWT Bearer tokens. Obtenez un token via \`/auth/login\` puis ajoutez-le dans le header Authorization.
+
+## Rate Limiting
+- 10 requêtes par minute par IP (global)
+- Certains endpoints ont des limites spécifiques
+
+## Codes d'erreur
+- 400: Bad Request - Données invalides
+- 401: Unauthorized - Token manquant ou invalide
+- 403: Forbidden - Accès refusé
+- 404: Not Found - Ressource introuvable
+- 429: Too Many Requests - Rate limit atteint`,
+    )
+    .setVersion('1.0')
+    .setContact(
+      'Collector Team',
+      'https://collector.shop',
+      'support@collector.shop',
+    )
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Entrez votre JWT token',
       },
-    }),
-  );
+      'JWT-auth',
+    )
+    .addTag('auth', 'Authentification et gestion des sessions')
+    .addTag('users', 'Gestion des utilisateurs')
+    .addTag('items', 'Gestion des articles')
+    .addTag('shops', 'Gestion des boutiques')
+    .addTag('payments', 'Paiements Stripe')
+    .addTag('notifications', 'Notifications utilisateur')
+    .addTag('admin', 'Administration')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, swaggerConfig);
+  SwaggerModule.setup('api/docs', app, document, {
+    swaggerOptions: {
+      persistAuthorization: true,
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+    },
+    customSiteTitle: 'Collector API Documentation',
+  });
 
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
 
   const protocol = httpsOptions ? 'https' : 'http';
-  console.log(`🚀 Backend running on ${protocol}://0.0.0.0:${port}`);
-  console.log(`🔒 Security: HTTPS ${httpsOptions ? 'ENABLED' : 'DISABLED'}`);
-  console.log(`🔒 Security: Helmet enabled`);
-  console.log(
-    `🔒 Security: CORS ${isProduction ? 'STRICT' : 'PERMISSIVE'} (${isProduction ? process.env.FRONTEND_URL : '*'})`,
+  logger.log(`Backend running on ${protocol}://0.0.0.0:${port}`);
+  logger.log(`Security: HTTPS ${httpsOptions ? 'ENABLED' : 'DISABLED'}`);
+  logger.log('Security: Helmet enabled');
+  logger.log(
+    `Security: CORS ${isProduction ? 'STRICT' : 'PERMISSIVE'} (${isProduction ? process.env.FRONTEND_URL : '*'})`,
   );
-  console.log(`🔒 Security: Response sanitization enabled`);
-  console.log(`✅ Validation: Global DTO validation enabled`);
+  logger.log('Security: Response sanitization enabled');
+  logger.log('Validation: Zod schema validation enabled');
+  logger.log('Logging: Centralized logging with Loki support enabled');
+  logger.log(`API Documentation: Swagger available at ${protocol}://0.0.0.0:${port}/api/docs`);
 }
 void bootstrap();

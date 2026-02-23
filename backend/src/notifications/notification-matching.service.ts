@@ -1,9 +1,8 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { InjectQueue } from '@nestjs/bull';
-import type { Queue } from 'bull';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import type { Cache } from 'cache-manager';
+import { Injectable } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import type { NotificationPreferences } from '@prisma/client';
+import { CacheService } from '../cache';
 import { PrismaService } from '../prisma/prisma.service';
 
 export interface MatchResult {
@@ -15,10 +14,12 @@ export interface MatchResult {
 
 @Injectable()
 export class NotificationMatchingService {
+  private readonly CACHE_TTL = 3600; // 1 hour in seconds
+
   constructor(
     private prisma: PrismaService,
     @InjectQueue('email') private emailQueue: Queue,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private cacheService: CacheService,
   ) {}
 
   /**
@@ -180,7 +181,7 @@ export class NotificationMatchingService {
   ): Promise<void> {
     // Try to get user preferences from cache first
     const cacheKey = `notification-prefs:${userId}`;
-    let prefs = await this.cacheManager.get<NotificationPreferences>(cacheKey);
+    let prefs = await this.cacheService.get<NotificationPreferences>(cacheKey);
 
     if (!prefs) {
       // Get or create user preferences from database
@@ -198,7 +199,7 @@ export class NotificationMatchingService {
       }
 
       // Cache for 1 hour
-      await this.cacheManager.set(cacheKey, prefs, 3600000);
+      await this.cacheService.set(cacheKey, prefs, this.CACHE_TTL);
     }
 
     const notificationType = isInterestMatch ? 'MATCHING_INTEREST' : 'NEW_ITEM';
