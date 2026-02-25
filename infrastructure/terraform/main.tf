@@ -46,7 +46,7 @@ resource "google_container_cluster" "collector" {
   # Protection contre la suppression accidentelle en production
   deletion_protection = var.environment == "production"
 
-  labels = {
+  resource_labels = {
     environment = var.environment
     managed-by  = "terraform"
   }
