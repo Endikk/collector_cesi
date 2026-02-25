@@ -90,17 +90,11 @@ jobs:
       - name: 🧬 Prisma Generate
         run: npx -y prisma generate --schema=backend/prisma/schema.prisma
 
-      # Cache ESLint : évite de relancer le type-checker TypeScript sur les
-      # fichiers inchangés (recommendedTypeChecked est le principal goulot).
-      - name: 💾 Restore ESLint Cache
-        uses: actions/cache@v4
-        with:
-          path: backend/.eslintcache
-          key: eslint-backend-${{ runner.os }}-${{ hashFiles('backend/src/**/*.ts', 'backend/test/**/*.ts', 'backend/eslint.config.mjs', 'backend/tsconfig.json') }}
-          restore-keys: |
-            eslint-backend-${{ runner.os }}-
-
-      - name: 🎨 Backend Lint
+      # lint:ci = tsc --noEmit (1.7s) + prettier --check (2s)
+      # ESLint avec recommendedTypeChecked prend 3+ minutes en CI
+      # car il recharge le compilateur TypeScript complet sur chaque fichier.
+      # tsc --noEmit couvre les mêmes erreurs de types, plus vite.
+      - name: 🎨 Type Check + Format (lint:ci)
         working-directory: ./backend
         run: npm run lint:ci
 
