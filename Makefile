@@ -1,5 +1,5 @@
 .PHONY: run dev reset stop ports logs help \
-        _minikube _terraform _images _db-reset _forward
+        _minikube _terraform _images _db-reset _forward _kill-ports
 
 # =============================================================================
 #  Collector — Commandes de développement local
@@ -8,7 +8,7 @@
 #  make dev    → Mode continu avec hot-reload backend (.ts)
 #  make reset  → Reset DB + redéploiement + port-forward
 #  make ports  → (Re)ouvre les port-forwards si fermés
-#  make stop   → Ferme les ports + supprime K8s + arrête Minikube
+#  make stop   → Libère les ports + supprime namespace K8s + arrête Minikube
 #  make logs   → Logs en temps réel du namespace collector
 # =============================================================================
 
@@ -33,7 +33,7 @@ run: _minikube _terraform _images
 	skaffold run --cache-artifacts=false
 	@$(MAKE) --no-print-directory _forward
 
-dev: _minikube _terraform _images
+dev: _minikube _terraform _images _kill-ports
 	skaffold dev -p dev --cache-artifacts=false
 
 reset: _minikube _terraform _images _db-reset
@@ -43,9 +43,7 @@ reset: _minikube _terraform _images _db-reset
 ## (Re)ouvre les port-forwards sans redéployer
 ports: _forward
 
-stop:
-	@echo "── Fermeture des port-forwards ──"
-	@pkill -f "kubectl port-forward svc/.*collector" 2>/dev/null || true
+stop: _kill-ports
 	@echo "── Suppression des ressources K8s ──"
 	-kubectl delete namespace collector --ignore-not-found
 	@echo "── Arrêt de Minikube ──"
@@ -95,15 +93,19 @@ _images:
 		fi; \
 	done
 
-# 4. Port-forward en arrière-plan (persistant après make run)
-#    - Tue d'abord tout ce qui occupe les ports cibles (autres projets inclus)
-#    - Lance kubectl port-forward avec nohup → survive à la fermeture du terminal
-_forward:
-	@echo ""; echo "── Port-forward (background) ──"
+# 4a. Tuer les processus occupant les ports cibles (kubectl port-forward + autres)
+_kill-ports:
+	@echo "── Libération des ports $(PORTS) ──"
+	@pkill -f "kubectl port-forward.*collector" 2>/dev/null || true
 	@for port in $(PORTS); do \
 		lsof -ti :$$port 2>/dev/null | xargs kill -9 2>/dev/null || true; \
 	done
 	@sleep 1
+
+# 4b. Port-forward en arrière-plan (persistant après make run)
+#     Lance kubectl port-forward avec nohup → survive à la fermeture du terminal
+_forward: _kill-ports
+	@echo ""; echo "── Port-forward (background) ──"
 	@nohup kubectl port-forward svc/frontend   -n collector 3000:3000 > /dev/null 2>&1 &
 	@nohup kubectl port-forward svc/backend    -n collector 4000:4000 > /dev/null 2>&1 &
 	@nohup kubectl port-forward svc/grafana    -n collector 3002:3002 > /dev/null 2>&1 &

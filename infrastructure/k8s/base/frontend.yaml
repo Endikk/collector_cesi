@@ -50,9 +50,14 @@ spec:
             - name: BACKEND_URL
               value: "http://backend:4000"
             - name: NEXT_PUBLIC_BACKEND_URL
-              value: "https://localhost:4000"
+              value: "http://localhost:4000"
             - name: NEXTAUTH_URL
-              value: "https://localhost:3000"
+              value: "http://localhost:3000"
+            # --- Redis (pub/sub pour le chat SSE et les notifications) ---
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: "6379"
           startupProbe:
             httpGet:
               path: /
