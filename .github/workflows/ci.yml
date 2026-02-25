@@ -23,7 +23,7 @@ concurrency:
 jobs:
   # ==================================================================
   # BACKEND QUALITY GATE
-  # Lint + Unit Tests + Build
+  # Lint (avec cache ESLint) + Unit Tests + E2E + Build
   # ==================================================================
   backend-quality:
     name: 🛡️ Backend — Lint, Tests, Build
@@ -90,16 +90,26 @@ jobs:
       - name: 🧬 Prisma Generate
         run: npx -y prisma generate --schema=backend/prisma/schema.prisma
 
-      - name: 🗄️ Apply Migrations (Test DB)
-        run: npx -y prisma migrate deploy --schema=backend/prisma/schema.prisma
+      # Cache ESLint : évite de relancer le type-checker TypeScript sur les
+      # fichiers inchangés (recommendedTypeChecked est le principal goulot).
+      - name: 💾 Restore ESLint Cache
+        uses: actions/cache@v4
+        with:
+          path: backend/.eslintcache
+          key: eslint-backend-${{ runner.os }}-${{ hashFiles('backend/src/**/*.ts', 'backend/test/**/*.ts', 'backend/eslint.config.mjs', 'backend/tsconfig.json') }}
+          restore-keys: |
+            eslint-backend-${{ runner.os }}-
 
       - name: 🎨 Backend Lint
         working-directory: ./backend
-        run: npm run lint
+        run: npm run lint:ci
+
+      - name: 🗄️ Apply Migrations (Test DB)
+        run: npx -y prisma migrate deploy --schema=backend/prisma/schema.prisma
 
       - name: 🧪 Backend Unit Tests
         working-directory: ./backend
-        run: npm run test -- --ci --coverage --forceExit
+        run: npm run test -- --ci --coverage --forceExit --maxWorkers=2
 
       - name: 🧪 Backend E2E Tests
         working-directory: ./backend
@@ -254,29 +264,48 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
   # ==================================================================
-  # DEPLOY SIMULATION
-  # Simule le déploiement (Terraform + K8s)
+  # DEPLOY SIMULATION — GCP / GKE
+  #
+  # Simule le déploiement vers Google Cloud Platform :
+  #   - Valide les manifests K8s (kustomize + dry-run)
+  #   - Valide la configuration Terraform (GKE)
+  #   - Affiche les commandes gcloud / kubectl du vrai déploiement
+  #
+  # Secrets requis en production :
+  #   GCP_PROJECT_ID       → ID du projet GCP
+  #   GCP_REGION           → Région (ex: europe-west1)
+  #   GCP_CLUSTER_NAME     → Nom du cluster GKE
+  #   GOOGLE_CREDENTIALS   → Service account JSON (base64)
   # ==================================================================
   deploy-simulation:
-    name: 🚀 Deploy Simulation
+    name: 🚀 Deploy Simulation — GCP
     runs-on: ubuntu-latest
     needs: [security-and-build, dependency-audit]
     if: github.event_name == 'push'
     environment:
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'recette' }}
       url: ${{ github.ref == 'refs/heads/main' && 'https://collector.app' || 'https://recette.collector.app' }}
+
+    env:
+      GCP_PROJECT_ID:   ${{ vars.GCP_PROJECT_ID   || 'collector-prod' }}
+      GCP_REGION:       ${{ vars.GCP_REGION        || 'europe-west1' }}
+      GCP_CLUSTER_NAME: ${{ vars.GCP_CLUSTER_NAME  || 'collector-cluster' }}
+
     steps:
       - name: ⬇️ Checkout
         uses: actions/checkout@v4
 
+      # ── kubectl ──────────────────────────────────────────────────
       - name: 🔧 Install kubectl
         uses: azure/setup-kubectl@v4
         with:
           version: 'v1.29.0'
 
+      # ── Kustomize ────────────────────────────────────────────────
       - name: 🔧 Install Kustomize
         uses: imranismail/setup-kustomize@v2
 
+      # ── Validation K8s ───────────────────────────────────────────
       - name: ✅ Validate Kubernetes Manifests
         run: |
           echo "════════════════════════════════════════"
@@ -284,85 +313,117 @@ jobs:
           echo "════════════════════════════════════════"
           echo ""
 
-          # Étape 1 : Kustomize build (vérifie la syntaxe et les refs)
           echo "1. kustomize build infrastructure/k8s/base/"
           kustomize build infrastructure/k8s/base/ > /tmp/k8s-manifests.yaml
           echo "   ✅ Kustomize build réussi"
           echo ""
 
-          # Étape 2 : kubectl dry-run (validation structurelle)
           echo "2. kubectl apply --dry-run=client"
           kubectl apply --dry-run=client -f /tmp/k8s-manifests.yaml
           echo "   ✅ Dry-run validé — les manifests sont conformes"
           echo ""
 
-          # Étape 3 : Vérification des Secrets (pas de valeurs en dur dans les Deployments)
           echo "3. Vérification de l'utilisation des K8s Secrets..."
           if grep -q 'secretKeyRef' infrastructure/k8s/base/backend.yaml && \
              grep -q 'secretKeyRef' infrastructure/k8s/base/frontend.yaml && \
              grep -q 'secretKeyRef' infrastructure/k8s/base/postgres.yaml; then
             echo "   ✅ Tous les secrets sont référencés via secretKeyRef"
           else
-            echo "   ⚠️ Certains manifests n'utilisent pas secretKeyRef"
+            echo "   ⚠️  Certains manifests n'utilisent pas secretKeyRef"
           fi
           echo ""
 
-          # Étape 4 : Compter les ressources
           echo "4. Ressources K8s générées :"
-          echo "   Deployments : $(grep -c 'kind: Deployment' /tmp/k8s-manifests.yaml)"
-          echo "   StatefulSets: $(grep -c 'kind: StatefulSet' /tmp/k8s-manifests.yaml)"
-          echo "   Services    : $(grep -c 'kind: Service' /tmp/k8s-manifests.yaml)"
-          echo "   Secrets     : $(grep -c 'kind: Secret' /tmp/k8s-manifests.yaml)"
-          echo "   HPA         : $(grep -c 'kind: HorizontalPodAutoscaler' /tmp/k8s-manifests.yaml)"
-          echo "   Ingress     : $(grep -c 'kind: Ingress' /tmp/k8s-manifests.yaml)"
+          echo "   Deployments : $(grep -c 'kind: Deployment'               /tmp/k8s-manifests.yaml)"
+          echo "   StatefulSets: $(grep -c 'kind: StatefulSet'              /tmp/k8s-manifests.yaml)"
+          echo "   Services    : $(grep -c 'kind: Service'                  /tmp/k8s-manifests.yaml)"
+          echo "   Secrets     : $(grep -c 'kind: Secret'                   /tmp/k8s-manifests.yaml)"
+          echo "   HPA         : $(grep -c 'kind: HorizontalPodAutoscaler'  /tmp/k8s-manifests.yaml)"
+          echo "   Ingress     : $(grep -c 'kind: Ingress'                  /tmp/k8s-manifests.yaml)"
           echo ""
 
+      # ── Terraform (GKE) ──────────────────────────────────────────
       - name: 🔧 Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
 
-      - name: ✅ Terraform Init & Validate
+      - name: ✅ Terraform Init & Validate (GKE)
         working-directory: ./infrastructure/terraform
         run: |
+          echo "════════════════════════════════════════"
+          echo "  🏗️  VALIDATION TERRAFORM — GKE"
+          echo "════════════════════════════════════════"
           terraform init -backend=false
           terraform validate
-          echo "✅ Configuration Terraform valide"
+          echo "✅ Configuration Terraform GKE valide"
 
-      - name: 🚚 Deploy Summary
+      # ── Simulation déploiement GCP ────────────────────────────────
+      - name: 🚀 GCP Deploy Simulation
         run: |
           ENV_NAME="${{ github.ref == 'refs/heads/main' && 'Production' || 'Recette' }}"
           echo ""
           echo "════════════════════════════════════════"
-          echo "  🚀 RÉSUMÉ DU DÉPLOIEMENT"
+          echo "  🚀 SIMULATION DÉPLOIEMENT GCP"
           echo "  Environnement : $ENV_NAME"
+          echo "  Projet        : $GCP_PROJECT_ID"
+          echo "  Région        : $GCP_REGION"
+          echo "  Cluster GKE   : $GCP_CLUSTER_NAME"
           echo "════════════════════════════════════════"
           echo ""
-          echo "Manifests K8s   : ✅ Validés (kustomize + dry-run)"
-          echo "Terraform       : ✅ Validé (init + validate)"
-          echo "Images Docker   : ✅ Build + scan Trivy OK (job précédent)"
+          echo "── Étape 1 : Authentification GCP ──────────────────────"
+          echo "  gcloud auth activate-service-account \\"
+          echo "    --key-file=\$GOOGLE_CREDENTIALS"
           echo ""
-          echo "Commandes de déploiement réel :"
-          echo "  1. terraform apply -auto-approve"
-          echo "  2. kubectl apply -k infrastructure/k8s/base"
-          echo "  3. kubectl rollout status deployment/backend -n collector"
-          echo "  4. kubectl rollout status deployment/frontend -n collector"
+          echo "── Étape 2 : Provisionnement GKE (Terraform) ───────────"
+          echo "  terraform -chdir=infrastructure/terraform apply \\"
+          echo "    -auto-approve \\"
+          echo "    -var=\"project_id=\$GCP_PROJECT_ID\" \\"
+          echo "    -var=\"region=\$GCP_REGION\" \\"
+          echo "    -var=\"cluster_name=\$GCP_CLUSTER_NAME\""
           echo ""
-          echo "✅ Pipeline $ENV_NAME terminé avec succès !"
+          echo "── Étape 3 : Configuration kubectl → GKE ───────────────"
+          echo "  gcloud container clusters get-credentials \$GCP_CLUSTER_NAME \\"
+          echo "    --region \$GCP_REGION \\"
+          echo "    --project \$GCP_PROJECT_ID"
+          echo ""
+          echo "── Étape 4 : Push images → Artifact Registry ───────────"
+          echo "  docker tag collector-backend:latest \\"
+          echo "    europe-west1-docker.pkg.dev/\$GCP_PROJECT_ID/collector/backend:\${{ github.sha }}"
+          echo "  docker push europe-west1-docker.pkg.dev/\$GCP_PROJECT_ID/collector/backend:\${{ github.sha }}"
+          echo ""
+          echo "  docker tag collector-frontend:latest \\"
+          echo "    europe-west1-docker.pkg.dev/\$GCP_PROJECT_ID/collector/frontend:\${{ github.sha }}"
+          echo "  docker push europe-west1-docker.pkg.dev/\$GCP_PROJECT_ID/collector/frontend:\${{ github.sha }}"
+          echo ""
+          echo "── Étape 5 : Déploiement K8s ───────────────────────────"
+          echo "  kubectl apply -k infrastructure/k8s/base"
+          echo "  kubectl rollout status deployment/backend  -n collector"
+          echo "  kubectl rollout status deployment/frontend -n collector"
+          echo ""
+          echo "✅ Simulation $ENV_NAME complète !"
 
       - name: 📋 GitHub Step Summary
         if: always()
         run: |
           ENV_NAME="${{ github.ref == 'refs/heads/main' && 'Production' || 'Recette' }}"
           {
-            echo "## 🚀 Deploy Simulation — $ENV_NAME"
+            echo "## 🚀 Deploy Simulation GCP — $ENV_NAME"
             echo ""
             echo "| Check | Statut |"
             echo "|-------|--------|"
             echo "| Kubernetes Manifests (kustomize + dry-run) | ✅ |"
-            echo "| Terraform (init + validate) | ✅ |"
+            echo "| Terraform GKE (init + validate) | ✅ |"
             echo "| Docker Images (backend + frontend) | ✅ |"
             echo "| Security Scan (Trivy) | ✅ |"
+            echo ""
+            echo "### Cible GCP"
+            echo "| Paramètre | Valeur |"
+            echo "|-----------|--------|"
+            echo "| Projet | \`$GCP_PROJECT_ID\` |"
+            echo "| Région | \`$GCP_REGION\` |"
+            echo "| Cluster GKE | \`$GCP_CLUSTER_NAME\` |"
+            echo "| Artifact Registry | \`$GCP_REGION-docker.pkg.dev/$GCP_PROJECT_ID/collector\` |"
             echo ""
             echo "> Commit : \`${{ github.sha }}\` — Branche : \`${{ github.ref_name }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

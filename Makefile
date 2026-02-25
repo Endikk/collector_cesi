@@ -1,8 +1,8 @@
 .PHONY: run dev reset stop ports logs help \
-        _minikube _terraform _images _db-reset _forward _kill-ports
+        _minikube _namespace _images _db-reset _forward _kill-ports
 
 # =============================================================================
-#  Collector — Commandes de développement local
+#  Collector — Commandes de développement local (Minikube)
 #
 #  make run    → Build + deploy complet sur Minikube + port-forward
 #  make dev    → Mode continu avec hot-reload backend (.ts)
@@ -10,6 +10,9 @@
 #  make ports  → (Re)ouvre les port-forwards si fermés
 #  make stop   → Libère les ports + supprime namespace K8s + arrête Minikube
 #  make logs   → Logs en temps réel du namespace collector
+#
+#  Note : Terraform cible GCP (CI/CD production).
+#         Le namespace local est créé directement via kubectl.
 # =============================================================================
 
 # Ports exposés localement
@@ -29,14 +32,14 @@ IMAGES := \
 # Commandes publiques
 # -----------------------------------------------------------------------------
 
-run: _minikube _terraform _images
+run: _minikube _namespace _images
 	skaffold run --cache-artifacts=false
 	@$(MAKE) --no-print-directory _forward
 
-dev: _minikube _terraform _images _kill-ports
+dev: _minikube _namespace _images _kill-ports
 	skaffold dev -p dev --cache-artifacts=false
 
-reset: _minikube _terraform _images _db-reset
+reset: _minikube _namespace _images _db-reset
 	skaffold run --cache-artifacts=false
 	@$(MAKE) --no-print-directory _forward
 
@@ -68,13 +71,12 @@ help:
 _minikube:
 	@bash scripts/infra/init-minikube.sh
 
-# 2. Provisionner le namespace via Terraform
-_terraform:
-	@echo ""; echo "── Terraform — namespace collector ──"
-	@cd infrastructure/terraform && \
-		terraform init -input=false -upgrade > /dev/null 2>&1 && \
-		terraform apply -auto-approve > /dev/null 2>&1
-	@echo "✅ Namespace 'collector' provisionné."
+# 2. Créer le namespace collector dans Minikube (idempotent)
+#    Le Terraform cible GCP (prod) — en local on passe par kubectl directement.
+_namespace:
+	@echo ""; echo "── Namespace K8s ──"
+	@kubectl create namespace collector --dry-run=client -o yaml | kubectl apply -f - > /dev/null 2>&1
+	@echo "✅ Namespace 'collector' prêt."
 
 # 3. Charger les images dans Minikube
 #    Stratégie : docker pull sur le daemon HOST (peut être authentifié)
