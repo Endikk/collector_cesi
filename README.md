@@ -1,108 +1,205 @@
-# 📦 Projet Collector
+# Collector.shop
 
-Bienvenue sur le dépôt officiel du projet **Collector**. 
-Ce projet a été réalisé dans le cadre de la validation du bloc de compétences **"Superviser et assurer le développement des applications logicielles"**.
+Une plateforme marketplace moderne et sécurisée pour les collectionneurs.
 
-Il démontre la mise en œuvre d'une architecture moderne, sécurisée et industrialisée (DevSecOps).
+![CI Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Security](https://img.shields.io/badge/security-impeccable-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Version](https://img.shields.io/badge/version-1.0.0-orange)
 
----
+## 📋 Table des Matières
 
-## 📑 Documents de Référence
-
-*   **[Rapport Complet (PROJECT_REPORT.md)](./PROJECT_REPORT.md)** : Documentation détaillée du processus qualité, sécurité et architecture. **Document principal pour l'évaluation.**
-*   **[Backlog (BACKLOG.md)](./BACKLOG.md)** : Suivi des User Stories et fonctionnalités.
-*   **[Présentation (PRESENTATION_SUPPORT.md)](./PRESENTATION_SUPPORT.md)** : Support pour la soutenance orale (Script & Schémas).
-*   **[Guide Contribution (app/CONTRIBUTING.md)](./app/CONTRIBUTING.md)** : Guide pour l'accueil des développeurs.
-
----
-
-## 🛠️ Architecture Technique (T3 Stack)
-
-Le POC est construit sur une stack robuste et typée :
-
-*   **Framework** : [Next.js 14](https://nextjs.org/) (App Router, Server Components)
-*   **Langage** : TypeScript
-*   **Base de Données** : Prisma ORM (SQLite en dev / Postgres compatible prod)
-*   **UI/UX** : Tailwind CSS + Shadcn UI + Magic UI (Animations)
-*   **Sécurité** : NextAuth.js + Validation Zod + Logs JSON
-*   **DevOps** : Docker + GitHub Actions (CI/CD)
+1. [À propos du projet](#à-propos-du-projet)
+2. [Stack Technique](#stack-technique)
+3. [Prérequis](#prérequis)
+4. [Démarrage Rapide (Docker)](#démarrage-rapide-docker)
+5. [Déploiement Kubernetes (Minikube)](#déploiement-kubernetes-minikube)
+6. [Développement Local](#développement-local)
+7. [Tests & Qualité](#tests--qualité)
+8. [Documentation](#documentation)
+9. [Licence](#licence)
 
 ---
 
-## 🚀 Guide de Démarrage
+## À propos du projet
 
-### 1. Installation
+Collector.shop est une marketplace full-stack permettant l'achat et la vente sécurisés d'objets de collection. Elle repose sur une architecture modulaire, une communication événementielle et une couche de sécurité avancée (Shift Left Security).
 
+**Fonctionnalités Clés :**
+*   Boutiques multi-vendeurs
+*   Détection de fraude en temps réel
+*   Paiements sécurisés via Stripe
+*   Validation automatique des articles
+*   Architecture orientée événements (Event Bus)
+
+---
+
+## Stack Technique
+
+Le projet s'appuie sur une stack moderne et robuste :
+
+| Composant | Technologies |
+| :--- | :--- |
+| **Frontend** | Next.js 16, TypeScript, Tailwind CSS, Shadcn UI, NextAuth.js |
+| **Backend** | NestJS 10, TypeScript, Prisma ORM, Event Bus |
+| **Base de Données** | PostgreSQL 16, Redis 7 |
+| **Infrastructure** | Docker, Kubernetes, NGINX Ingress |
+| **DevOps** | GitHub Actions, Trivy, ESLint, Jest, Playwright |
+
+---
+
+## Prérequis
+
+Assurez-vous d'avoir installé :
+
+*   **Docker** & **Docker Compose**
+*   **Node.js** (v20+) & **npm** (pour le dev local)
+*   **Minikube** (optionnel, pour déploiement K8s)
+
+### 🔑 Variables d'Environnement
+Le projet utilise un fichier `.env` centralisé à la racine.
+Copiez le `.env.example` (si disponible) ou utilisez le `.env` généré automatiquement pour commencer.
+
+---
+
+## Démarrage Rapide (Docker)
+
+La méthode la plus simple pour lancer le projet.
+
+1.  **Cloner le dépôt**
+    ```bash
+    git clone https://github.com/username/collector.git
+    cd collector
+    ```
+
+2.  **Lancer les services**
+    ```bash
+    docker-compose up -d --build
+    ```
+
+3.  **Accéder à l'application**
+    *   Frontend : [https://localhost:3000](https://localhost:3000)
+    *   API Backend : [https://localhost:4000](https://localhost:4000)
+    *   Base de données (Postgres) : `localhost:5432`
+
+4.  **Arrêter les services**
+    ```bash
+    docker-compose down
+    ```
+
+---
+
+## Infrastructure as Code (Terraform)
+
+Le projet adopte une approche **GitOps** :
+1.  **Terraform** : Provisionne l'infrastructure "physique" (Cluster K8s, VPC, Namespaces, Storage).
+2.  **Kubernetes Manifests** : Gère le déploiement des applications (Deployment, Service, Ingress).
+
+**Provisionner l'infrastructure (Simulation Locale) :**
 ```bash
-# Aller dans le dossier du code source
-cd app
+cd infrastructure/terraform
+terraform init
+terraform apply
+```
+*Cela créera le namespace `collector` dans votre cluster actuel.*
 
-# Installer les dépendances
-npm install
+---
 
-# Initialiser la base de données locale
-npx prisma generate
-npx prisma db push
+## Déploiement Kubernetes (Minikube)
+
+Déployer l'application dans un cluster Kubernetes local.
+
+### 1. Démarrer Minikube
+```bash
+minikube start --driver=docker
+eval $(minikube docker-env)
 ```
 
-### 2. Lancer l'application
-
+### 2. Construire les images
 ```bash
-# Mode développement
-npm run dev
+docker build -t collector-frontend:latest -f Dockerfile .
+docker build -t collector-backend:latest -f backend/Dockerfile ./backend
 ```
-Accédez à l'application sur **[http://localhost:3000](http://localhost:3000)**.
+
+### 3. Déployer
+```bash
+# Déployer tous les manifestes
+kubectl apply -k infrastructure/k8s/base
+
+# Ou utiliser le script d'installation via npm
+npm run infra:minikube
+```
+
+### 4. Accéder
+```bash
+minikube tunnel
+# Accès via IP externe ou localhost selon votre OS
+```
 
 ---
 
-## ✅ Évaluation & Démonstration
+## Développement Local
 
-Voici les commandes pour vérifier les critères techniques de l'évaluation :
+Pour les développeurs souhaitant lancer les services individuellement.
 
-### 1. Tests Automatisés (Qualité)
-Lancer la suite de tests unitaires et intégration (Vitest) :
+### Global
 ```bash
-npm test
+npm install        # Installer toutes les dépendances (root, backend, frontend)
+npm run dev        # Démarrer Backend + Frontend en parallèle
+npm run db:sync    # Synchroniser le client Prisma entre backend et root
 ```
-*Couvre : Composants UI, Sécurité des routes, Logique métier.*
 
-### 2. Audit de Sécurité (DevSecOps)
-Vérifier les vulnérabilités des dépendances :
+### Backend (via Workspace)
+```bash
+npm run start:dev --workspace=backend
+```
+
+### Frontend (via Workspace)
+```bash
+npm run dev --workspace=frontend
+```
+
+*Note : Nécessite une instance PostgreSQL/Redis active (utilisez `docker-compose up -d db redis`).*
+
+---
+
+## Tests & Qualité
+
+Nous appliquons des standards de qualité élevés.
+
+**Lancer les Tests Unitaires**
+```bash
+npm run test:backend  # Tests Backend
+npm run test:frontend # Tests Frontend
+```
+
+**Lancer le Linter**
+```bash
+npm run lint
+```
+
+**Audit de Sécurité**
 ```bash
 npm audit
 ```
 
-### 3. Test de Montée en Charge (Performance)
-Simuler 50 utilisateurs simultanés pour la démonstration de "Disponibilité" :
-```bash
-# Dans un nouveau terminal, pendant que le serveur tourne
-node stress-test.js
-```
+---
 
-### 4. Supervision (Ops)
-Un endpoint de **Health Check** est disponible pour le monitoring :
-*   URL : [http://localhost:3000/api/health](http://localhost:3000/api/health)
-*   Retourne : Statut de l'application et connexion BDD.
+## Documentation
+
+Une documentation complète est disponible dans le dossier `docs/` :
+
+*   [**Vue d'ensemble Architecture**](./docs/ARCHITECTURE_MODULAIRE.md) - Détails des modules et événements.
+*   [**Stratégie de Sécurité**](./docs/SECURITY.md) - Implémentations et bonnes pratiques.
+*   [**Assurance Qualité**](./docs/STRATEGY_QUALITY_SKILLS.md) - Métriques QA et processus.
+*   [**Documentation API**](./docs/api/README.md) - Endpoints et utilisation.
 
 ---
 
-## 📂 Structure du Répertoire
+## Licence
 
-```
-.
-├── PROJECT_REPORT.md       # Rapport Qualité/Sécurité/Archi
-├── PRESENTATION_SUPPORT.md # Script soutenance
-├── app/                    # Code Source (Next.js)
-│   ├── app/                # Pages & API Routes
-│   ├── components/         # Bibliothèque de composants
-│   ├── lib/                # Utilitaires (Logger, Prisma)
-│   ├── prisma/             # Schéma BDD
-│   ├── __tests__/          # Tests d'intégration
-│   ├── stress-test.js      # Script de charge
-│   ├── Dockerfile          # Configuration conteneur
-│   └── CONTRIBUTING.md     # Guide développeur
-└── ...
-```
+Distribué sous licence MIT. Voir `LICENSE` pour plus d'informations.
 
 ---
-*Projet réalisé le 20/01/2026.*
+
+**Développé pour Projet École d'Ingénieurs CESI**

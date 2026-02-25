@@ -1,0 +1,342 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Operation successful",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "filter": "Filter",
+    "sortBy": "Sort by",
+    "price": "Price",
+    "category": "Category",
+    "readMore": "Read more",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "seeAll": "See all"
+  },
+  "nav": {
+    "home": "Home",
+    "explore": "Explore",
+    "sell": "Sell",
+    "messages": "Messages",
+    "profile": "Profile",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "admin": "Admin",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "shops": "Shops",
+    "favorites": "Favorites"
+  },
+  "home": {
+    "title": "Welcome to Collector",
+    "subtitle": "The reference marketplace for collectors",
+    "hero": {
+      "title": "Find your dream collectibles",
+      "description": "Thousands of unique items await you",
+      "cta": "Start exploring",
+      "sellCta": "Sell my items"
+    },
+    "categories": {
+      "title": "Popular categories",
+      "viewAll": "View all categories"
+    },
+    "featured": {
+      "title": "Featured items",
+      "newArrivals": "New arrivals",
+      "trending": "Trending"
+    }
+  },
+  "item": {
+    "title": "Item",
+    "description": "Description",
+    "price": "Price",
+    "condition": "Condition",
+    "seller": "Seller",
+    "category": "Category",
+    "addToCart": "Add to cart",
+    "buyNow": "Buy now",
+    "contactSeller": "Contact seller",
+    "reportItem": "Report",
+    "shareItem": "Share",
+    "priceHistory": "Price history",
+    "shipping": "Shipping cost",
+    "status": {
+      "available": "Available",
+      "sold": "Sold",
+      "reserved": "Reserved",
+      "pending": "Pending"
+    },
+    "condition": {
+      "new": "New",
+      "likeNew": "Like new",
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "poor": "Poor"
+    }
+  },
+  "sell": {
+    "title": "Sell an item",
+    "createListing": "Create listing",
+    "itemDetails": "Item details",
+    "pricing": "Pricing",
+    "photos": "Photos",
+    "publish": "Publish",
+    "draft": "Save as draft",
+    "form": {
+      "title": "Title",
+      "titlePlaceholder": "E.g., Nintendo 64 console in excellent condition",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe your item in detail...",
+      "price": "Sale price",
+      "shippingCost": "Shipping cost",
+      "category": "Category",
+      "selectCategory": "Select a category",
+      "condition": "Condition",
+      "photos": "Photos (max 5)",
+      "uploadPhotos": "Upload photos"
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "descriptionRequired": "Description is required",
+      "priceRequired": "Price is required",
+      "priceMin": "Price must be greater than 0",
+      "categoryRequired": "Category is required",
+      "photosRequired": "At least one photo is required"
+    }
+  },
+  "profile": {
+    "title": "Profile",
+    "myItems": "My items",
+    "myPurchases": "My purchases",
+    "mySales": "My sales",
+    "myShops": "My shops",
+    "settings": "Settings",
+    "reviews": "Reviews",
+    "rating": "Rating",
+    "memberSince": "Member since",
+    "edit": "Edit profile",
+    "bio": "About"
+  },
+  "messages": {
+    "title": "Messages",
+    "conversations": "Conversations",
+    "newMessage": "New message",
+    "sendMessage": "Send",
+    "typePlaceholder": "Type a message...",
+    "noConversations": "No conversations",
+    "markAsRead": "Mark as read",
+    "delete": "Delete conversation"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "types": {
+      "newMessage": "New message",
+      "itemSold": "Item sold",
+      "priceChange": "Price change",
+      "newReview": "New review",
+      "itemValidated": "Item validated",
+      "itemRejected": "Item rejected"
+    }
+  },
+  "shop": {
+    "title": "Shop",
+    "createShop": "Create shop",
+    "editShop": "Edit shop",
+    "shopName": "Shop name",
+    "shopDescription": "Description",
+    "items": "Items",
+    "totalSales": "Total sales",
+    "rating": "Rating",
+    "owner": "Owner"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "summary": "Summary",
+    "itemPrice": "Item price",
+    "shipping": "Shipping",
+    "commission": "Commission (5%)",
+    "total": "Total",
+    "paymentMethod": "Payment method",
+    "confirmPurchase": "Confirm purchase",
+    "processing": "Processing...",
+    "success": "Purchase successful!",
+    "error": "Payment error"
+  },
+  "admin": {
+    "title": "Administration",
+    "dashboard": "Dashboard",
+    "items": "Items",
+    "users": "Users",
+    "shops": "Shops",
+    "reports": "Reports",
+    "moderation": "Moderation",
+    "analytics": "Analytics",
+    "settings": "Settings",
+    "fraudDetection": "Fraud detection",
+    "advertising": "Advertising"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "forgotPassword": "Forgot password?",
+    "rememberMe": "Remember me",
+    "loginButton": "Sign in",
+    "registerButton": "Sign up",
+    "or": "or",
+    "continueWithGoogle": "Continue with Google",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized access",
+    "serverError": "Server error",
+    "networkError": "Network error",
+    "goHome": "Go home",
+    "tryAgain": "Try again"
+  },
+  "footer": {
+    "about": "About",
+    "contact": "Contact",
+    "terms": "Terms of service",
+    "privacy": "Privacy policy",
+    "help": "Help",
+    "followUs": "Follow us",
+    "copyright": "© 2026 Collector. All rights reserved.",
+    "loadMore": "Load more",
+    "buy": {
+      "title": "Buy",
+      "howToBuy": "How to buy",
+      "byCategory": "Shop by category",
+      "promotions": "Promotions",
+      "app": "Collector app",
+      "brands": "Brands",
+      "carBrands": "Car brands",
+      "rights": "Rights and obligations on Collector",
+      "extra": "Collector Extra"
+    },
+    "sell": {
+      "title": "Sell",
+      "howToSell": "How to sell",
+      "tools": "Selling tools",
+      "sellersSpace": "Sellers hub",
+      "openShop": "Open a Collector shop",
+      "shippingSpace": "Shipping hub",
+      "fees": "Selling fees",
+      "protection": "Seller protection",
+      "international": "Sell internationally",
+      "howItWorks": "How Collector works"
+    },
+    "aboutSection": {
+      "title": "About Collector",
+      "sustainable": "Sustainable consumption",
+      "legalNotice": "Legal notice",
+      "advertising": "Collector Advertising",
+      "affiliation": "Affiliation",
+      "vero": "VeRO: Intellectual Property",
+      "developers": "Collector developer program",
+      "press": "Press releases",
+      "careers": "Career opportunities",
+      "courtDecisions": "Court decisions"
+    },
+    "helpSection": {
+      "title": "Help",
+      "security": "Security center",
+      "guarantee": "Collector buyer protection"
+    },
+    "community": {
+      "title": "Community",
+      "news": "Collector news",
+      "helpForums": "Help forums",
+      "discussionForums": "Discussion forums",
+      "groups": "Groups"
+    },
+    "sites": "Collector sites",
+    "copyrightText": "Copyright © 1995-2026 Collector Inc. All rights reserved.",
+    "accessibilityLink": "Accessibility",
+    "termsLink": "User agreement",
+    "privacyNotice": "Privacy notice",
+    "paymentTerms": "Payment terms of use",
+    "cookiesLink": "Cookies",
+    "adChoice": "AdChoice",
+    "andConjunction": "and",
+    "backToTop": "Back to top",
+    "openChat": "Open chat"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to main content",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "openUserMenu": "Open user menu",
+    "languageSelector": "Language selector",
+    "searchButton": "Search button",
+    "logoLink": "Link to home",
+    "notificationCount": "{count} unread notification(s)",
+    "loading": "Loading",
+    "imageAlt": "Image of {title}"
+  },
+  "utilityBar": {
+    "hello": "Hello",
+    "myProfile": "My profile",
+    "signOut": "Sign out",
+    "listItem": "List an item",
+    "deals": "Deals",
+    "chat": "Chat",
+    "purchases": "Purchases",
+    "mySpace": "My Account",
+    "signIn": "Sign in",
+    "or": "or",
+    "signUp": "sign up",
+    "adminBackoffice": "Admin Back Office"
+  },
+  "navbar": {
+    "searchPlaceholder": "Search on Collector",
+    "allCategories": "All categories",
+    "advancedSearch": "Advanced search",
+    "exploreByCategory": "Explore by category"
+  },
+  "heroCarousel": {
+    "title": "Latest Finds",
+    "subtitle": "Discover the latest items listed by the community.",
+    "viewAll": "View all",
+    "justNow": "Just now",
+    "defaultSeller": "Seller"
+  },
+  "notificationsDropdown": {
+    "heading": "Notifications",
+    "markAllRead": "Mark all as read",
+    "loading": "Loading...",
+    "empty": "No notifications",
+    "markAsRead": "Mark as read",
+    "delete": "Delete",
+    "newNotification": "New notification",
+    "types": {
+      "newMessage": "You have received a new message",
+      "itemSold": "Your item has been sold!",
+      "itemPurchased": "Your purchase has been confirmed",
+      "newReview": "You have received a new review",
+      "newItem": "New item: {title}",
+      "newItemDefault": "New item listed",
+      "matchingInterest": "✨ {title} matches your interests",
+      "matchingInterestDefault": "New item matching your interests"
+    }
+  },
+  "homePage": {
+    "noItems": "No items found",
+    "noItemsHint": "Try adjusting your search filters."
+  }
+}

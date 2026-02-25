@@ -1,0 +1,142 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: collector
+  labels:
+    app: backend
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 4000
+      targetPort: 3000
+      name: http
+    - port: 5555
+      targetPort: 5555
+      name: prisma-studio
+  selector:
+    app: backend
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: collector-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: http
+            - containerPort: 5555
+              name: debug
+          env:
+            # --- Secrets (via K8s Secret) ---
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DATABASE_URL
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: JWT_SECRET
+            - name: ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: ENCRYPTION_KEY
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: STRIPE_SECRET_KEY
+            - name: STRIPE_PUBLISHABLE_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: STRIPE_PUBLISHABLE_KEY
+            - name: STRIPE_WEBHOOK_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: STRIPE_WEBHOOK_SECRET
+            - name: SMTP_USER
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: SMTP_USER
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: SMTP_PASSWORD
+            - name: FRAUD_DETECTION_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: FRAUD_DETECTION_API_KEY
+            # --- Config (non-sensible) ---
+            - name: REDIS_HOST
+              value: redis
+            - name: REDIS_PORT
+              value: "6379"
+            - name: PORT
+              value: "3000"
+            - name: NODE_OPTIONS
+              value: "--max-old-space-size=768"
+            - name: HTTPS_ENABLED
+              value: "false"
+            - name: SMTP_HOST
+              value: "localhost"
+            - name: SMTP_PORT
+              value: "1025"
+            - name: SMTP_SECURE
+              value: "false"
+            - name: SMTP_FROM
+              value: "dev@collector.local"
+            - name: FRAUD_DETECTION_WEBHOOK_URL
+              value: "https://localhost"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 90
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 8
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+          startupProbe:
+            httpGet:
+              path: /health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 30
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi

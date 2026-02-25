@@ -1,0 +1,53 @@
+import { render, screen, fireEvent } from "@testing-library/react";
+import { SellPage } from "../_components/SellPage";
+
+// Mock NextAuth useSession hooks
+jest.mock("next-auth/react", () => ({
+    useSession: jest.fn(() => ({
+        data: { user: { name: "Test User" } },
+        status: "authenticated",
+    })),
+}));
+
+const pushMock = jest.fn();
+jest.mock("next/navigation", () => ({
+    useRouter: () => ({
+        push: pushMock,
+        refresh: jest.fn(),
+    }),
+}));
+
+// Mock Magic UI
+jest.mock("@/components/ui/blur-fade", () => ({
+    default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}), { virtual: true });
+
+// Mock Server Actions
+jest.mock("@/lib/actions/items", () => ({
+    createItem: jest.fn(),
+}));
+
+
+test("La page de vente affiche le formulaire", () => {
+    render(<SellPage />);
+
+    // Check for Title input
+    expect(screen.getByLabelText(/Titre/i)).toBeDefined();
+
+    // Check for Price input
+    expect(screen.getByLabelText(/Prix/i)).toBeDefined();
+
+    // Check for Description
+    expect(screen.getByLabelText(/Description/i)).toBeDefined();
+
+    // Check Submit button
+    expect(screen.getByRole("button", { name: /Publier/i })).toBeDefined();
+});
+
+test("Le formulaire gère la saisie utilisateur", () => {
+    render(<SellPage />);
+
+    const titleInput = screen.getByLabelText(/Titre/i) as HTMLInputElement;
+    fireEvent.change(titleInput, { target: { value: "My New Item" } });
+    expect(titleInput.value).toBe("My New Item");
+});

@@ -1,0 +1,257 @@
+##############################################
+# Promtail - Agent de collecte de logs
+##############################################
+# Promtail collecte les logs des conteneurs
+# et les envoie à Loki avec des labels.
+##############################################
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: promtail-config
+  namespace: collector
+  labels:
+    app: promtail
+data:
+  promtail-config.yaml: |
+    server:
+      http_listen_port: 9080
+      grpc_listen_port: 0
+
+    positions:
+      filename: /tmp/positions.yaml
+
+    clients:
+      - url: http://loki:3100/loki/api/v1/push
+        tenant_id: collector
+        batchwait: 1s
+        batchsize: 1048576
+        timeout: 10s
+
+    scrape_configs:
+      # Collecte des logs des pods Kubernetes
+      - job_name: kubernetes-pods
+        kubernetes_sd_configs:
+          - role: pod
+        relabel_configs:
+          # Garde seulement les pods du namespace collector
+          - source_labels: [__meta_kubernetes_namespace]
+            action: keep
+            regex: collector
+
+          # Utilise le nom du pod comme label
+          - source_labels: [__meta_kubernetes_pod_name]
+            target_label: pod
+
+          # Utilise le nom du container comme label
+          - source_labels: [__meta_kubernetes_pod_container_name]
+            target_label: container
+
+          # Extrait le nom de l'application du label app
+          - source_labels: [__meta_kubernetes_pod_label_app]
+            target_label: app
+
+          # Extrait le namespace
+          - source_labels: [__meta_kubernetes_namespace]
+            target_label: namespace
+
+          # Définit le chemin du fichier de log
+          - source_labels: [__meta_kubernetes_pod_uid, __meta_kubernetes_pod_container_name]
+            target_label: __path__
+            separator: /
+            replacement: /var/log/pods/*$1/$2/*.log
+
+        pipeline_stages:
+          # Décode le format Docker JSON (wrapper {"log":"...","stream":"...","time":"..."})
+          # Les fichiers /var/log/pods/ sont en format Docker JSON sur Minikube
+          - docker: {}
+
+          # Parse les logs JSON du backend
+          - match:
+              selector: '{app="backend"}'
+              stages:
+                - json:
+                    expressions:
+                      level: level
+                      message: message
+                      timestamp: timestamp
+                      service: service
+                      environment: environment
+                      correlationId: context.correlationId
+                      userId: context.userId
+                      method: context.method
+                      path: context.path
+                      statusCode: context.statusCode
+                      duration: context.duration
+
+                - labels:
+                    level:
+                    service:
+                    environment:
+
+                - timestamp:
+                    source: timestamp
+                    format: RFC3339Nano
+
+          # Parse les logs JSON du frontend
+          - match:
+              selector: '{app="frontend"}'
+              stages:
+                - json:
+                    expressions:
+                      level: level
+                      message: message
+                      timestamp: timestamp
+
+                - labels:
+                    level:
+
+                - timestamp:
+                    source: timestamp
+                    format: RFC3339Nano
+
+          # Ajoute des labels pour les erreurs
+          - match:
+              selector: '{level="error"} |~ "error|Error|ERROR"'
+              stages:
+                - labels:
+                    severity: error
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: promtail
+  namespace: collector
+  labels:
+    app: promtail
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: promtail
+  labels:
+    app: promtail
+rules:
+  - apiGroups: [""]
+    resources:
+      - nodes
+      - nodes/proxy
+      - services
+      - endpoints
+      - pods
+    verbs: ["get", "watch", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: promtail
+  labels:
+    app: promtail
+subjects:
+  - kind: ServiceAccount
+    name: promtail
+    namespace: collector
+roleRef:
+  kind: ClusterRole
+  name: promtail
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: promtail
+  namespace: collector
+  labels:
+    app: promtail
+spec:
+  selector:
+    matchLabels:
+      app: promtail
+  template:
+    metadata:
+      labels:
+        app: promtail
+    spec:
+      serviceAccountName: promtail
+      containers:
+        - name: promtail
+          image: grafana/promtail:2.9.4
+          imagePullPolicy: IfNotPresent
+          args:
+            - -config.file=/etc/promtail/promtail-config.yaml
+          ports:
+            - containerPort: 9080
+              name: http
+              protocol: TCP
+          env:
+            - name: HOSTNAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          volumeMounts:
+            - name: config
+              mountPath: /etc/promtail
+            - name: tmp
+              mountPath: /tmp
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: varlibdockercontainers
+              mountPath: /var/lib/docker/containers
+              readOnly: true
+            - name: pods
+              mountPath: /var/log/pods
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 25m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+          securityContext:
+            readOnlyRootFilesystem: true
+            allowPrivilegeEscalation: false
+      volumes:
+        - name: config
+          configMap:
+            name: promtail-config
+        - name: tmp
+          emptyDir: {}
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: varlibdockercontainers
+          hostPath:
+            path: /var/lib/docker/containers
+        - name: pods
+          hostPath:
+            path: /var/log/pods
+      tolerations:
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/master
+          operator: Exists
+        - effect: NoSchedule
+          key: node-role.kubernetes.io/control-plane
+          operator: Exists
