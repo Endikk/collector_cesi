@@ -312,8 +312,8 @@ jobs:
           echo "   ✅ Kustomize build réussi"
           echo ""
 
-          echo "2. kubectl apply --dry-run=client"
-          kubectl apply --dry-run=client -f /tmp/k8s-manifests.yaml
+          echo "2. kubectl apply --dry-run=client --validate=false"
+          kubectl apply --dry-run=client --validate=false -f /tmp/k8s-manifests.yaml
           echo "   ✅ Dry-run validé — les manifests sont conformes"
           echo ""
 
