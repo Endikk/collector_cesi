@@ -49,7 +49,7 @@ import { LoggingModule, CorrelationIdMiddleware } from './logging';
     ThrottlerModule.forRoot([
       {
         ttl: 60000,
-        limit: 10,
+        limit: parseInt(process.env.THROTTLE_LIMIT ?? '10'),
       },
     ]),
     BullModule.forRoot({
