@@ -216,7 +216,66 @@
     "privacy": "Datenschutz",
     "help": "Hilfe",
     "followUs": "Folgen Sie uns",
-    "copyright": "© 2026 Collector. Alle Rechte vorbehalten."
+    "copyright": "© 2026 Collector. Alle Rechte vorbehalten.",
+    "loadMore": "Mehr laden",
+    "buy": {
+      "title": "Kaufen",
+      "howToBuy": "Wie man kauft",
+      "byCategory": "Nach Kategorie kaufen",
+      "promotions": "Aktionen",
+      "app": "Collector-App",
+      "brands": "Marken",
+      "carBrands": "Automarken",
+      "rights": "Rechte und Pflichten bei Collector",
+      "extra": "Collector Extra"
+    },
+    "sell": {
+      "title": "Verkaufen",
+      "howToSell": "Wie man verkauft",
+      "tools": "Verkaufstools",
+      "sellersSpace": "Verkäuferbereich",
+      "openShop": "Einen Collector-Shop eröffnen",
+      "shippingSpace": "Versandbereich",
+      "fees": "Verkaufsgebühren",
+      "protection": "Verkäuferschutz",
+      "international": "International verkaufen",
+      "howItWorks": "So funktioniert Collector"
+    },
+    "aboutSection": {
+      "title": "Über Collector",
+      "sustainable": "Nachhaltiger Konsum",
+      "legalNotice": "Impressum",
+      "advertising": "Collector Advertising",
+      "affiliation": "Partnerschaft",
+      "vero": "VeRO: Geistiges Eigentum",
+      "developers": "Collector-Entwicklerprogramm",
+      "press": "Pressemitteilungen",
+      "careers": "Karrieremöglichkeiten",
+      "courtDecisions": "Gerichtsentscheidungen"
+    },
+    "helpSection": {
+      "title": "Hilfe",
+      "security": "Sicherheitscenter",
+      "guarantee": "Collector-Käuferschutz"
+    },
+    "community": {
+      "title": "Community",
+      "news": "Collector-Nachrichten",
+      "helpForums": "Hilfeforen",
+      "discussionForums": "Diskussionsforen",
+      "groups": "Gruppen"
+    },
+    "sites": "Collector-Websites",
+    "copyrightText": "Copyright © 1995-2026 Collector Inc. Alle Rechte vorbehalten.",
+    "accessibilityLink": "Barrierefreiheit",
+    "termsLink": "Nutzungsbedingungen",
+    "privacyNotice": "Datenschutzhinweis",
+    "paymentTerms": "Zahlungs-Nutzungsbedingungen",
+    "cookiesLink": "Cookies",
+    "adChoice": "AdChoice",
+    "andConjunction": "und",
+    "backToTop": "Nach oben",
+    "openChat": "Chat öffnen"
   },
   "accessibility": {
     "skipToContent": "Zum Hauptinhalt springen",
@@ -229,5 +288,55 @@
     "notificationCount": "{count} ungelesene Benachrichtigung(en)",
     "loading": "Wird geladen",
     "imageAlt": "Bild von {title}"
+  },
+  "utilityBar": {
+    "hello": "Hallo",
+    "myProfile": "Mein Profil",
+    "signOut": "Abmelden",
+    "listItem": "Artikel einstellen",
+    "deals": "Angebote",
+    "chat": "Chat",
+    "purchases": "Käufe",
+    "mySpace": "Mein Bereich",
+    "signIn": "Anmelden",
+    "or": "oder",
+    "signUp": "registrieren",
+    "adminBackoffice": "Admin-Backoffice"
+  },
+  "navbar": {
+    "searchPlaceholder": "Auf Collector suchen",
+    "allCategories": "Alle Kategorien",
+    "advancedSearch": "Erweiterte Suche",
+    "exploreByCategory": "Nach Kategorie erkunden"
+  },
+  "heroCarousel": {
+    "title": "Die neuesten Schätze",
+    "subtitle": "Entdecken Sie die neuesten von der Community eingestellten Artikel.",
+    "viewAll": "Alle anzeigen",
+    "justNow": "Gerade eben",
+    "defaultSeller": "Verkäufer"
+  },
+  "notificationsDropdown": {
+    "heading": "Benachrichtigungen",
+    "markAllRead": "Alle als gelesen markieren",
+    "loading": "Wird geladen...",
+    "empty": "Keine Benachrichtigungen",
+    "markAsRead": "Als gelesen markieren",
+    "delete": "Löschen",
+    "newNotification": "Neue Benachrichtigung",
+    "types": {
+      "newMessage": "Sie haben eine neue Nachricht erhalten",
+      "itemSold": "Ihr Artikel wurde verkauft!",
+      "itemPurchased": "Ihr Kauf wurde bestätigt",
+      "newReview": "Sie haben eine neue Bewertung erhalten",
+      "newItem": "Neuer Artikel: {title}",
+      "newItemDefault": "Neuer Artikel veröffentlicht",
+      "matchingInterest": "✨ {title} entspricht Ihren Interessen",
+      "matchingInterestDefault": "Neuer Artikel passend zu Ihren Interessen"
+    }
+  },
+  "homePage": {
+    "noItems": "Keine Artikel gefunden",
+    "noItemsHint": "Versuchen Sie, Ihre Suchfilter anzupassen."
   }
 }

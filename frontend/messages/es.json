@@ -216,7 +216,66 @@
     "privacy": "Política de privacidad",
     "help": "Ayuda",
     "followUs": "Síguenos",
-    "copyright": "© 2026 Collector. Todos los derechos reservados."
+    "copyright": "© 2026 Collector. Todos los derechos reservados.",
+    "loadMore": "Cargar más",
+    "buy": {
+      "title": "Comprar",
+      "howToBuy": "Cómo comprar",
+      "byCategory": "Comprar por categorías",
+      "promotions": "Promociones",
+      "app": "Aplicación Collector",
+      "brands": "Marcas",
+      "carBrands": "Marcas de coches",
+      "rights": "Derechos y obligaciones en Collector",
+      "extra": "Collector Extra"
+    },
+    "sell": {
+      "title": "Vender",
+      "howToSell": "Cómo vender",
+      "tools": "Herramientas de venta",
+      "sellersSpace": "Espacio vendedores",
+      "openShop": "Abrir una tienda Collector",
+      "shippingSpace": "Espacio de envíos",
+      "fees": "Tarifas de venta",
+      "protection": "Protección del vendedor",
+      "international": "Vender internacionalmente",
+      "howItWorks": "Cómo funciona Collector"
+    },
+    "aboutSection": {
+      "title": "Acerca de Collector",
+      "sustainable": "Consumo responsable",
+      "legalNotice": "Aviso legal",
+      "advertising": "Collector Advertising",
+      "affiliation": "Afiliación",
+      "vero": "VeRO: Propiedad Intelectual",
+      "developers": "Programa de desarrolladores Collector",
+      "press": "Comunicados de prensa",
+      "careers": "Oportunidades de carrera",
+      "courtDecisions": "Decisiones judiciales"
+    },
+    "helpSection": {
+      "title": "Ayuda",
+      "security": "Centro de seguridad",
+      "guarantee": "Garantía del comprador Collector"
+    },
+    "community": {
+      "title": "Comunidad",
+      "news": "Noticias Collector",
+      "helpForums": "Foros de ayuda",
+      "discussionForums": "Foros de debate",
+      "groups": "Grupos"
+    },
+    "sites": "Sitios Collector",
+    "copyrightText": "Copyright © 1995-2026 Collector Inc. Todos los derechos reservados.",
+    "accessibilityLink": "Accesibilidad",
+    "termsLink": "Condiciones de uso",
+    "privacyNotice": "Aviso de privacidad",
+    "paymentTerms": "Condiciones de uso de servicios de pago",
+    "cookiesLink": "Cookies",
+    "adChoice": "AdChoice",
+    "andConjunction": "y",
+    "backToTop": "Volver arriba",
+    "openChat": "Abrir chat"
   },
   "accessibility": {
     "skipToContent": "Ir al contenido principal",
@@ -229,5 +288,55 @@
     "notificationCount": "{count} notificación(es) sin leer",
     "loading": "Cargando",
     "imageAlt": "Imagen de {title}"
+  },
+  "utilityBar": {
+    "hello": "Hola",
+    "myProfile": "Mi perfil",
+    "signOut": "Cerrar sesión",
+    "listItem": "Poner en venta",
+    "deals": "Ofertas",
+    "chat": "Chat",
+    "purchases": "Compras",
+    "mySpace": "Mi Cuenta",
+    "signIn": "Inicia sesión",
+    "or": "o",
+    "signUp": "regístrate",
+    "adminBackoffice": "Panel Admin"
+  },
+  "navbar": {
+    "searchPlaceholder": "Buscar en Collector",
+    "allCategories": "Todas las categorías",
+    "advancedSearch": "Búsqueda avanzada",
+    "exploreByCategory": "Explorar por categoría"
+  },
+  "heroCarousel": {
+    "title": "Los Últimos Tesoros",
+    "subtitle": "Descubre los últimos artículos publicados por la comunidad.",
+    "viewAll": "Ver todo",
+    "justNow": "Ahora mismo",
+    "defaultSeller": "Vendedor"
+  },
+  "notificationsDropdown": {
+    "heading": "Notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "loading": "Cargando...",
+    "empty": "Sin notificaciones",
+    "markAsRead": "Marcar como leído",
+    "delete": "Eliminar",
+    "newNotification": "Nueva notificación",
+    "types": {
+      "newMessage": "Has recibido un nuevo mensaje",
+      "itemSold": "¡Tu artículo ha sido vendido!",
+      "itemPurchased": "Tu compra ha sido confirmada",
+      "newReview": "Has recibido una nueva reseña",
+      "newItem": "Nuevo artículo: {title}",
+      "newItemDefault": "Nuevo artículo publicado",
+      "matchingInterest": "✨ {title} coincide con tus intereses",
+      "matchingInterestDefault": "Nuevo artículo que coincide con tus intereses"
+    }
+  },
+  "homePage": {
+    "noItems": "No se encontraron artículos",
+    "noItemsHint": "Intenta ajustar los filtros de búsqueda."
   }
 }

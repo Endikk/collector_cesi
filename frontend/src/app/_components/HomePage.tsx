@@ -8,6 +8,8 @@ import { HeroCarousel } from "./HeroCarousel";
 import { RecommendationsSection } from "./RecommendationsSection";
 import { Search } from "lucide-react";
 import { Prisma } from "@prisma/client";
+import { getLocale } from "@/lib/i18n/get-locale";
+import { getMessages, getMessage } from "@/lib/i18n/get-messages";
 
 async function getCategories() {
     try {
@@ -75,6 +77,11 @@ export async function HomePage({ searchParams }: HomePageProps) {
     const minPrice = typeof searchParams.minPrice === "string" ? parseFloat(searchParams.minPrice) : undefined;
     const maxPrice = typeof searchParams.maxPrice === "string" ? parseFloat(searchParams.maxPrice) : undefined;
 
+    // Server-side translations
+    const locale = await getLocale();
+    const messages = await getMessages(locale);
+    const t = (key: string) => getMessage(messages, key);
+
     // Fetch all categories first
     const categories = await getCategories();
 
@@ -129,8 +136,8 @@ export async function HomePage({ searchParams }: HomePageProps) {
                                 <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-muted">
                                     <Search className="h-10 w-10 text-muted-foreground" />
                                 </div>
-                                <h3 className="text-xl font-bold">Aucun objet trouvé</h3>
-                                <p className="text-muted-foreground mt-2">Essayez de modifier vos filtres de recherche.</p>
+                                <h3 className="text-xl font-bold">{t('homePage.noItems')}</h3>
+                                <p className="text-muted-foreground mt-2">{t('homePage.noItemsHint')}</p>
                             </div>
                         )}
                     </div>

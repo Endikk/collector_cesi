@@ -8,7 +8,9 @@ export const UpdateItemSchema = z.object({
     .optional(),
   description: z
     .string()
-    .max(2000, { message: 'La description ne peut pas dépasser 2000 caractères' })
+    .max(2000, {
+      message: 'La description ne peut pas dépasser 2000 caractères',
+    })
     .optional(),
   price: z
     .number({ message: 'Le prix doit être un nombre' })
@@ -36,7 +38,8 @@ export class UpdateItemDto {
 
   @ApiPropertyOptional({
     description: "Description détaillée de l'article",
-    example: "Figurine originale de 1977, en excellent état, avec emballage d'origine.",
+    example:
+      "Figurine originale de 1977, en excellent état, avec emballage d'origine.",
     maxLength: 2000,
   })
   description?: string;

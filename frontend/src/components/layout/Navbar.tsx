@@ -9,11 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SecondaryNav } from "./SecondaryNav";
 import { UtilityBar } from "./UtilityBar";
+import { useTranslations } from "@/lib/i18n/LocaleProvider";
 
 function SearchBar() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const [query, setQuery] = useState(searchParams.get("q") || "");
+    const t = useTranslations();
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -35,29 +37,31 @@ function SearchBar() {
                     </div>
                     <Input
                         type="search"
-                        placeholder="Rechercher sur Collector"
+                        placeholder={t('navbar.searchPlaceholder')}
                         className="w-full pl-10 pr-36 h-[42px] border-2 border-black/80 focus-visible:ring-0 rounded-full text-base"
                         value={query}
                         onChange={(e) => setQuery(e.target.value)}
                     />
                     <div className="absolute right-0 h-full flex items-center pr-1 border-l border-border/50">
                         <Button type="button" variant="ghost" className="h-[38px] rounded-r-full text-xs font-normal text-muted-foreground px-4 hover:bg-transparent">
-                            Toutes les catég... <ChevronDown className="ml-1 h-3 w-3" />
+                            {t('navbar.allCategories')} <ChevronDown className="ml-1 h-3 w-3" />
                         </Button>
                     </div>
                 </div>
                 <Button type="submit" className="ml-3 h-[42px] px-10 rounded-full bg-[#3665f3] hover:bg-[#2b54d6] text-white font-semibold text-base shadow-none">
-                    Rechercher
+                    {t('common.search')}
                 </Button>
             </form>
             <Link href="/" className="text-[11px] text-muted-foreground hover:underline hidden lg:block whitespace-nowrap">
-                Recherche approfondie
+                {t('navbar.advancedSearch')}
             </Link>
         </div>
     );
 }
 
 export default function NavBar() {
+    const t = useTranslations();
+
     return (
         <div className="flex flex-col bg-white">
             <UtilityBar />
@@ -71,7 +75,7 @@ export default function NavBar() {
 
                     <div className="flex-1 hidden md:flex items-center">
                         <Button variant="ghost" className="mr-2 text-xs font-medium text-muted-foreground hover:text-foreground hidden xl:flex">
-                            Explorer <br /> par catégorie <ChevronDown className="ml-1 h-3 w-3" />
+                            {t('navbar.exploreByCategory')} <ChevronDown className="ml-1 h-3 w-3" />
                         </Button>
 
                         <Suspense fallback={<div className="flex-1 h-10 bg-secondary/20 rounded-full" />}>

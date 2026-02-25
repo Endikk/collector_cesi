@@ -8,11 +8,7 @@ import { Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import { Request, Response } from 'express';
 import { LoggerService } from './logger.service';
-import {
-  getCorrelationId,
-  RequestWithCorrelationId,
-  CORRELATION_ID_KEY,
-} from './correlation-id.middleware';
+import { getCorrelationId } from './correlation-id.middleware';
 
 /**
  * Intercepteur de Logging des Requêtes HTTP

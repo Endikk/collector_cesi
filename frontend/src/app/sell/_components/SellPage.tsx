@@ -3,13 +3,12 @@
 import { useState, useEffect, useActionState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Image from "next/image";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, AlertCircle } from "lucide-react";
+import { ImagePlus, Loader2, AlertCircle, X } from "lucide-react";
 import BlurFade from "@/components/ui/blur-fade";
 import { createItem, getCategories, State } from "@/lib/actions/items";
 import { useFormStatus } from "react-dom";
@@ -45,7 +44,8 @@ export function SellPage() {
     const { data: session, status } = useSession();
     const router = useRouter();
     const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
-    const [imageUrl, setImageUrl] = useState("");
+    const [imageBase64, setImageBase64] = useState("");
+    const [imageFileName, setImageFileName] = useState("");
 
     // Server Action State
     const initialState: State = { message: null, errors: {} };
@@ -154,57 +154,90 @@ export function SellPage() {
                                 )}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-6">
-                                <div className="space-y-2">
-                                    <Label htmlFor="price">Prix (€)</Label>
-                                    <Input
-                                        id="price"
-                                        name="price"
-                                        type="number"
-                                        min="1"
-                                        step="0.01"
-                                        required
-                                        className="bg-background/50"
-                                    />
-                                    {state.errors?.price && (
-                                        <p className="text-sm text-red-500">
-                                            {state.errors.price.join(", ")}
-                                        </p>
-                                    )}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="imageUrl">Image URL (Optionnel)</Label>
-                                    <div className="relative">
-                                        <Input
-                                            id="imageUrl"
-                                            name="imageUrl"
-                                            type="url"
-                                            value={imageUrl}
-                                            onChange={(e) => setImageUrl(e.target.value)}
-                                            placeholder="https://..."
-                                            className="pl-9 bg-background/50"
-                                        />
-                                        <ImagePlus className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
-                                    </div>
-                                    {state.errors?.imageUrl && (
-                                        <p className="text-sm text-red-500">
-                                            {state.errors.imageUrl.join(", ")}
-                                        </p>
-                                    )}
-                                </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="price">Prix (€)</Label>
+                                <Input
+                                    id="price"
+                                    name="price"
+                                    type="number"
+                                    min="1"
+                                    step="0.01"
+                                    required
+                                    className="bg-background/50"
+                                />
+                                {state.errors?.price && (
+                                    <p className="text-sm text-red-500">
+                                        {state.errors.price.join(", ")}
+                                    </p>
+                                )}
                             </div>
 
-                            {imageUrl && (
-                                <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border">
-                                    <Image
-                                        src={imageUrl}
-                                        alt="Aperçu de l'image"
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, 672px"
-                                        className="object-cover"
-                                    />
-                                </div>
-                            )}
+                            {/* Image file upload */}
+                            <div className="space-y-2">
+                                <Label>Photo (Optionnel)</Label>
+                                {/* Hidden field carrying base64 value to the server action */}
+                                <input type="hidden" name="imageUrl" value={imageBase64} />
+
+                                {imageBase64 ? (
+                                    <div className="relative">
+                                        <div className="aspect-video w-full overflow-hidden rounded-lg border border-border">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={imageBase64}
+                                                alt="Aperçu de l'image"
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </div>
+                                        <div className="flex items-center justify-between mt-2">
+                                            <p className="text-xs text-muted-foreground truncate max-w-[calc(100%-3rem)]">
+                                                {imageFileName}
+                                            </p>
+                                            <button
+                                                type="button"
+                                                onClick={() => { setImageBase64(""); setImageFileName(""); }}
+                                                className="p-1 rounded hover:bg-muted"
+                                                aria-label="Supprimer l'image"
+                                            >
+                                                <X className="h-4 w-4 text-muted-foreground" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label
+                                        htmlFor="imageFile"
+                                        className="flex flex-col items-center justify-center w-full aspect-video rounded-lg border-2 border-dashed border-border bg-background/50 cursor-pointer hover:bg-muted/50 transition-colors"
+                                    >
+                                        <ImagePlus className="h-8 w-8 text-muted-foreground mb-2" />
+                                        <span className="text-sm text-muted-foreground">Cliquez pour ajouter une photo</span>
+                                        <span className="text-xs text-muted-foreground mt-1">JPG, PNG, WEBP — max 5 Mo</span>
+                                        <input
+                                            id="imageFile"
+                                            type="file"
+                                            accept="image/jpeg,image/png,image/webp,image/gif"
+                                            className="sr-only"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (!file) return;
+                                                if (file.size > 5 * 1024 * 1024) {
+                                                    alert("L'image ne doit pas dépasser 5 Mo.");
+                                                    return;
+                                                }
+                                                setImageFileName(file.name);
+                                                const reader = new FileReader();
+                                                reader.onload = (ev) => {
+                                                    setImageBase64(ev.target?.result as string);
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }}
+                                        />
+                                    </label>
+                                )}
+                                {state.errors?.imageUrl && (
+                                    <p className="text-sm text-red-500">
+                                        {state.errors.imageUrl.join(", ")}
+                                    </p>
+                                )}
+                            </div>
 
                             <SubmitButton />
                         </form>

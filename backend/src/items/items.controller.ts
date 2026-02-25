@@ -27,7 +27,7 @@ export class ItemsController {
   @Get('categories')
   @ApiOperation({
     summary: 'Liste des catégories',
-    description: 'Retourne toutes les catégories d\'articles disponibles.',
+    description: "Retourne toutes les catégories d'articles disponibles.",
   })
   @ApiResponse({
     status: 200,
@@ -50,13 +50,13 @@ export class ItemsController {
 
   @Get(':id')
   @ApiOperation({
-    summary: 'Détails d\'un article',
-    description: 'Retourne les informations détaillées d\'un article.',
+    summary: "Détails d'un article",
+    description: "Retourne les informations détaillées d'un article.",
   })
-  @ApiParam({ name: 'id', description: 'ID de l\'article' })
+  @ApiParam({ name: 'id', description: "ID de l'article" })
   @ApiResponse({
     status: 200,
-    description: 'Détails de l\'article',
+    description: "Détails de l'article",
     schema: {
       properties: {
         id: { type: 'string' },
@@ -64,7 +64,10 @@ export class ItemsController {
         description: { type: 'string' },
         price: { type: 'number', example: 150.0 },
         currency: { type: 'string', example: 'EUR' },
-        status: { type: 'string', enum: ['PENDING', 'APPROVED', 'REJECTED', 'SOLD'] },
+        status: {
+          type: 'string',
+          enum: ['PENDING', 'APPROVED', 'REJECTED', 'SOLD'],
+        },
         images: { type: 'array', items: { type: 'string' } },
         category: { type: 'object' },
         shop: { type: 'object' },
@@ -80,9 +83,9 @@ export class ItemsController {
   @Get(':id/price-history')
   @ApiOperation({
     summary: 'Historique des prix',
-    description: 'Retourne l\'historique des changements de prix d\'un article.',
+    description: "Retourne l'historique des changements de prix d'un article.",
   })
-  @ApiParam({ name: 'id', description: 'ID de l\'article' })
+  @ApiParam({ name: 'id', description: "ID de l'article" })
   @ApiResponse({
     status: 200,
     description: 'Historique des prix',
@@ -107,12 +110,13 @@ export class ItemsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Modifier le prix',
-    description: 'Met à jour le prix d\'un article. Seul le propriétaire peut modifier.',
+    description:
+      "Met à jour le prix d'un article. Seul le propriétaire peut modifier.",
   })
-  @ApiParam({ name: 'id', description: 'ID de l\'article' })
+  @ApiParam({ name: 'id', description: "ID de l'article" })
   @ApiResponse({ status: 200, description: 'Prix mis à jour' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
-  @ApiResponse({ status: 403, description: 'Non propriétaire de l\'article' })
+  @ApiResponse({ status: 403, description: "Non propriétaire de l'article" })
   @ApiResponse({ status: 404, description: 'Article non trouvé' })
   async updatePrice(
     @Param('id') id: string,
@@ -127,12 +131,13 @@ export class ItemsController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Modifier un article',
-    description: 'Met à jour les informations d\'un article. Seul le propriétaire peut modifier.',
+    description:
+      "Met à jour les informations d'un article. Seul le propriétaire peut modifier.",
   })
-  @ApiParam({ name: 'id', description: 'ID de l\'article' })
+  @ApiParam({ name: 'id', description: "ID de l'article" })
   @ApiResponse({ status: 200, description: 'Article mis à jour' })
   @ApiResponse({ status: 401, description: 'Non authentifié' })
-  @ApiResponse({ status: 403, description: 'Non propriétaire de l\'article' })
+  @ApiResponse({ status: 403, description: "Non propriétaire de l'article" })
   @ApiResponse({ status: 404, description: 'Article non trouvé' })
   async updateItem(
     @Param('id') id: string,

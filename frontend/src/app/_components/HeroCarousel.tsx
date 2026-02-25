@@ -1,6 +1,9 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "@/lib/i18n/LocaleProvider";
 
 interface HeroCarouselProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -8,6 +11,8 @@ interface HeroCarouselProps {
 }
 
 export function HeroCarousel({ items = [] }: HeroCarouselProps) {
+    const t = useTranslations();
+
     if (!items || items.length === 0) {
         return null;
     }
@@ -15,9 +20,9 @@ export function HeroCarousel({ items = [] }: HeroCarouselProps) {
     const displayItems = items.slice(0, 8).map(item => ({
         id: item.id,
         title: item.title,
-        user: item.owner?.name || "Vendeur",
+        user: item.owner?.name || t('heroCarousel.defaultSeller'),
         image: item.images && item.images.length > 0 ? item.images[0].url : "https://images.unsplash.com/photo-1639322537228-ad714291f22c?q=80&w=2670&auto=format&fit=crop",
-        time: "À l'instant",
+        time: t('heroCarousel.justNow'),
         avatarSeed: item.owner?.name || "user",
         live: false
     }));
@@ -26,11 +31,11 @@ export function HeroCarousel({ items = [] }: HeroCarouselProps) {
         <section className="mb-12">
             <div className="flex items-end justify-between mb-6">
                 <div>
-                    <h2 className="text-2xl font-bold mb-1">Les Dernières Pépites</h2>
-                    <p className="text-muted-foreground text-sm">Découvrez les derniers objets mis en vente par la communauté.</p>
+                    <h2 className="text-2xl font-bold mb-1">{t('heroCarousel.title')}</h2>
+                    <p className="text-muted-foreground text-sm">{t('heroCarousel.subtitle')}</p>
                 </div>
                 <Link href="#" className="text-sm font-medium hover:underline text-foreground mb-1">
-                    Tout afficher
+                    {t('heroCarousel.viewAll')}
                 </Link>
             </div>
 
@@ -39,13 +44,22 @@ export function HeroCarousel({ items = [] }: HeroCarouselProps) {
                     <div key={slide.id} className="min-w-[280px] md:min-w-[300px] group cursor-pointer">
                         <div className="relative aspect-[4/5] rounded-xl overflow-hidden mb-3 bg-muted">
                             {slide.image && (
-                                <Image
-                                    src={slide.image}
-                                    alt={slide.title}
-                                    fill
-                                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                                    sizes="(max-width: 768px) 280px, 300px"
-                                />
+                                slide.image.startsWith("data:") ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img
+                                        src={slide.image}
+                                        alt={slide.title}
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <Image
+                                        src={slide.image}
+                                        alt={slide.title}
+                                        fill
+                                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                                        sizes="(max-width: 768px) 280px, 300px"
+                                    />
+                                )
                             )}
                             {/* Overlay Gradient */}
                             <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />

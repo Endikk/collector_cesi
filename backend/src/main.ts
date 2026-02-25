@@ -157,6 +157,8 @@ L'API utilise JWT Bearer tokens. Obtenez un token via \`/auth/login\` puis ajout
   logger.log('Security: Response sanitization enabled');
   logger.log('Validation: Zod schema validation enabled');
   logger.log('Logging: Centralized logging with Loki support enabled');
-  logger.log(`API Documentation: Swagger available at ${protocol}://0.0.0.0:${port}/api/docs`);
+  logger.log(
+    `API Documentation: Swagger available at ${protocol}://0.0.0.0:${port}/api/docs`,
+  );
 }
 void bootstrap();

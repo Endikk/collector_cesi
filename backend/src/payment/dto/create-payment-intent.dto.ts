@@ -10,7 +10,9 @@ export const CreatePaymentIntentSchema = z.object({
     .min(1, { message: "L'identifiant de l'acheteur est requis" }),
 });
 
-export type CreatePaymentIntentInput = z.infer<typeof CreatePaymentIntentSchema>;
+export type CreatePaymentIntentInput = z.infer<
+  typeof CreatePaymentIntentSchema
+>;
 
 export class CreatePaymentIntentDto {
   static schema = CreatePaymentIntentSchema;

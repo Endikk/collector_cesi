@@ -240,7 +240,10 @@ export async function sendMessage(conversationId: string, content: string) {
             })
         ).catch((err) => console.error("Redis Publish Error:", err));
 
-        revalidatePath(`/chat/${conversationId}`);
+        // Only revalidate the chat list (sidebar), not the conversation page.
+        // The conversation page uses SSE for real-time updates; calling
+        // revalidatePath on it would trigger a router.refresh() on the sender,
+        // which resets local state and disrupts the real-time flow.
         revalidatePath("/chat");
 
         return {

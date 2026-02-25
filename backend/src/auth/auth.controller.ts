@@ -89,7 +89,8 @@ export class AuthController {
   @ApiBearerAuth('JWT-auth')
   @ApiOperation({
     summary: 'Profil utilisateur connecté',
-    description: 'Retourne les informations du profil de l\'utilisateur connecté.',
+    description:
+      "Retourne les informations du profil de l'utilisateur connecté.",
   })
   @ApiResponse({
     status: 200,

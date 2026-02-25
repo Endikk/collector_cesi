@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getNotifications, markNotificationAsRead, markAllNotificationsAsRead, deleteNotification } from "@/app/actions/notifications";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "@/lib/i18n/LocaleProvider";
 
 interface Notification {
     id: string;
@@ -19,8 +20,12 @@ interface Notification {
     createdAt: Date;
 }
 
+const localeMap: Record<string, string> = { fr: 'fr-FR', en: 'en-US', es: 'es-ES', de: 'de-DE' };
+
 export function NotificationsDropdown() {
     const router = useRouter();
+    const { locale } = useLocale();
+    const t = useTranslations();
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -96,23 +101,23 @@ export function NotificationsDropdown() {
 
         switch (notification.type) {
             case "NEW_MESSAGE":
-                return "Vous avez reçu un nouveau message";
+                return t('notificationsDropdown.types.newMessage');
             case "ITEM_SOLD":
-                return "Votre objet a été vendu !";
+                return t('notificationsDropdown.types.itemSold');
             case "ITEM_PURCHASED":
-                return "Votre achat a été confirmé";
+                return t('notificationsDropdown.types.itemPurchased');
             case "NEW_REVIEW":
-                return "Vous avez reçu un nouvel avis";
+                return t('notificationsDropdown.types.newReview');
             case "NEW_ITEM":
-                return parsedData?.itemTitle 
-                    ? `Nouvel article : ${parsedData.itemTitle}`
-                    : "Nouvel article publié";
+                return parsedData?.itemTitle
+                    ? t('notificationsDropdown.types.newItem', { title: String(parsedData.itemTitle) })
+                    : t('notificationsDropdown.types.newItemDefault');
             case "MATCHING_INTEREST":
-                return parsedData?.itemTitle 
-                    ? `✨ ${parsedData.itemTitle} correspond à vos intérêts`
-                    : "Nouvel article correspondant à vos intérêts";
+                return parsedData?.itemTitle
+                    ? t('notificationsDropdown.types.matchingInterest', { title: String(parsedData.itemTitle) })
+                    : t('notificationsDropdown.types.matchingInterestDefault');
             default:
-                return "Nouvelle notification";
+                return t('notificationsDropdown.newNotification');
         }
     };
 
@@ -151,7 +156,7 @@ export function NotificationsDropdown() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80 p-0">
                 <div className="p-4 border-b flex items-center justify-between">
-                    <h3 className="font-semibold">Notifications</h3>
+                    <h3 className="font-semibold">{t('notificationsDropdown.heading')}</h3>
                     {unreadCount > 0 && (
                         <Button
                             variant="ghost"
@@ -159,20 +164,20 @@ export function NotificationsDropdown() {
                             onClick={handleMarkAllAsRead}
                             className="text-xs h-7"
                         >
-                            Tout marquer lu
+                            {t('notificationsDropdown.markAllRead')}
                         </Button>
                     )}
                 </div>
-                
+
                 <div className="max-h-[400px] overflow-y-auto">
                     {loading ? (
                         <div className="p-4 text-center text-sm text-muted-foreground">
-                            Chargement...
+                            {t('notificationsDropdown.loading')}
                         </div>
                     ) : notifications.length === 0 ? (
                         <div className="p-8 text-center text-sm text-muted-foreground">
                             <Bell className="h-8 w-8 mx-auto mb-2 opacity-20" />
-                            Aucune notification
+                            {t('notificationsDropdown.empty')}
                         </div>
                     ) : (
                         <div className="py-1">
@@ -193,7 +198,7 @@ export function NotificationsDropdown() {
                                                 {getNotificationText(notification)}
                                             </p>
                                             <p className="text-xs text-muted-foreground mt-1">
-                                                {new Date(notification.createdAt).toLocaleDateString("fr-FR", {
+                                                {new Date(notification.createdAt).toLocaleDateString(localeMap[locale] ?? 'fr-FR', {
                                                     day: "numeric",
                                                     month: "short",
                                                     hour: "2-digit",
@@ -209,7 +214,7 @@ export function NotificationsDropdown() {
                                                         handleMarkAsRead(notification.id);
                                                     }}
                                                     className="p-1 hover:bg-blue-100 rounded"
-                                                    title="Marquer comme lu"
+                                                    title={t('notificationsDropdown.markAsRead')}
                                                 >
                                                     <Check className="h-3 w-3 text-blue-600" />
                                                 </button>
@@ -220,7 +225,7 @@ export function NotificationsDropdown() {
                                                     handleDelete(notification.id);
                                                 }}
                                                 className="p-1 hover:bg-red-100 rounded"
-                                                title="Supprimer"
+                                                title={t('notificationsDropdown.delete')}
                                             >
                                                 <Trash2 className="h-3 w-3 text-red-600" />
                                             </button>

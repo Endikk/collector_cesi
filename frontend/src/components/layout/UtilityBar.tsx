@@ -15,9 +15,11 @@ import {
     AvatarImage,
 } from "@/components/ui/avatar";
 import { NotificationsDropdown } from "@/components/common/NotificationsDropdown";
+import { useTranslations } from "@/lib/i18n/LocaleProvider";
 
 export function UtilityBar() {
     const { data: session } = useSession();
+    const t = useTranslations();
 
     return (
         <div className="w-full border-b bg-background text-[11px] md:text-xs">
@@ -28,7 +30,7 @@ export function UtilityBar() {
                         {session ? (
                             <DropdownMenu>
                                 <DropdownMenuTrigger className="flex items-center gap-1 focus:outline-none">
-                                    <span className="text-foreground">Bonjour</span>
+                                    <span className="text-foreground">{t('utilityBar.hello')}</span>
                                     <span className="font-bold text-foreground cursor-pointer flex items-center gap-1">
                                         {session.user?.name}
                                         <ChevronDown className="h-3 w-3" />
@@ -50,12 +52,12 @@ export function UtilityBar() {
                                     </div>
 
                                     <Link href="/profile" className="block py-1.5 hover:underline hover:text-[#3665f3] transition-colors">
-                                        Mon profil
+                                        {t('utilityBar.myProfile')}
                                     </Link>
 
                                     {session.user?.role === 'ADMIN' && (
                                         <Link href="/admin" className="block py-1.5 hover:underline hover:text-[#3665f3] transition-colors font-semibold text-purple-600">
-                                            🔐 Back Office Admin
+                                            🔐 {t('utilityBar.adminBackoffice')}
                                         </Link>
                                     )}
 
@@ -65,33 +67,33 @@ export function UtilityBar() {
                                         onClick={() => signOut()}
                                         className="text-left w-full hover:underline hover:text-[#3665f3] transition-colors"
                                     >
-                                        Se déconnecter
+                                        {t('utilityBar.signOut')}
                                     </button>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
                             <>
-                                <span className="text-foreground">Bonjour !</span>
-                                <Link href="/auth/login" className="text-blue-600 hover:underline ml-1">Connectez-vous</Link>
-                                <span className="mx-1">ou</span>
-                                <Link href="/auth/register" className="text-blue-600 hover:underline">inscrivez-vous</Link>
+                                <span className="text-foreground">{t('utilityBar.hello')} !</span>
+                                <Link href="/auth/login" className="text-blue-600 hover:underline ml-1">{t('utilityBar.signIn')}</Link>
+                                <span className="mx-1">{t('utilityBar.or')}</span>
+                                <Link href="/auth/register" className="text-blue-600 hover:underline">{t('utilityBar.signUp')}</Link>
                             </>
                         )}
                     </div>
-                    <Link href="/sell" className="hover:underline hidden sm:block">Mise en vente</Link>
-                    <Link href="#" className="hover:underline hidden sm:block">Bons Plans</Link>
-                    <Link href="/chat/" className="hover:underline hidden sm:block">Chat</Link>
+                    <Link href="/sell" className="hover:underline hidden sm:block">{t('utilityBar.listItem')}</Link>
+                    <Link href="#" className="hover:underline hidden sm:block">{t('utilityBar.deals')}</Link>
+                    <Link href="/chat/" className="hover:underline hidden sm:block">{t('utilityBar.chat')}</Link>
                 </div>
 
                 {/* Right Side */}
                 <div className="flex items-center gap-4 sm:gap-6 text-muted-foreground">
-                    <Link href="/sell" className="hover:underline hover:text-foreground">Vendre</Link>
+                    <Link href="/sell" className="hover:underline hover:text-foreground">{t('nav.sell')}</Link>
                     <Link href="/profile/purchases" className="hidden sm:flex items-center gap-1 hover:text-foreground cursor-pointer">
-                        <span>Achats</span>
+                        <span>{t('utilityBar.purchases')}</span>
                         <ChevronDown className="h-3 w-3" />
                     </Link>
                     <Link href="/profile" className="flex items-center gap-1 hover:text-foreground cursor-pointer">
-                        <span>Mon Espace</span>
+                        <span>{t('utilityBar.mySpace')}</span>
                         <ChevronDown className="h-3 w-3" />
                     </Link>
                     <div className="flex items-center gap-4 text-foreground">

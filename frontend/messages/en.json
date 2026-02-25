@@ -216,7 +216,66 @@
     "privacy": "Privacy policy",
     "help": "Help",
     "followUs": "Follow us",
-    "copyright": "© 2026 Collector. All rights reserved."
+    "copyright": "© 2026 Collector. All rights reserved.",
+    "loadMore": "Load more",
+    "buy": {
+      "title": "Buy",
+      "howToBuy": "How to buy",
+      "byCategory": "Shop by category",
+      "promotions": "Promotions",
+      "app": "Collector app",
+      "brands": "Brands",
+      "carBrands": "Car brands",
+      "rights": "Rights and obligations on Collector",
+      "extra": "Collector Extra"
+    },
+    "sell": {
+      "title": "Sell",
+      "howToSell": "How to sell",
+      "tools": "Selling tools",
+      "sellersSpace": "Sellers hub",
+      "openShop": "Open a Collector shop",
+      "shippingSpace": "Shipping hub",
+      "fees": "Selling fees",
+      "protection": "Seller protection",
+      "international": "Sell internationally",
+      "howItWorks": "How Collector works"
+    },
+    "aboutSection": {
+      "title": "About Collector",
+      "sustainable": "Sustainable consumption",
+      "legalNotice": "Legal notice",
+      "advertising": "Collector Advertising",
+      "affiliation": "Affiliation",
+      "vero": "VeRO: Intellectual Property",
+      "developers": "Collector developer program",
+      "press": "Press releases",
+      "careers": "Career opportunities",
+      "courtDecisions": "Court decisions"
+    },
+    "helpSection": {
+      "title": "Help",
+      "security": "Security center",
+      "guarantee": "Collector buyer protection"
+    },
+    "community": {
+      "title": "Community",
+      "news": "Collector news",
+      "helpForums": "Help forums",
+      "discussionForums": "Discussion forums",
+      "groups": "Groups"
+    },
+    "sites": "Collector sites",
+    "copyrightText": "Copyright © 1995-2026 Collector Inc. All rights reserved.",
+    "accessibilityLink": "Accessibility",
+    "termsLink": "User agreement",
+    "privacyNotice": "Privacy notice",
+    "paymentTerms": "Payment terms of use",
+    "cookiesLink": "Cookies",
+    "adChoice": "AdChoice",
+    "andConjunction": "and",
+    "backToTop": "Back to top",
+    "openChat": "Open chat"
   },
   "accessibility": {
     "skipToContent": "Skip to main content",
@@ -229,5 +288,55 @@
     "notificationCount": "{count} unread notification(s)",
     "loading": "Loading",
     "imageAlt": "Image of {title}"
+  },
+  "utilityBar": {
+    "hello": "Hello",
+    "myProfile": "My profile",
+    "signOut": "Sign out",
+    "listItem": "List an item",
+    "deals": "Deals",
+    "chat": "Chat",
+    "purchases": "Purchases",
+    "mySpace": "My Account",
+    "signIn": "Sign in",
+    "or": "or",
+    "signUp": "sign up",
+    "adminBackoffice": "Admin Back Office"
+  },
+  "navbar": {
+    "searchPlaceholder": "Search on Collector",
+    "allCategories": "All categories",
+    "advancedSearch": "Advanced search",
+    "exploreByCategory": "Explore by category"
+  },
+  "heroCarousel": {
+    "title": "Latest Finds",
+    "subtitle": "Discover the latest items listed by the community.",
+    "viewAll": "View all",
+    "justNow": "Just now",
+    "defaultSeller": "Seller"
+  },
+  "notificationsDropdown": {
+    "heading": "Notifications",
+    "markAllRead": "Mark all as read",
+    "loading": "Loading...",
+    "empty": "No notifications",
+    "markAsRead": "Mark as read",
+    "delete": "Delete",
+    "newNotification": "New notification",
+    "types": {
+      "newMessage": "You have received a new message",
+      "itemSold": "Your item has been sold!",
+      "itemPurchased": "Your purchase has been confirmed",
+      "newReview": "You have received a new review",
+      "newItem": "New item: {title}",
+      "newItemDefault": "New item listed",
+      "matchingInterest": "✨ {title} matches your interests",
+      "matchingInterestDefault": "New item matching your interests"
+    }
+  },
+  "homePage": {
+    "noItems": "No items found",
+    "noItemsHint": "Try adjusting your search filters."
   }
 }

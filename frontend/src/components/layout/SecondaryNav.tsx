@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "@/lib/i18n/LocaleProvider";
 
 const categories = [
     { name: "Enregistré", href: "/profile/purchases" },
@@ -15,12 +16,14 @@ const categories = [
 ];
 
 export function SecondaryNav() {
+    const t = useTranslations();
+
     return (
         <div className="w-full border-b bg-background shadow-sm overflow-x-auto">
             <div className="container flex items-center h-10 text-[13px] text-muted-foreground whitespace-nowrap">
                 <div className="flex items-center gap-6 px-4">
                     <Link href="/" className="font-semibold text-foreground hover:underline">
-                        Accueil
+                        {t('nav.home')}
                     </Link>
                     {categories.map((cat) => (
                         <Link

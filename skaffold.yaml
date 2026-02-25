@@ -1,0 +1,101 @@
+apiVersion: skaffold/v4beta13
+kind: Config
+metadata:
+  name: collector
+
+# =============================================================================
+# BUILD — Images buildées dans le daemon Minikube (push: false)
+# Skaffold détecte kubeContext=minikube et pointe Docker vers Minikube.
+# Les tags SHA sont injectés automatiquement dans les manifestes K8s.
+# =============================================================================
+build:
+  local:
+    push: false
+    useBuildkit: true
+  artifacts:
+    - image: collector-backend
+      context: backend
+      docker:
+        dockerfile: Dockerfile.dev
+        target: development
+
+    - image: collector-frontend
+      context: .
+      docker:
+        dockerfile: frontend/Dockerfile
+        target: runner
+
+# =============================================================================
+# MANIFESTS — Kustomize génère les manifestes K8s finaux.
+# Aucun hook ici : Minikube, Terraform et les images sont gérés par le Makefile
+# avant que Skaffold ne soit invoqué.
+# =============================================================================
+manifests:
+  kustomize:
+    paths:
+      - infrastructure/k8s/base
+
+# =============================================================================
+# DEPLOY — kubectl apply + attente que chaque pod soit Ready (probes K8s)
+# =============================================================================
+deploy:
+  kubectl: {}
+  statusCheck: true
+  statusCheckDeadlineSeconds: 600
+  kubeContext: minikube
+
+# =============================================================================
+# PORT FORWARD — Exposition automatique sur localhost
+# =============================================================================
+portForward:
+  - resourceType: service
+    resourceName: backend
+    namespace: collector
+    port: 4000
+    localPort: 4000
+
+  - resourceType: service
+    resourceName: frontend
+    namespace: collector
+    port: 3000
+    localPort: 3000
+
+  - resourceType: service
+    resourceName: grafana
+    namespace: collector
+    port: 3002
+    localPort: 3002
+
+  - resourceType: service
+    resourceName: prometheus
+    namespace: collector
+    port: 9090
+    localPort: 9090
+
+# =============================================================================
+# PROFILES
+# =============================================================================
+profiles:
+
+  # --- dev : hot-reload backend (.ts synchro sans rebuild d'image)
+  #   → make dev
+  - name: dev
+    build:
+      local:
+        push: false
+        useBuildkit: true
+      artifacts:
+        - image: collector-backend
+          context: backend
+          docker:
+            dockerfile: Dockerfile.dev
+            target: development
+          sync:
+            manual:
+              - src: "src/**/*.ts"
+                dest: /app/src
+        - image: collector-frontend
+          context: .
+          docker:
+            dockerfile: frontend/Dockerfile
+            target: runner

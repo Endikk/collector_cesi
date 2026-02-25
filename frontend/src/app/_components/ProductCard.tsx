@@ -28,13 +28,22 @@ export const ProductCard = memo(function ProductCard({ item, delay }: ProductCar
             <Card className="group relative overflow-hidden border-0 bg-white shadow-md transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-primary/5">
                 <div className="relative aspect-[4/3] w-full overflow-hidden">
                     {item.images.length > 0 ? (
-                        <Image
-                            src={item.images[0].url}
-                            alt={item.title}
-                            fill
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                            className="object-cover transition-transform duration-500 group-hover:scale-110"
-                        />
+                        item.images[0].url.startsWith("data:") ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={item.images[0].url}
+                                alt={item.title}
+                                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                        ) : (
+                            <Image
+                                src={item.images[0].url}
+                                alt={item.title}
+                                fill
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                className="object-cover transition-transform duration-500 group-hover:scale-110"
+                            />
+                        )
                     ) : (
                         <div className="flex h-full w-full items-center justify-center bg-secondary/50">
                             <Package className="h-12 w-12 text-muted-foreground/50" />

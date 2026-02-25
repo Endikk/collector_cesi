@@ -1,8 +1,14 @@
-import { Module, MiddlewareConsumer, NestModule, RequestMethod } from '@nestjs/common';
+import {
+  Module,
+  MiddlewareConsumer,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
 import { RedisCacheModule } from './cache';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { CustomThrottlerGuard } from './common/throttler.guard';
 
 import { HttpMetricsInterceptor } from './common/http-metrics.interceptor';
 import { AppController } from './app.controller';
@@ -77,7 +83,7 @@ import { LoggingModule, CorrelationIdMiddleware } from './logging';
     AppService,
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
+      useClass: CustomThrottlerGuard,
     },
     {
       provide: APP_INTERCEPTOR,

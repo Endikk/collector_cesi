@@ -11,7 +11,10 @@ export const UpdateShopSchema = z.object({
     .string()
     .max(500, { message: 'La description ne peut pas dépasser 500 caractères' })
     .optional(),
-  logo: z.string().url({ message: 'Le logo doit être une URL valide' }).optional(),
+  logo: z
+    .string()
+    .url({ message: 'Le logo doit être une URL valide' })
+    .optional(),
 });
 
 export type UpdateShopInput = z.infer<typeof UpdateShopSchema>;

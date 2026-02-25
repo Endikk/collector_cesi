@@ -4,6 +4,8 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { subscriberRedis } from "@/lib/redis";
 
+export const dynamic = "force-dynamic";
+
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ conversationId: string }> }
@@ -57,7 +59,7 @@ export async function GET(
             const pingInterval = setInterval(() => {
                 try {
                     controller.enqueue(encoder.encode(`:\n\n`));
-                } catch (e) {
+                } catch {
                     clearInterval(pingInterval);
                     redisClient.unsubscribe(channel);
                     redisClient.quit();
@@ -68,7 +70,7 @@ export async function GET(
                 clearInterval(pingInterval);
                 redisClient.unsubscribe(channel);
                 redisClient.quit();
-                try { controller.close() } catch (e) { }
+                try { controller.close() } catch { }
             });
         }
     });
@@ -76,9 +78,9 @@ export async function GET(
     return new Response(stream, {
         headers: {
             "Content-Type": "text/event-stream",
-            "Cache-Control": "no-cache",
+            "Cache-Control": "no-cache, no-transform",
             "Connection": "keep-alive",
-            "Access-Control-Allow-Origin": "*",
+            "X-Accel-Buffering": "no",
         },
     });
 }

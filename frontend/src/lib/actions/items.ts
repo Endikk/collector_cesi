@@ -10,7 +10,7 @@ const createItemSchema = z.object({
     title: z.string().min(5, "Le titre doit faire au moins 5 caractères").max(100),
     description: z.string().min(20, "La description doit être détaillée (min 20 caractères)"),
     price: z.preprocess((val) => Number(val), z.number().min(1, "Le prix minimum est de 1€")),
-    imageUrl: z.string().url("URL d'image invalide").optional().or(z.literal("")),
+    imageUrl: z.string().optional().or(z.literal("")),
     categoryId: z.string().min(1, "Veuillez sélectionner une catégorie"),
 });
 

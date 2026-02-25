@@ -21,8 +21,15 @@ export class BruteForceGuard implements CanActivate {
   private readonly COMBINED_MAX_ATTEMPTS = 3;
   private readonly BLOCK_DURATION_MS = 15 * 60 * 1000;
 
+  private cleanupInterval: ReturnType<typeof setInterval>;
+
   constructor(private reflector: Reflector) {
-    setInterval(() => this.cleanup(), 5 * 60 * 1000);
+    this.cleanupInterval = setInterval(() => this.cleanup(), 5 * 60 * 1000);
+    this.cleanupInterval.unref();
+  }
+
+  destroy() {
+    clearInterval(this.cleanupInterval);
   }
 
   canActivate(context: ExecutionContext): boolean {

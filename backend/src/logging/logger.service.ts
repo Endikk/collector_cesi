@@ -1,4 +1,8 @@
-import { Injectable, LoggerService as NestLoggerService, Scope } from '@nestjs/common';
+import {
+  Injectable,
+  LoggerService as NestLoggerService,
+  Scope,
+} from '@nestjs/common';
 
 /**
  * Niveaux de log supportés
@@ -103,7 +107,11 @@ export class LoggerService implements NestLoggerService {
   /**
    * Log niveau ERROR
    */
-  error(message: string | Error, trace?: string, context?: string | LogContext): void {
+  error(
+    message: string | Error,
+    trace?: string,
+    context?: string | LogContext,
+  ): void {
     const errorInfo = message instanceof Error ? message : undefined;
     const msg = message instanceof Error ? message.message : message;
     this.writeLog('error', msg, context, errorInfo, trace);
@@ -147,7 +155,8 @@ export class LoggerService implements NestLoggerService {
     duration: number,
     context?: Partial<LogContext>,
   ): void {
-    const level: LogLevel = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
+    const level: LogLevel =
+      statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
     const message = `${method} ${path} ${statusCode} - ${duration}ms`;
 
     this.writeLog(level, message, {
@@ -162,7 +171,11 @@ export class LoggerService implements NestLoggerService {
   /**
    * Log un événement métier
    */
-  logBusinessEvent(event: string, data: Record<string, unknown>, context?: Partial<LogContext>): void {
+  logBusinessEvent(
+    event: string,
+    data: Record<string, unknown>,
+    context?: Partial<LogContext>,
+  ): void {
     this.writeLog('info', `[BUSINESS_EVENT] ${event}`, {
       ...context,
       event,
@@ -173,7 +186,11 @@ export class LoggerService implements NestLoggerService {
   /**
    * Log une action de sécurité
    */
-  logSecurity(action: string, details: Record<string, unknown>, context?: Partial<LogContext>): void {
+  logSecurity(
+    action: string,
+    details: Record<string, unknown>,
+    context?: Partial<LogContext>,
+  ): void {
     this.writeLog('warn', `[SECURITY] ${action}`, {
       ...context,
       securityAction: action,
@@ -184,7 +201,11 @@ export class LoggerService implements NestLoggerService {
   /**
    * Log une métrique de performance
    */
-  logPerformance(operation: string, duration: number, context?: Partial<LogContext>): void {
+  logPerformance(
+    operation: string,
+    duration: number,
+    context?: Partial<LogContext>,
+  ): void {
     const level: LogLevel = duration > 1000 ? 'warn' : 'debug';
     this.writeLog(level, `[PERF] ${operation}: ${duration}ms`, {
       ...context,

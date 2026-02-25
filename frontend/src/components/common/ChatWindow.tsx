@@ -39,40 +39,50 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, oth
         }
     }, [messages]);
 
+    // Sync initialMessages when navigating between conversations
     useEffect(() => {
         setMessages(initialMessages);
-    }, [initialMessages]);
+    }, [conversationId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    // Real-time updates via Server-Sent Events (SSE)
+    // Real-time updates via Server-Sent Events (SSE) with auto-reconnect
     useEffect(() => {
         if (!conversationId) return;
 
-        const eventSource = new EventSource(`/api/chat/${conversationId}/stream`);
+        let eventSource: EventSource | null = null;
+        let reconnectTimeout: ReturnType<typeof setTimeout> | null = null;
+        let active = true;
 
-        eventSource.onmessage = (event) => {
-            try {
-                const data = JSON.parse(event.data);
+        const connect = () => {
+            if (!active) return;
+            eventSource = new EventSource(`/api/chat/${conversationId}/stream`);
 
-                // Ignore connection messages
-                if (data.type === "connected") return;
+            eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === "connected") return;
+                    setMessages((prev) => {
+                        if (prev.some((msg) => msg.id === data.id)) return prev;
+                        return [...prev, data as Message];
+                    });
+                } catch (error) {
+                    console.error("Error parsing real-time message:", error);
+                }
+            };
 
-                setMessages((prev) => {
-                    // Check if message already exists (from optimistic UI or previous load)
-                    if (prev.some((msg) => msg.id === data.id)) return prev;
-                    return [...prev, data as Message];
-                });
-            } catch (error) {
-                console.error("Error parsing real-time message:", error);
-            }
+            eventSource.onerror = () => {
+                eventSource?.close();
+                if (active) {
+                    reconnectTimeout = setTimeout(connect, 3000);
+                }
+            };
         };
 
-        eventSource.onerror = (error) => {
-            console.error("SSE Error:", error);
-            eventSource.close();
-        };
+        connect();
 
         return () => {
-            eventSource.close();
+            active = false;
+            if (reconnectTimeout) clearTimeout(reconnectTimeout);
+            eventSource?.close();
         };
     }, [conversationId]);
 

@@ -71,7 +71,10 @@ export class ZodValidationPipe implements PipeTransform {
 /**
  * Register a Zod schema for a DTO class
  */
-export function registerSchema(dtoClass: new (...args: unknown[]) => unknown, schema: ZodSchema): void {
+export function registerSchema(
+  dtoClass: new (...args: unknown[]) => unknown,
+  schema: ZodSchema,
+): void {
   schemaRegistry.set(dtoClass.name, schema);
 }
 
