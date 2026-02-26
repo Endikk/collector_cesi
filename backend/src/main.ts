@@ -71,7 +71,7 @@ async function bootstrap() {
       : '*', // Permissif en dev
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'x-user-role'],
     exposedHeaders: ['X-Total-Count'], // Pour pagination
   });
 

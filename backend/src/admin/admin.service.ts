@@ -198,6 +198,30 @@ export class AdminService {
     });
   }
 
+  // Transactions
+  async getTransactions() {
+    return this.prisma.transaction.findMany({
+      select: {
+        id: true,
+        amount: true,
+        commission: true,
+        status: true,
+        createdAt: true,
+        buyer: {
+          select: { id: true, name: true, email: true },
+        },
+        seller: {
+          select: { id: true, name: true, email: true },
+        },
+        item: {
+          select: { id: true, title: true },
+        },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 100,
+    });
+  }
+
   // Chat Moderation
   async getAllMessages() {
     return this.prisma.message.findMany({

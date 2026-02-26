@@ -57,6 +57,12 @@ export class AdminController {
     return this.adminService.deleteItem(id);
   }
 
+  // Transactions
+  @Get('transactions')
+  getTransactions() {
+    return this.adminService.getTransactions();
+  }
+
   // Reports & Moderation
   @Get('items/flagged')
   getFlaggedItems() {

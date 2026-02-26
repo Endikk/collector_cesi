@@ -132,15 +132,35 @@ export async function deleteItem(itemId: string) {
 export async function getAdminStats() {
     try {
         const session = await getServerSession(authOptions);
+        if (!session?.user?.role) {
+            return { success: false, stats: null, error: "Session invalide ou rôle manquant" };
+        }
         const stats = await fetchBackend("/admin/stats", {
             headers: {
-                "x-user-role": session?.user?.role || "",
+                "x-user-role": session.user.role,
             },
         });
         return { success: true, stats };
     } catch (error) {
-        console.error("Error fetching stats:", error);
-        return { success: false, stats: null };
+        const msg = error instanceof Error ? error.message : "Erreur inconnue";
+        console.error("Error fetching stats:", msg);
+        return { success: false, stats: null, error: msg };
+    }
+}
+
+// Transactions
+export async function getAdminTransactions() {
+    try {
+        const session = await getServerSession(authOptions);
+        const transactions = await fetchBackend("/admin/transactions", {
+            headers: {
+                "x-user-role": session?.user?.role || "",
+            },
+        });
+        return { success: true, transactions };
+    } catch (error) {
+        console.error("Error fetching transactions:", error);
+        return { success: false, transactions: [] };
     }
 }
 

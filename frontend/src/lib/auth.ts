@@ -48,6 +48,20 @@ export const authOptions: NextAuthOptions = {
         }),
     ],
     callbacks: {
+        async redirect({ url, baseUrl }) {
+            // Allow relative URLs
+            if (url.startsWith("/")) return `${baseUrl}${url}`;
+            // Allow URLs on the same origin (handles localhost + collector.local)
+            try {
+                const urlOrigin = new URL(url).origin;
+                if (urlOrigin === baseUrl || url.startsWith("http://localhost") || url.startsWith("https://localhost")) {
+                    return url;
+                }
+            } catch {
+                // invalid URL, fall through
+            }
+            return baseUrl;
+        },
         async session({ session, token }) {
             return {
                 ...session,

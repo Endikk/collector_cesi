@@ -60,6 +60,11 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, oth
                 try {
                     const data = JSON.parse(event.data);
                     if (data.type === "connected") return;
+                    // Skip messages sent by the current user — they are already
+                    // displayed via the optimistic update in handleSendMessage.
+                    // The optimistic message id will be replaced with the real id
+                    // once the server action resolves.
+                    if (data.senderId === currentUserId) return;
                     setMessages((prev) => {
                         if (prev.some((msg) => msg.id === data.id)) return prev;
                         return [...prev, data as Message];
@@ -84,7 +89,7 @@ export function ChatWindow({ conversationId, initialMessages, currentUserId, oth
             if (reconnectTimeout) clearTimeout(reconnectTimeout);
             eventSource?.close();
         };
-    }, [conversationId]);
+    }, [conversationId, currentUserId]);
 
     const handleSendMessage = async (e: React.FormEvent) => {
         e.preventDefault();
