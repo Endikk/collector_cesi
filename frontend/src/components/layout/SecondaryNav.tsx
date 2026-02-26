@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useTranslations } from "@/lib/i18n/LocaleProvider";
 
 const categories = [
-    { name: "Enregistré", href: "/profile/purchases" },
     { name: "Art & Collections", href: "/?categories=Art%20%26%20Collections" },
     { name: "Auto & Moto", href: "/?categories=Auto%20%26%20Moto" },
     { name: "High-Tech", href: "/?categories=High-Tech" },

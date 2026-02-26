@@ -183,6 +183,7 @@ export function AdminDashboard() {
 
     const loadData = async () => {
         setLoading(true);
+        setLoadError(null);
         const [statsResult, usersResult, categoriesResult, itemsResult, messagesResult, conversationsResult, transactionsResult] = await Promise.all([
             getAdminStats(),
             getAdminUsers(),
@@ -326,7 +327,7 @@ export function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-600">
-                            {stats.totalCommission.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                            {(stats.totalCommission ?? 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                         </div>
                     </CardContent>
                 </Card>
@@ -427,11 +428,10 @@ export function AdminDashboard() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-xs px-2 py-1 rounded ${
-                                                item.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
-                                                item.status === 'SOLD' ? 'bg-gray-100 text-gray-700' :
-                                                'bg-yellow-100 text-yellow-700'
-                                            }`}>
+                                            <span className={`text-xs px-2 py-1 rounded ${item.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
+                                                    item.status === 'SOLD' ? 'bg-gray-100 text-gray-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                }`}>
                                                 {item.status}
                                             </span>
                                             <Button
@@ -468,10 +468,9 @@ export function AdminDashboard() {
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-medium">{user.name || 'Sans nom'}</span>
-                                                <span className={`text-xs px-2 py-0.5 rounded ${
-                                                    user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
-                                                    'bg-gray-100 text-gray-700'
-                                                }`}>
+                                                <span className={`text-xs px-2 py-0.5 rounded ${user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
+                                                        'bg-gray-100 text-gray-700'
+                                                    }`}>
                                                     {user.role}
                                                 </span>
                                             </div>
@@ -542,13 +541,12 @@ export function AdminDashboard() {
                                                         +{tx.commission.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} commission
                                                     </div>
                                                 </div>
-                                                <span className={`text-xs px-2 py-1 rounded ${
-                                                    tx.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
-                                                    tx.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-                                                    'bg-red-100 text-red-700'
-                                                }`}>
+                                                <span className={`text-xs px-2 py-1 rounded ${tx.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                                                        tx.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                                            'bg-red-100 text-red-700'
+                                                    }`}>
                                                     {tx.status === 'COMPLETED' ? 'Complétée' :
-                                                     tx.status === 'PENDING' ? 'En attente' : 'Annulée'}
+                                                        tx.status === 'PENDING' ? 'En attente' : 'Annulée'}
                                                 </span>
                                             </div>
                                         </div>
