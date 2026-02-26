@@ -8,9 +8,10 @@ import {
 @Injectable()
 export class AdminGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const request = context
-      .switchToHttp()
-      .getRequest<{ user?: { role: string }; headers: Record<string, string> }>();
+    const request = context.switchToHttp().getRequest<{
+      user?: { role: string };
+      headers: Record<string, string>;
+    }>();
 
     // 1. If JWT auth populated request.user, use it directly
     if (request.user?.role === 'ADMIN') {

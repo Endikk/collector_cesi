@@ -5,10 +5,10 @@ import { AdminGuard } from './admin.guard';
 @Controller('admin')
 @UseGuards(AdminGuard)
 export class AdminTransactionsController {
-    constructor(private readonly adminService: AdminService) { }
+  constructor(private readonly adminService: AdminService) {}
 
-    @Get('transactions')
-    getTransactions() {
-        return this.adminService.getTransactions();
-    }
+  @Get('transactions')
+  getTransactions() {
+    return this.adminService.getTransactions();
+  }
 }
