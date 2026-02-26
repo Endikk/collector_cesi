@@ -16,7 +16,7 @@
 # =============================================================================
 
 # Ports exposés localement
-PORTS := 3000 4000 3002 9090
+PORTS := 3000 4000 3002 9090 5432 6379
 
 # Images tiers à charger dans Minikube (évite la rate-limit Docker Hub)
 IMAGES := \
@@ -112,12 +112,17 @@ _forward: _kill-ports
 	@nohup kubectl port-forward svc/backend    -n collector 4000:4000 > /dev/null 2>&1 &
 	@nohup kubectl port-forward svc/grafana    -n collector 3002:3002 > /dev/null 2>&1 &
 	@nohup kubectl port-forward svc/prometheus -n collector 9090:9090 > /dev/null 2>&1 &
+	@nohup kubectl port-forward pod/db-0       -n collector 5432:5432 > /dev/null 2>&1 &
+	@nohup kubectl port-forward svc/redis      -n collector 6379:6379 > /dev/null 2>&1 &
 	@sleep 2
 	@echo "✅ Services disponibles :"
 	@echo "   http://localhost:3000  → Frontend (Collector.shop)"
 	@echo "   http://localhost:4000  → Backend API"
+	@echo "   http://localhost:4000/api/docs  → Swagger UI"
 	@echo "   http://localhost:3002  → Grafana (admin/admin)"
 	@echo "   http://localhost:9090  → Prometheus"
+	@echo "   localhost:5432         → PostgreSQL (DB collector)"
+	@echo "   localhost:6379         → Redis"
 
 # 5. Reset DB (make reset uniquement)
 #    Si le pod DB tourne déjà → vide le schéma avant redéploiement
