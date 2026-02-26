@@ -47,13 +47,19 @@ spec:
                   name: db-credentials
                   key: DATABASE_URL
             # --- Config (non-sensible) ---
+            # Le runner Next.js standalone tourne en HTTP.
+            # HTTPS est terminé à l'ingress NGINX (https://collector.local).
+            - name: HTTPS_ENABLED
+              value: "false"
             - name: BACKEND_URL
               value: "http://backend:4000"
             - name: NEXT_PUBLIC_BACKEND_URL
               value: "http://localhost:4000"
             - name: NEXTAUTH_URL
-              value: "http://localhost:3000"
-            # --- Redis (pub/sub pour le chat SSE et les notifications) ---
+              value: "https://collector.local"
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "0"
+            # --- Redis ---
             - name: REDIS_HOST
               value: "redis"
             - name: REDIS_PORT
@@ -62,6 +68,7 @@ spec:
             httpGet:
               path: /
               port: 3000
+              scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5
@@ -70,6 +77,7 @@ spec:
             httpGet:
               path: /
               port: 3000
+              scheme: HTTP
             initialDelaySeconds: 30
             periodSeconds: 15
             timeoutSeconds: 5
@@ -78,6 +86,7 @@ spec:
             httpGet:
               path: /
               port: 3000
+              scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 5
             timeoutSeconds: 3
@@ -90,6 +99,15 @@ spec:
               cpu: 500m
               memory: 512Mi
 ---
+# Ingress HTTPS — TLS terminé ici par NGINX Ingress Controller.
+# Le pod frontend tourne en HTTP, mais l'accès externe est HTTPS.
+#
+# Pour accéder via https://collector.local :
+#   1) make hosts   → ajoute "127.0.0.1 collector.local" dans /etc/hosts
+#   2) make tunnel  → lance minikube tunnel (dans un autre terminal)
+#   3) Browser      → https://collector.local
+#
+# Le secret TLS "collector-tls" est injecté automatiquement par : make run
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -97,7 +115,14 @@ metadata:
   namespace: collector
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - collector.local
+      secretName: collector-tls
   rules:
     - host: collector.local
       http:

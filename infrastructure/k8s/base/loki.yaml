@@ -62,6 +62,13 @@ data:
       reject_old_samples: true
       reject_old_samples_max_age: 168h
       max_entries_limit_per_query: 5000
+      max_query_parallelism: 8
+
+    querier:
+      max_concurrent: 20
+
+    frontend:
+      max_outstanding_per_tenant: 512
 
     ruler:
       alertmanager_url: http://localhost:9093

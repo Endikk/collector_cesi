@@ -97,6 +97,7 @@ spec:
               value: "3000"
             - name: NODE_OPTIONS
               value: "--max-old-space-size=768"
+            # HTTP en interne — HTTPS terminé à l'ingress NGINX
             - name: HTTPS_ENABLED
               value: "false"
             - name: SMTP_HOST
@@ -113,14 +114,12 @@ spec:
             httpGet:
               path: /health
               port: 3000
-            initialDelaySeconds: 90
-            periodSeconds: 15
-            timeoutSeconds: 5
-            failureThreshold: 8
+              scheme: HTTP
           readinessProbe:
             httpGet:
               path: /health
               port: 3000
+              scheme: HTTP
             initialDelaySeconds: 45
             periodSeconds: 10
             timeoutSeconds: 5
@@ -129,6 +128,7 @@ spec:
             httpGet:
               path: /health
               port: 3000
+              scheme: HTTP
             initialDelaySeconds: 10
             periodSeconds: 10
             timeoutSeconds: 5

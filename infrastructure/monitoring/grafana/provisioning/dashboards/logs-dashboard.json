@@ -177,7 +177,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by (level) (count_over_time({namespace=\"collector\", app=\"backend\"} | json [$__interval]))",
+          "expr": "sum by (level) (count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" [$__interval]))",
           "legendFormat": "{{level}}",
           "refId": "A"
         }
@@ -233,7 +233,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | level=\"error\" [$__range])",
+          "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | level=\"error\" [$__range])",
           "legendFormat": "Erreurs",
           "refId": "A"
         }
@@ -289,7 +289,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | level=\"warn\" [$__range])",
+          "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | level=\"warn\" [$__range])",
           "legendFormat": "Warnings",
           "refId": "A"
         }
@@ -391,7 +391,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum(rate({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | method != \"\" [$__interval]))",
+          "expr": "sum(rate({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | context_method != \"\" [$__interval]))",
           "legendFormat": "Requetes/s",
           "refId": "A"
         }
@@ -525,8 +525,8 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "sum by (statusCode) (count_over_time({namespace=\"collector\", app=\"backend\"} | json | statusCode != \"\" [$__interval]))",
-          "legendFormat": "{{statusCode}}",
+          "expr": "sum by (context_statusCode) (count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | context_statusCode != \"\" [$__interval]))",
+          "legendFormat": "{{context_statusCode}}",
           "refId": "A"
         }
       ],
@@ -574,7 +574,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{namespace=\"collector\", app=\"backend\"} | json | level=\"error\" or level=\"fatal\"",
+          "expr": "{namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | level=\"error\" or level=\"fatal\"",
           "legendFormat": "",
           "refId": "A"
         }
@@ -623,7 +623,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{namespace=\"collector\", app=~\"$app\"} | json",
+          "expr": "{namespace=\"collector\", app=~\"$app\"} | json | __error__=\"\"",
           "legendFormat": "",
           "refId": "A"
         }
@@ -672,7 +672,7 @@
             "type": "loki",
             "uid": "loki"
           },
-          "expr": "{namespace=\"collector\"} | json | correlationId=\"$correlationId\"",
+          "expr": "{namespace=\"collector\"} | json | __error__=\"\" | context_correlationId=\"$correlationId\"",
           "legendFormat": "",
           "refId": "A"
         }
@@ -681,7 +681,7 @@
       "type": "logs"
     }
   ],
-  "refresh": "10s",
+  "refresh": "30s",
   "schemaVersion": 38,
   "tags": ["collector", "logs", "loki", "observability"],
   "templating": {

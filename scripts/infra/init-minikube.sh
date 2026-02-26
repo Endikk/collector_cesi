@@ -28,7 +28,7 @@ printf "════════════════════════
 # ── 1. Prérequis ──
 step "1/3 — Vérification des prérequis"
 MISSING=""
-for cmd in minikube docker kubectl terraform; do
+for cmd in minikube docker kubectl skaffold; do
     command -v "$cmd" &>/dev/null || MISSING="$MISSING $cmd"
 done
 [ -n "$MISSING" ] && fail "Outil(s) manquant(s) :$MISSING"
@@ -70,21 +70,33 @@ step "3/3 — Activation des addons"
 
 enable_addon() {
     local addon=$1
+    local wait_for_ready=${2:-false}
     printf "   → %-20s" "$addon"
     if minikube addons list 2>/dev/null | grep -E "[[:space:]]${addon}[[:space:]]" | grep -q "enabled"; then
         printf "déjà actif ✓\n"
         return 0
     fi
-    timeout 60 minikube addons enable "$addon" > /dev/null 2>&1 \
+    timeout 120 minikube addons enable "$addon" > /dev/null 2>&1 \
         && printf "activé ✓\n" \
-        || printf "(timeout — actif au prochain démarrage)\n"
+        || { printf "⚠️  timeout\n"; return 0; }
+
+    # Attendre que les pods du contrôleur ingress soient prêts
+    if [ "$wait_for_ready" = "true" ]; then
+        printf "     ⏳ Attente du contrôleur ingress (max 90s)...\n"
+        kubectl wait --namespace ingress-nginx \
+            --for=condition=ready pod \
+            --selector=app.kubernetes.io/component=controller \
+            --timeout=90s > /dev/null 2>&1 \
+            && printf "     ✅ Contrôleur ingress prêt.\n" \
+            || printf "     ⚠️  Contrôleur ingress non prêt — continuons quand même.\n"
+    fi
 }
 
 # storage-provisioner et default-storageclass sont requis pour les PVC (postgres, prometheus)
 enable_addon storage-provisioner
 enable_addon default-storageclass
 enable_addon metrics-server
-enable_addon ingress
+enable_addon ingress true
 ok "Addons configurés."
 
 printf "\n════════════════════════════════════════════════════════\n"

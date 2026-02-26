@@ -295,7 +295,7 @@ data:
       "description": "Dashboard de monitoring des logs centralises pour Collector",
       "editable": true,
       "schemaVersion": 38,
-      "refresh": "10s",
+      "refresh": "30s",
       "tags": ["collector", "logs", "loki", "observability"],
       "time": { "from": "now-1h", "to": "now" },
       "title": "Collector - Logs Centralises",
@@ -334,7 +334,7 @@ data:
           "gridPos": { "x": 0, "y": 1, "w": 12, "h": 6 },
           "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "bars", "fillOpacity": 80, "stacking": { "group": "A", "mode": "normal" } } }, "overrides": [{ "matcher": { "id": "byName", "options": "error" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }, { "matcher": { "id": "byName", "options": "warn" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] }, { "matcher": { "id": "byName", "options": "info" }, "properties": [{ "id": "color", "value": { "fixedColor": "blue", "mode": "fixed" } }] }] },
           "options": { "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "right" } },
-          "targets": [{ "expr": "sum by (level) (count_over_time({namespace=\"collector\", app=\"backend\"} | json [$__interval]))", "legendFormat": "{{level}}", "refId": "A" }],
+          "targets": [{ "expr": "sum by (level) (count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" [$__interval]))", "legendFormat": "{{level}}", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         },
         {
@@ -342,7 +342,7 @@ data:
           "gridPos": { "x": 12, "y": 1, "w": 6, "h": 6 },
           "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "red", "value": 1 }] } } },
           "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["sum"] } },
-          "targets": [{ "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | level=\"error\" [$__range])", "legendFormat": "Erreurs", "refId": "A" }],
+          "targets": [{ "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | level=\"error\" [$__range])", "legendFormat": "Erreurs", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         },
         {
@@ -350,7 +350,7 @@ data:
           "gridPos": { "x": 18, "y": 1, "w": 6, "h": 6 },
           "fieldConfig": { "defaults": { "color": { "mode": "thresholds" }, "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }, { "color": "yellow", "value": 1 }] } } },
           "options": { "colorMode": "value", "graphMode": "area", "reduceOptions": { "calcs": ["sum"] } },
-          "targets": [{ "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | level=\"warn\" [$__range])", "legendFormat": "Warnings", "refId": "A" }],
+          "targets": [{ "expr": "count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | level=\"warn\" [$__range])", "legendFormat": "Warnings", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         },
         { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 7 }, "id": 5, "title": "Requetes HTTP", "type": "row" },
@@ -359,7 +359,7 @@ data:
           "gridPos": { "x": 0, "y": 8, "w": 12, "h": 6 },
           "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "line", "fillOpacity": 10, "lineInterpolation": "smooth", "lineWidth": 2 }, "unit": "reqps" } },
           "options": { "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "right" } },
-          "targets": [{ "expr": "sum(rate({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | method != \"\" [$__interval]))", "legendFormat": "Requetes/s", "refId": "A" }],
+          "targets": [{ "expr": "sum(rate({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | context_method != \"\" [$__interval]))", "legendFormat": "Requetes/s", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         },
         {
@@ -367,7 +367,7 @@ data:
           "gridPos": { "x": 12, "y": 8, "w": 12, "h": 6 },
           "fieldConfig": { "defaults": { "color": { "mode": "palette-classic" }, "custom": { "drawStyle": "bars", "fillOpacity": 80, "stacking": { "group": "A", "mode": "normal" } } }, "overrides": [{ "matcher": { "id": "byRegexp", "options": "/5.+/" }, "properties": [{ "id": "color", "value": { "fixedColor": "red", "mode": "fixed" } }] }, { "matcher": { "id": "byRegexp", "options": "/4.+/" }, "properties": [{ "id": "color", "value": { "fixedColor": "yellow", "mode": "fixed" } }] }, { "matcher": { "id": "byRegexp", "options": "/2.+/" }, "properties": [{ "id": "color", "value": { "fixedColor": "green", "mode": "fixed" } }] }] },
           "options": { "legend": { "calcs": ["sum"], "displayMode": "table", "placement": "right" } },
-          "targets": [{ "expr": "sum by (statusCode) (count_over_time({namespace=\"collector\", app=\"backend\"} | json | statusCode != \"\" [$__interval]))", "legendFormat": "{{statusCode}}", "refId": "A" }],
+          "targets": [{ "expr": "sum by (context_statusCode) (count_over_time({namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | context_statusCode != \"\" [$__interval]))", "legendFormat": "{{context_statusCode}}", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         },
         { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 14 }, "id": 8, "title": "Erreurs et Alertes", "type": "row" },
@@ -375,7 +375,7 @@ data:
           "id": 9, "title": "Logs d'erreur (temps reel)", "type": "logs",
           "gridPos": { "x": 0, "y": 15, "w": 24, "h": 8 },
           "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
-          "targets": [{ "expr": "{namespace=\"collector\", app=\"backend\"} | json | level=\"error\" or level=\"fatal\"", "refId": "A" }],
+          "targets": [{ "expr": "{namespace=\"collector\", app=\"backend\"} | json | __error__=\"\" | level=\"error\" or level=\"fatal\"", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         },
         { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 23 }, "id": 10, "title": "Tous les logs", "type": "row" },
@@ -383,7 +383,7 @@ data:
           "id": 11, "title": "Flux de logs", "type": "logs",
           "gridPos": { "x": 0, "y": 24, "w": 24, "h": 12 },
           "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showLabels": true, "showTime": true, "sortOrder": "Descending", "wrapLogMessage": true },
-          "targets": [{ "expr": "{namespace=\"collector\", app=~\"$app\"} | json", "refId": "A" }],
+          "targets": [{ "expr": "{namespace=\"collector\", app=~\"$app\"} | json | __error__=\"\"", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         },
         { "collapsed": false, "gridPos": { "h": 1, "w": 24, "x": 0, "y": 36 }, "id": 12, "title": "Tracabilite", "type": "row" },
@@ -391,7 +391,7 @@ data:
           "id": 13, "title": "Tracage par Correlation ID", "type": "logs",
           "gridPos": { "x": 0, "y": 37, "w": 24, "h": 8 },
           "options": { "dedupStrategy": "none", "enableLogDetails": true, "prettifyLogMessage": true, "showLabels": true, "showTime": true, "sortOrder": "Ascending", "wrapLogMessage": true },
-          "targets": [{ "expr": "{namespace=\"collector\"} | json | correlationId=\"$correlationId\"", "refId": "A" }],
+          "targets": [{ "expr": "{namespace=\"collector\"} | json | __error__=\"\" | context_correlationId=\"$correlationId\"", "refId": "A" }],
           "datasource": { "type": "loki", "uid": "loki" }
         }
       ]
