@@ -88,6 +88,11 @@ spec:
                 secretKeyRef:
                   name: backend-secrets
                   key: FRAUD_DETECTION_API_KEY
+            - name: INTERNAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: INTERNAL_API_KEY
             # --- Config (non-sensible) ---
             - name: REDIS_HOST
               value: redis

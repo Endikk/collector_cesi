@@ -13,7 +13,7 @@ import { AdminGuard } from './admin.guard';
 @Controller('admin')
 @UseGuards(AdminGuard)
 export class AdminController {
-  constructor(private readonly adminService: AdminService) {}
+  constructor(private readonly adminService: AdminService) { }
 
   @Get('stats')
   getStats() {
@@ -55,12 +55,6 @@ export class AdminController {
   @Delete('items/:id')
   deleteItem(@Param('id') id: string) {
     return this.adminService.deleteItem(id);
-  }
-
-  // Transactions
-  @Get('transactions')
-  getTransactions() {
-    return this.adminService.getTransactions();
   }
 
   // Reports & Moderation

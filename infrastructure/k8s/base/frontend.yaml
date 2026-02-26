@@ -57,6 +57,11 @@ spec:
               value: "http://localhost:4000"
             - name: NEXTAUTH_URL
               value: "https://collector.local"
+            - name: INTERNAL_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-secrets
+                  key: INTERNAL_API_KEY
             - name: NODE_TLS_REJECT_UNAUTHORIZED
               value: "0"
             # --- Redis ---

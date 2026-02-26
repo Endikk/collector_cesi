@@ -183,13 +183,14 @@ export function AdminDashboard() {
 
     const loadData = async () => {
         setLoading(true);
-        const [statsResult, usersResult, categoriesResult, itemsResult, messagesResult, conversationsResult] = await Promise.all([
+        const [statsResult, usersResult, categoriesResult, itemsResult, messagesResult, conversationsResult, transactionsResult] = await Promise.all([
             getAdminStats(),
             getAdminUsers(),
             getAdminCategories(),
             getAdminItems(),
             getAdminMessages(),
             getAdminConversations(),
+            getAdminTransactions(),
         ]);
 
         if (statsResult.success) setStats(statsResult.stats as AdminStats);
@@ -198,6 +199,7 @@ export function AdminDashboard() {
         if (itemsResult.success) setItems(itemsResult.items as AdminItem[]);
         if (messagesResult.success) setMessages(messagesResult.messages as AdminMessage[]);
         if (conversationsResult.success) setConversations(conversationsResult.conversations as AdminConversation[]);
+        if (transactionsResult.success) setTransactions(transactionsResult.transactions as AdminTransaction[]);
         setLoading(false);
     };
 
