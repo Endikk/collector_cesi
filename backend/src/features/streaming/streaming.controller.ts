@@ -1,7 +1,9 @@
-import { Controller, Post, Body, Param } from '@nestjs/common';
+import { Controller, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { StreamingService } from './streaming.service';
+import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 
 @Controller('streaming')
+@UseGuards(JwtAuthGuard)
 export class StreamingController {
   constructor(private readonly streamingService: StreamingService) {}
 

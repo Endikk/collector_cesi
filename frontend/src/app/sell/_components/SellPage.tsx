@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Loader2, AlertCircle, X } from "lucide-react";
+import { ImagePlus, Loader2, AlertCircle, X, Info } from "lucide-react";
 import BlurFade from "@/components/ui/blur-fade";
 import { createItem, getCategories, State } from "@/lib/actions/items";
 import { useFormStatus } from "react-dom";
@@ -46,6 +46,7 @@ export function SellPage() {
     const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
     const [imageBase64, setImageBase64] = useState("");
     const [imageFileName, setImageFileName] = useState("");
+    const [priceValue, setPriceValue] = useState("");
 
     // Server Action State
     const initialState: State = { message: null, errors: {} };
@@ -164,12 +165,26 @@ export function SellPage() {
                                     step="0.01"
                                     required
                                     className="bg-background/50"
+                                    value={priceValue}
+                                    onChange={(e) => setPriceValue(e.target.value)}
                                 />
                                 {state.errors?.price && (
                                     <p className="text-sm text-red-500">
                                         {state.errors.price.join(", ")}
                                     </p>
                                 )}
+                                <div className="flex items-start gap-2 bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-400 p-3 rounded-md text-sm">
+                                    <Info className="h-4 w-4 mt-0.5 shrink-0" />
+                                    <div>
+                                        <p>Collector prélève une commission de 5% sur chaque vente.</p>
+                                        {priceValue && parseFloat(priceValue) > 0 && (
+                                            <p className="font-medium mt-1">
+                                                Pour un prix de {parseFloat(priceValue).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}, vous recevrez{' '}
+                                                {(parseFloat(priceValue) * 0.95).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} après commission.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Image file upload */}

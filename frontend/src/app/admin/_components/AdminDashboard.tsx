@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trash2, Plus, Users, Package, TrendingUp, FolderTree, AlertCircle, MessageSquare } from 'lucide-react';
+import { Trash2, Plus, Users, Package, TrendingUp, FolderTree, AlertCircle, MessageSquare, Receipt } from 'lucide-react';
 import { toast } from 'sonner';
 import {
     getAdminStats,
@@ -23,6 +23,7 @@ import {
     getAdminConversations,
     deleteMessage,
     deleteConversation,
+    getAdminTransactions,
 } from '@/app/actions/admin';
 
 interface AdminStats {
@@ -91,6 +92,17 @@ interface AdminMessage {
     };
 }
 
+interface AdminTransaction {
+    id: string;
+    amount: number;
+    commission: number;
+    status: string;
+    createdAt: string;
+    buyer: { id: string; name: string | null; email: string };
+    seller: { id: string; name: string | null; email: string };
+    item: { id: string; title: string };
+}
+
 interface AdminConversation {
     id: string;
     createdAt: string;
@@ -118,8 +130,10 @@ export function AdminDashboard() {
     const [items, setItems] = useState<AdminItem[]>([]);
     const [messages, setMessages] = useState<AdminMessage[]>([]);
     const [conversations, setConversations] = useState<AdminConversation[]>([]);
+    const [transactions, setTransactions] = useState<AdminTransaction[]>([]);
     const [newCategoryName, setNewCategoryName] = useState('');
     const [loading, setLoading] = useState(true);
+    const [loadError, setLoadError] = useState<string | null>(null);
 
     useEffect(() => {
         if (status === 'unauthenticated') {
@@ -136,22 +150,29 @@ export function AdminDashboard() {
             let mounted = true;
             const load = async () => {
                 setLoading(true);
-                const [statsResult, usersResult, categoriesResult, itemsResult, messagesResult, conversationsResult] = await Promise.all([
+                setLoadError(null);
+                const [statsResult, usersResult, categoriesResult, itemsResult, messagesResult, conversationsResult, transactionsResult] = await Promise.all([
                     getAdminStats(),
                     getAdminUsers(),
                     getAdminCategories(),
                     getAdminItems(),
                     getAdminMessages(),
                     getAdminConversations(),
+                    getAdminTransactions(),
                 ]);
 
                 if (mounted) {
-                    if (statsResult.success) setStats(statsResult.stats as AdminStats);
+                    if (statsResult.success) {
+                        setStats(statsResult.stats as AdminStats);
+                    } else {
+                        setLoadError((statsResult as { error?: string }).error || 'Erreur inconnue lors du chargement des stats');
+                    }
                     if (usersResult.success) setUsers(usersResult.users as AdminUser[]);
                     if (categoriesResult.success) setCategories(categoriesResult.categories as Category[]);
                     if (itemsResult.success) setItems(itemsResult.items as AdminItem[]);
                     if (messagesResult.success) setMessages(messagesResult.messages as AdminMessage[]);
                     if (conversationsResult.success) setConversations(conversationsResult.conversations as AdminConversation[]);
+                    if (transactionsResult.success) setTransactions(transactionsResult.transactions as AdminTransaction[]);
                     setLoading(false);
                 }
             };
@@ -162,13 +183,15 @@ export function AdminDashboard() {
 
     const loadData = async () => {
         setLoading(true);
-        const [statsResult, usersResult, categoriesResult, itemsResult, messagesResult, conversationsResult] = await Promise.all([
+        setLoadError(null);
+        const [statsResult, usersResult, categoriesResult, itemsResult, messagesResult, conversationsResult, transactionsResult] = await Promise.all([
             getAdminStats(),
             getAdminUsers(),
             getAdminCategories(),
             getAdminItems(),
             getAdminMessages(),
             getAdminConversations(),
+            getAdminTransactions(),
         ]);
 
         if (statsResult.success) setStats(statsResult.stats as AdminStats);
@@ -177,6 +200,7 @@ export function AdminDashboard() {
         if (itemsResult.success) setItems(itemsResult.items as AdminItem[]);
         if (messagesResult.success) setMessages(messagesResult.messages as AdminMessage[]);
         if (conversationsResult.success) setConversations(conversationsResult.conversations as AdminConversation[]);
+        if (transactionsResult.success) setTransactions(transactionsResult.transactions as AdminTransaction[]);
         setLoading(false);
     };
 
@@ -246,7 +270,7 @@ export function AdminDashboard() {
     }
 
     if (!stats) {
-        return <div className="p-8">Erreur de chargement</div>;
+        return <div className="p-8 text-red-500">Erreur de chargement : {loadError || 'Stats non disponibles'}</div>;
     }
 
     return (
@@ -303,7 +327,7 @@ export function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-600">
-                            {stats.totalCommission.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                            {(stats.totalCommission ?? 0).toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
                         </div>
                     </CardContent>
                 </Card>
@@ -315,6 +339,7 @@ export function AdminDashboard() {
                     <TabsTrigger value="categories">Catégories</TabsTrigger>
                     <TabsTrigger value="items">Articles</TabsTrigger>
                     <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+                    <TabsTrigger value="transactions">Transactions</TabsTrigger>
                     <TabsTrigger value="moderation">Modération Chat</TabsTrigger>
                 </TabsList>
 
@@ -403,11 +428,10 @@ export function AdminDashboard() {
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-2">
-                                            <span className={`text-xs px-2 py-1 rounded ${
-                                                item.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
-                                                item.status === 'SOLD' ? 'bg-gray-100 text-gray-700' :
-                                                'bg-yellow-100 text-yellow-700'
-                                            }`}>
+                                            <span className={`text-xs px-2 py-1 rounded ${item.status === 'AVAILABLE' ? 'bg-green-100 text-green-700' :
+                                                    item.status === 'SOLD' ? 'bg-gray-100 text-gray-700' :
+                                                        'bg-yellow-100 text-yellow-700'
+                                                }`}>
                                                 {item.status}
                                             </span>
                                             <Button
@@ -444,10 +468,9 @@ export function AdminDashboard() {
                                         <div className="flex-1">
                                             <div className="flex items-center gap-2">
                                                 <span className="font-medium">{user.name || 'Sans nom'}</span>
-                                                <span className={`text-xs px-2 py-0.5 rounded ${
-                                                    user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
-                                                    'bg-gray-100 text-gray-700'
-                                                }`}>
+                                                <span className={`text-xs px-2 py-0.5 rounded ${user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
+                                                        'bg-gray-100 text-gray-700'
+                                                    }`}>
                                                     {user.role}
                                                 </span>
                                             </div>
@@ -474,6 +497,62 @@ export function AdminDashboard() {
                                     </div>
                                 ))}
                             </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Transactions Tab */}
+                <TabsContent value="transactions" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Receipt className="h-5 w-5" />
+                                Transactions & Commissions
+                            </CardTitle>
+                            <p className="text-sm text-muted-foreground">
+                                Historique des transactions avec le détail des commissions (5%)
+                            </p>
+                        </CardHeader>
+                        <CardContent>
+                            {transactions.length === 0 ? (
+                                <p className="text-sm text-muted-foreground text-center py-8">Aucune transaction pour le moment.</p>
+                            ) : (
+                                <div className="space-y-3">
+                                    {transactions.map((tx) => (
+                                        <div
+                                            key={tx.id}
+                                            className="flex items-center justify-between p-3 border rounded-lg"
+                                        >
+                                            <div className="flex-1 min-w-0">
+                                                <div className="font-medium truncate">{tx.item.title}</div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {tx.buyer.name || tx.buyer.email} → {tx.seller.name || tx.seller.email}
+                                                </div>
+                                                <div className="text-xs text-muted-foreground mt-1">
+                                                    {new Date(tx.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-4 text-right">
+                                                <div>
+                                                    <div className="text-sm font-medium">
+                                                        {tx.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}
+                                                    </div>
+                                                    <div className="text-xs font-medium text-green-600">
+                                                        +{tx.commission.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })} commission
+                                                    </div>
+                                                </div>
+                                                <span className={`text-xs px-2 py-1 rounded ${tx.status === 'COMPLETED' ? 'bg-green-100 text-green-700' :
+                                                        tx.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                                            'bg-red-100 text-red-700'
+                                                    }`}>
+                                                    {tx.status === 'COMPLETED' ? 'Complétée' :
+                                                        tx.status === 'PENDING' ? 'En attente' : 'Annulée'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </TabsContent>

@@ -3,6 +3,11 @@
 # ==============================================================================
 .DS_Store
 *.pem
+
+# TLS Certificates (auto-générés via : make certs  ou  bash scripts/infra/gen-certs.sh)
+certs/
+frontend/secrets/
+backend/secrets/
 .env
 .env*.local
 .env*.bak

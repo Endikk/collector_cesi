@@ -24,8 +24,13 @@ export class PaymentController {
    */
   @UseGuards(JwtAuthGuard)
   @Post('create-intent')
-  async createPaymentIntent(@Body() body: CreatePaymentIntentDto) {
-    return this.paymentService.createPaymentIntent(body.itemId, body.buyerId);
+  async createPaymentIntent(
+    @Body() body: CreatePaymentIntentDto,
+    @Req() req: Request & { user?: { id: string } },
+  ) {
+    // Use authenticated user's ID instead of client-supplied buyerId to prevent spoofing
+    const buyerId = req.user?.id || body.buyerId;
+    return this.paymentService.createPaymentIntent(body.itemId, buyerId);
   }
 
   /**

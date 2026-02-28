@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -29,7 +30,18 @@ export function RegisterPage() {
             });
 
             if (res.ok) {
-                router.push("/auth/login");
+                // Auto-login after successful registration
+                const result = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+
+                if (result?.ok) {
+                    router.push("/");
+                } else {
+                    router.push("/auth/login");
+                }
             } else {
                 const data = await res.json();
                 setError(data.message || "Registration failed");

@@ -64,7 +64,7 @@ export function UtilityBar() {
                                     <DropdownMenuSeparator className="my-2" />
 
                                     <button
-                                        onClick={() => signOut()}
+                                        onClick={() => signOut({ callbackUrl: window.location.origin })}
                                         className="text-left w-full hover:underline hover:text-[#3665f3] transition-colors"
                                     >
                                         {t('utilityBar.signOut')}

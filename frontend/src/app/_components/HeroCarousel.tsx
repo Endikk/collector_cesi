@@ -41,7 +41,7 @@ export function HeroCarousel({ items = [] }: HeroCarouselProps) {
 
             <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
                 {displayItems.map((slide) => (
-                    <div key={slide.id} className="min-w-[280px] md:min-w-[300px] group cursor-pointer">
+                    <Link key={slide.id} href={`/items/${slide.id}`} className="min-w-[280px] md:min-w-[300px] group cursor-pointer block">
                         <div className="relative aspect-[4/5] rounded-xl overflow-hidden mb-3 bg-muted">
                             {slide.image && (
                                 slide.image.startsWith("data:") ? (
@@ -86,7 +86,7 @@ export function HeroCarousel({ items = [] }: HeroCarouselProps) {
                         <h3 className="font-medium text-sm leading-tight group-hover:underline line-clamp-2">
                             {slide.title}
                         </h3>
-                    </div>
+                    </Link>
                 ))}
             </div>
         </section>

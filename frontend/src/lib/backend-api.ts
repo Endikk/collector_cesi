@@ -13,10 +13,17 @@ const getBackendUrl = () => {
 const BACKEND_URL = getBackendUrl();
 
 export async function fetchBackend<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
+    // Include internal API key for server-to-server calls (Next.js server actions → backend)
+    const internalHeaders: Record<string, string> = {};
+    if (typeof window === 'undefined' && process.env.INTERNAL_API_KEY) {
+        internalHeaders['x-internal-api-key'] = process.env.INTERNAL_API_KEY;
+    }
+
     const res = await fetch(`${BACKEND_URL}${endpoint}`, {
         ...options,
         headers: {
             'Content-Type': 'application/json',
+            ...internalHeaders,
             ...options.headers,
         },
     });

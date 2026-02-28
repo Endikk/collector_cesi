@@ -18,6 +18,27 @@ Une plateforme marketplace moderne et sécurisée pour les collectionneurs.
 7. [Tests & Qualité](#tests--qualité)
 8. [Documentation](#documentation)
 9. [Licence](#licence)
+10. [Évaluation du Projet](#évaluation-du-projet)
+
+---
+
+## 🎓 Évaluation du Projet
+
+Ce projet a obtenu la note de **19/20** lors de son évaluation. Le détail des points obtenus est présenté ci-dessous :
+
+| Compétence évaluée | Critères | Note |
+| :--- | :--- | :---: |
+| **Maintenir et développer son expertise en développement d’applications** | Le protocole d’expérimentation en bac à sable est présenté. Il comprend les technologies et plateformes testées ainsi que leurs interactions. Les difficultés rencontrées et les résultats obtenus sont présentés et permettent de valider l’adoption des technologies. | **2** |
+| | L’implémentation technique du POC valide la faisabilité des points clés de l’architecture de la solution applicative à développer (découpage applicatif, communication interservice, sécurité, hébergement, orchestration, etc.), elle est documentée. | **4** |
+| | La fonctionnalité métier développée au niveau du POC répond aux besoins fonctionnels exprimés par la maîtrise d’ouvrage. | **1** |
+| **Piloter le développement et le déploiement d’applications** | Le processus de livraison continue est schématisé. Il est conforme aux exigences de développement et de mise en production. Le POC intègre la plateforme de livraison continue conformément au processus décrit. | **3** |
+| | Les compétences de l’équipe sont recensées. Les expertises techniques à acquérir sont identifiées. Au moins une action de formation est proposée. | **1** |
+| | Le POC s’exécute dans un environnement managé. La disponibilité et la montée en charge de l’application sont démontrées. | **2** |
+| **Élaborer le processus d’assurance qualité logicielle** | Au moins 4 indicateurs sont définis. Ils servent les objectifs de qualité logicielle (fonctionnalité, performance, maintenabilité, fiabilité). Leur mesure met en évidence des axes d’amélioration pouvant réduire la dette technique. | **1** |
+| | Le processus de test est formalisé. Il présente les différents types de tests, les outils de tests associés (unitaires, intégration, non régression, performances, fonctionnels, conformité réglementaire, etc.) et les parties prenantes. Au moins deux types de tests sont appliqués au POC. Ils sont exécutés avec succès. | **2** |
+| | Le plan de remédiation priorise les actions pour réduire les risques de sécurité critiques du parc applicatif du SI. Le POC intègre au moins deux bonnes pratiques pour sécuriser l’application. | **2** |
+| **Présentation orale** | Les schémas et tableaux sont lisibles et adaptés à une présentation orale. Ils sont utilisés pour supporter la prestation orale. | **1** |
+| | La prestation orale est fluide et dynamique. Elle prend en compte l'auditoire. Le vocabulaire est précis et adapté. Elle est structurée. | **0** |
 
 ---
 
@@ -202,4 +223,5 @@ Distribué sous licence MIT. Voir `LICENSE` pour plus d'informations.
 
 ---
 
-**Développé pour Projet École d'Ingénieurs CESI**
+
+**Développé dans le cadre du cursus MAALSI au CESI**
